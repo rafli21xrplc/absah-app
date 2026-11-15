@@ -1,0 +1,39 @@
+/* Absah design tokens. Light by default; dark follows the OS. */
+:root {
+  --absah-bg: #f7f8f6;
+  --absah-surface: #ffffff;
+  --absah-text: #17201b;
+  --absah-muted: #5b6660;
+  --absah-border: #dfe3df;
+  --absah-primary: #0f7a4f;
+  --absah-primary-text: #ffffff;
+  --absah-hadir: #0f7a4f;
+  --absah-telat: #b26b00;
+  --absah-alpa: #b42318;
+  --absah-radius: 10px;
+  --absah-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --absah-bg: #101512;
+    --absah-surface: #181f1b;
+    --absah-text: #e8ede9;
+    --absah-muted: #9aa69f;
+    --absah-border: #2a332e;
+    --absah-primary: #3fbf86;
+    --absah-primary-text: #08130d;
+    --absah-hadir: #3fbf86;
+    --absah-telat: #e2a33b;
+    --absah-alpa: #f07167;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--absah-bg);
+  color: var(--absah-text);
+  font-family: var(--absah-font);
+  font-size: 16px;
+  line-height: 1.5;
+}

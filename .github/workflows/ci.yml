@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      # @absah/contracts and @absah/capabilities come from the public absah-api repo,
+      # pinned to a commit by pnpm-lock.yaml.
+      - run: pnpm install --frozen-lockfile
+      - name: Lint, typecheck, test
+        run: pnpm turbo lint typecheck test
+      - name: Build web and kiosk
+        run: pnpm build

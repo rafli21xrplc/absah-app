@@ -1,0 +1,16 @@
+.screen {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 16px;
+}
+.title {
+  font-size: 40px;
+  margin: 0 0 8px;
+}
+.hint {
+  color: var(--absah-muted);
+  font-size: 20px;
+  margin: 0;
+}

@@ -1,0 +1,22 @@
+.main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+.eyebrow {
+  color: var(--absah-muted);
+  font-size: 14px;
+  margin: 0 0 4px;
+}
+.title {
+  font-size: 28px;
+  line-height: 1.2;
+  margin: 0 0 12px;
+}
+.card {
+  background: var(--absah-surface);
+  border: 1px solid var(--absah-border);
+  border-radius: var(--absah-radius);
+  padding: 16px;
+  margin-top: 16px;
+}
