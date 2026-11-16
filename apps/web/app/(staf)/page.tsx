@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import { signOut } from '@/lib/auth';
 import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
+import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
 import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
@@ -62,7 +63,12 @@ export default function StafHome() {
       </p>
       <h1 className={styles.title}>Halo, {me.user.name}</h1>
       <nav className={styles.list} aria-label="Menu">
-        <span className={styles.card}>Presensi</span>
+        <Link className={styles.card} href="/hari-ini">
+          Presensi hari ini
+        </Link>
+        <Link className={styles.card} href="/koreksi">
+          {hasRole(...CORRECTION_DECIDERS) ? 'Koreksi presensi' : 'Koreksi saya'}
+        </Link>
         {hasRole(...STUDENT_READERS) && (
           <>
             <Link className={styles.card} href="/siswa">

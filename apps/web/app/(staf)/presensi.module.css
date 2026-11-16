@@ -1,0 +1,129 @@
+.segment {
+  display: inline-flex;
+  margin: 8px 0 16px;
+  border: 1px solid var(--absah-border);
+  border-radius: var(--absah-radius);
+  overflow: hidden;
+}
+.segment button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: none;
+  background: var(--absah-surface);
+  color: var(--absah-text);
+  font: inherit;
+  cursor: pointer;
+}
+.segment button[aria-pressed='true'] {
+  background: var(--absah-primary);
+  color: var(--absah-primary-text);
+  font-weight: 600;
+}
+.sessions {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sessionCard {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--absah-border);
+  border-radius: var(--absah-radius);
+  background: var(--absah-surface);
+  color: var(--absah-text);
+  text-decoration: none;
+}
+.sessionCard > :last-child {
+  justify-self: start;
+}
+.sessionTime {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--absah-muted);
+}
+.sessionTitle {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Session screen: built for one thumb. The send bar sits at the bottom of the screen. */
+.students {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 96px;
+  padding: 0;
+  list-style: none;
+}
+.student {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--absah-border);
+  border-radius: var(--absah-radius);
+  background: var(--absah-surface);
+}
+.studentName {
+  font-weight: 600;
+}
+.choices {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+.choice {
+  min-height: 44px;
+  border: 1px solid var(--absah-border);
+  border-radius: var(--absah-radius);
+  background: transparent;
+  color: var(--absah-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.choice:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.choice[aria-pressed='true'] {
+  border-color: var(--absah-primary);
+  background: var(--absah-primary);
+  color: var(--absah-primary-text);
+}
+.choice[data-status='A'][aria-pressed='true'] {
+  border-color: var(--absah-alpa);
+  background: var(--absah-alpa);
+}
+.choice[data-status='T'][aria-pressed='true'] {
+  border-color: var(--absah-telat);
+  background: var(--absah-telat);
+}
+.sendBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  gap: 6px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--absah-border);
+  background: var(--absah-bg);
+}
+.sendBar > button {
+  width: 100%;
+}
+.sendBar p {
+  margin: 0;
+  font-size: 14px;
+}
+.reason {
+  min-height: 80px;
+  padding: 10px 12px;
+  border: 1px solid var(--absah-border);
+  border-radius: var(--absah-radius);
+  background: var(--absah-surface);
+  color: var(--absah-text);
+  font: inherit;
+}
