@@ -114,13 +114,21 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   number, first name, attempts and a plain-words reason (errorLabel; the raw code stays visible).
 - Never show or log full phone numbers; the API already masks them.
 
-## Action links (apps/web/app/(portal)/t, ORT-01)
+## Action links and portal (apps/web/app/(portal), ORT-01/02)
 - /t: the action link page from a WhatsApp message, no login. The token arrives in the #fragment, is
   kept in sessionStorage for reloads (tab only) and removed from the address bar; calls send it as
   api(..., { linkToken }) -> `Authorization: Link <token>`, cookies omitted. 401 unknown, 410
   LINK_EXPIRED. Shows first name only; one izin per link (409 link_used); "Tampilkan kartu" ->
   POST /links/card, 409 bound_elsewhere -> "Pindahkan kartu ke HP ini" (replace, after a confirm).
+- /portal (PWA siswa; parents' children too): WorkspaceProvider with signInPath /masuk/hp (WhatsApp
+  OTP, lib/auth.ts sendPhoneOtp/verifyPhoneOtp, normalizePhone). Cards from GET /cards/mine; a card is
+  bound once per phone (POST /cards/devices) and its day keys kept in localStorage
+  (absah.card.<studentId>, lib/card.ts) so the QR works offline for a week; 404 on refresh = another
+  phone took it. History from GET /portal/attendance.
 - CardQr redraws the QR once per 30-second window from the keys (makeCardToken); no animation.
+- PWA: app/manifest.ts (start_url /portal, maskable icon), public/icons (generated PNGs), apple meta
+  in the (portal) layout, public/portal-sw.js registered in production only: handles /portal, /t,
+  /masuk/hp and static assets (network first, cache offline); /api and staff pages are never cached.
 - Staff set WhatsApp numbers on /siswa/kontak?id=<studentId> (PUT /students/{id}/contacts; admin,
   operator, the wali kelas): guardians (messages, links) and the student's login. Numbers masked;
   an empty field keeps the number.
