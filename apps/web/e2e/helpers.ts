@@ -100,3 +100,17 @@ export function cardToken(card: GateFixture['cards'][number], ms: number): strin
   const mac = createHmac('sha256', Buffer.from(card.deviceKey, 'base64url')).update(`${card.cardId}:${window}`).digest().subarray(0, 16);
   return ['A1', Buffer.concat([uuidBytes(card.cardId), uuidBytes(card.deviceId)]).toString('base64url'), window.toString(36), mac.toString('base64url')].join('.');
 }
+
+/**
+ * The action link of the school's newest WhatsApp message (absah-api `notify:last-link`, dev only):
+ * what the parent would tap. The fake sender keeps messages inside the worker process.
+ */
+export function lastActionLink(schoolId: string): string | null {
+  const out = execFileSync('pnpm', ['-s', 'notify:last-link', '--school', schoolId], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    encoding: 'utf8',
+  });
+  const result = JSON.parse(out.trim().split('\n').at(-1) ?? 'null') as { link: string | null } | null;
+  return result?.link ?? null;
+}

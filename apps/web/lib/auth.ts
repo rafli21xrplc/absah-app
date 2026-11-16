@@ -37,6 +37,26 @@ export async function enableTwoFactor(password: string): Promise<{ secret: strin
   return { secret, uri: body.totpURI, backupCodes: body.backupCodes ?? [] };
 }
 
+/** WhatsApp OTP (siswa, orang tua). The server answers the same whether or not the number has an account. */
+export async function sendPhoneOtp(phoneNumber: string): Promise<void> {
+  const res = await post('/phone-number/send-otp', { phoneNumber });
+  if (!res.ok) throw failed(res.status, 'Kode tidak bisa dikirim. Periksa nomor lalu coba lagi.');
+}
+
+export async function verifyPhoneOtp(phoneNumber: string, code: string): Promise<void> {
+  const res = await post('/phone-number/verify', { phoneNumber, code });
+  if (!res.ok) throw failed(res.status, 'Kode salah atau sudah kedaluwarsa. Minta kode baru.');
+}
+
+/** "0812-3456-7890", "62812..." or "+62 812..." -> "+628123456789"; other input is returned trimmed. */
+export function normalizePhone(input: string): string {
+  const digits = input.replace(/[^\d+]/g, '');
+  if (digits.startsWith('+')) return digits;
+  if (digits.startsWith('62')) return `+${digits}`;
+  if (digits.startsWith('0')) return `+62${digits.slice(1)}`;
+  return digits;
+}
+
 export async function signOut(): Promise<void> {
   await post('/sign-out', {});
 }
