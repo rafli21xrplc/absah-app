@@ -19,6 +19,8 @@ test('Jadwal: jam pelajaran, wali kelas, lesson with clash check, Excel template
   await page.getByRole('tab', { name: 'Jam pelajaran' }).click();
   await page.getByRole('button', { name: 'Isi', exact: true }).click();
   await expect(page.getByLabel('Jumat jam 8 selesai')).toHaveValue('12:20');
+  // No sideways scrolling on phones.
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Simpan jam pelajaran' }).click();
   await expect(page.getByText('Jam pelajaran tersimpan.')).toBeVisible();
 

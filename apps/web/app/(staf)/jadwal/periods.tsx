@@ -129,9 +129,11 @@ export function PeriodsEditor({ initial, canEdit, onSaved }: { initial: Schedule
         </p>
       )}
       {canEdit && (
-        <Button type="button" disabled={busy} onClick={() => void save()}>
-          Simpan jam pelajaran
-        </Button>
+        <div className={page.actions}>
+          <Button type="button" disabled={busy} onClick={() => void save()}>
+            Simpan jam pelajaran
+          </Button>
+        </div>
       )}
     </section>
   );
