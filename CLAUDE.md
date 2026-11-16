@@ -77,6 +77,15 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - Roles (lib/schedule-access.ts): page for admin/operator/kepsek/wakasek (it lists rombel);
   editing for admin/operator/wakasek. attendance.mode = 'daily' opens on Wali kelas; the grid is optional.
 
+## Attendance pages (apps/web/app/(staf)/hari-ini, sesi/[id], koreksi)
+- Hari ini: GET /attendance/today?scope=mine|all (all for admin/operator/kepsek/wakasek/piket).
+- Session screen is built for one thumb: every student starts Hadir, five 44px choices per row,
+  fixed rows (izin, UKS, koreksi) shown read-only, a fixed send bar at the bottom. Submit sends
+  exceptions only, one Idempotency-Key per send (reused on retry, reset when an answer changes).
+- Locked sessions: "Ajukan koreksi" picks changes + reason -> POST /sessions/{id}/corrections.
+  /koreksi: wakasek and kepsek approve or reject; others see their own requests.
+- E2E creates today's sessions with absah-api `attendance:generate --force` (helpers.generateSessions).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and

@@ -4,15 +4,24 @@ import { createHmac, randomUUID } from 'node:crypto';
 import { API_ENV, API_SERVER_DIR } from './env';
 
 /** Creates a school with an admin invitation through absah-api's ops CLI (school:create). */
-export function createSchool(name: string): { schoolId: string; inviteUrl: string; email: string } {
+export function createSchool(name: string, level?: 'sd' | 'smp' | 'sma' | 'smk'): { schoolId: string; inviteUrl: string; email: string } {
   const email = `e2e-${randomUUID()}@test.local`;
   const out = execFileSync(
     'pnpm',
-    ['-s', 'school:create', '--name', name, '--admin-name', 'Admin E2E', '--admin-email', email, '--json'],
+    ['-s', 'school:create', '--name', name, '--admin-name', 'Admin E2E', '--admin-email', email, '--json', ...(level ? ['--level', level] : [])],
     { cwd: API_SERVER_DIR, env: { ...process.env, ...API_ENV }, encoding: 'utf8' },
   );
   const result = JSON.parse(out.trim().split('\n').at(-1) ?? '{}') as { schoolId: string; inviteUrl: string };
   return { ...result, email };
+}
+
+/** Today's attendance sessions now, instead of waiting for the 05.00 job (forced: works on weekends). */
+export function generateSessions(schoolId: string): void {
+  execFileSync('pnpm', ['-s', 'attendance:generate', '--school', schoolId, '--force', '--json'], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    encoding: 'utf8',
+  });
 }
 
 function base32Decode(input: string): Buffer {
