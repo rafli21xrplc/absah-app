@@ -108,6 +108,12 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   text; list of kiosks with online/offline, last heartbeat, queue size and version, refreshed every
   30 s; "Cabut" revokes after a confirm.
 
+## Notifications page (apps/web/app/(staf)/notifikasi)
+- Menu "Notifikasi WhatsApp" for NOTIFY_VIEWERS (admin, operator; lib/notify.ts). GET
+  /notifications/overview: today's counts per status, failures of the last 7 days with the masked
+  number, first name, attempts and a plain-words reason (errorLabel; the raw code stays visible).
+- Never show or log full phone numbers; the API already masks them.
+
 ## Kiosk app (apps/kiosk, GRB-02/03)
 - One page, three phases (lib/use-kiosk.ts): loading -> unpaired (PairScreen: one-time code typed,
   scanned with the camera or a USB scanner; one Idempotency-Key per code) -> ready (ScanScreen).
