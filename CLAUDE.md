@@ -43,6 +43,11 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - Works on cheap Android phones: small bundles, no heavy animation, large text and 44px tap targets.
 - Colors only through tokens in @absah/ui/tokens.css (light + dark).
 
+## Capabilities in the web
+- Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
+  <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
+  <IfCap name="bool.key"> to hide menus and screens. Hiding is cosmetic; the API enforces requireCap.
+
 ## Working style
 - Before writing code, post a short plan: files to add/change, endpoints used, tests.
 - Keep PRs under ~600 changed lines excluding generated files; split otherwise.
