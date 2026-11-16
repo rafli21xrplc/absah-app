@@ -72,3 +72,31 @@ export async function onboardAdmin(page: Page, inviteUrl: string, email: string)
   await expect(page).toHaveURL(/\/setup$/);
 }
 
+
+export interface GateFixture {
+  timezone: string;
+  schoolDate: string;
+  cards: { cardId: string; deviceId: string; deviceKey: string }[];
+}
+
+/**
+ * Bound test phones for every active student (absah-api `gate:load-fixture`, dev only), with today's
+ * device keys: what a real phone receives when its holder activates the card.
+ */
+export function gateFixture(schoolId: string): GateFixture {
+  const out = execFileSync('pnpm', ['-s', 'gate:load-fixture', '--school', schoolId], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    encoding: 'utf8',
+  });
+  return JSON.parse(out.trim().split('\n').at(-1) ?? '{}') as GateFixture;
+}
+
+const uuidBytes = (uuid: string) => Buffer.from(uuid.replace(/-/g, ''), 'hex');
+
+/** The QR text of a card at `ms`, as the phone makes it (@absah/contracts gate/card-token.ts, format A1). */
+export function cardToken(card: GateFixture['cards'][number], ms: number): string {
+  const window = Math.floor(ms / 1000 / 30);
+  const mac = createHmac('sha256', Buffer.from(card.deviceKey, 'base64url')).update(`${card.cardId}:${window}`).digest().subarray(0, 16);
+  return ['A1', Buffer.concat([uuidBytes(card.cardId), uuidBytes(card.deviceId)]).toString('base64url'), window.toString(36), mac.toString('base64url')].join('.');
+}
