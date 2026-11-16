@@ -1,29 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
-import { createSchool, randomDigits, totp } from './helpers';
-
-const PASSWORD = 'kata-sandi-e2e-123';
-
-/** Invitation -> password -> sign in -> TOTP enrollment -> lands in the wizard. */
-async function onboardAdmin(page: Page, inviteUrl: string, email: string) {
-  await page.goto(inviteUrl);
-  await page.getByLabel('Buat kata sandi').fill(PASSWORD);
-  await page.getByRole('button', { name: 'Terima undangan' }).click();
-  await page.getByRole('link', { name: 'Masuk sekarang' }).click();
-
-  await page.getByRole('textbox', { name: 'Email' }).fill(email);
-  await page.getByLabel('Kata sandi').fill(PASSWORD);
-  await page.getByRole('button', { name: 'Masuk' }).click();
-
-  // Admins must enroll TOTP before acting in a school.
-  await expect(page).toHaveURL(/\/keamanan\/dua-langkah$/);
-  await page.getByLabel('Kata sandi Anda').fill(PASSWORD);
-  await page.getByRole('button', { name: 'Lanjut' }).click();
-  const secret = (await page.getByTestId('totp-secret').textContent())?.trim() ?? '';
-  await page.getByLabel('Kode 6 angka dari aplikasi').fill(totp(secret));
-  await page.getByRole('button', { name: 'Aktifkan' }).click();
-
-  await expect(page).toHaveURL(/\/setup$/);
-}
+import { expect, test } from '@playwright/test';
+import { createSchool, onboardAdmin, randomDigits } from './helpers';
 
 type Level = 'sd' | 'smk';
 

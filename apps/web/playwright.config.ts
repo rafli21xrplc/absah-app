@@ -16,7 +16,8 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'pnpm exec tsx src/entrypoints/http.ts',
+      // HTTP and worker (outbox consumers parse imports).
+      command: 'pnpm exec concurrently -k -n http,worker "tsx src/entrypoints/http.ts" "tsx src/entrypoints/worker.ts"',
       cwd: API_SERVER_DIR,
       env: API_ENV,
       url: `http://localhost:${API_PORT}/api/v1/health`,

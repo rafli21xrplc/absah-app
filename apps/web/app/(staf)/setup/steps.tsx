@@ -274,7 +274,11 @@ export function ImportStep({ caps, onDone, onBack }: StepProps) {
     >
       <div className={styles.summary}>
         <strong>Import dari {source}</strong>
-        <p className={forms.hint}>Alur import tersedia di pembaruan berikutnya. Anda bisa melanjutkan setup sekarang.</p>
+        <p className={forms.hint}>
+          {source === 'Dapodik'
+            ? 'Lanjutkan setup dulu. Setelah selesai, buka menu Import Dapodik di beranda: unggah berkas ekspor, periksa pratinjau, lalu terapkan.'
+            : 'Import dari EMIS tersedia di pembaruan berikutnya. Anda bisa melanjutkan setup sekarang.'}
+        </p>
       </div>
     </Shell>
   );

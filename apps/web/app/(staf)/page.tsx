@@ -7,14 +7,16 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { api } from '@/lib/api';
 import { signOut } from '@/lib/auth';
-import { IfCap } from '@/lib/capabilities';
+import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
+import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../shell.module.css';
 
 export default function StafHome() {
   const router = useRouter();
-  const { me, schoolId, isAdmin, selectSchool } = useWorkspace();
+  const { me, schoolId, isAdmin, hasRole, selectSchool } = useWorkspace();
+  const dataSource = useCapability('data.source');
   const school = me.schools.find((s) => s.id === schoolId);
 
   // A new school's admin lands in the setup wizard until it is finished.
@@ -59,6 +61,21 @@ export default function StafHome() {
       <h1 className={styles.title}>Halo, {me.user.name}</h1>
       <nav className={styles.list} aria-label="Menu">
         <span className={styles.card}>Presensi</span>
+        {hasRole(...STUDENT_READERS) && (
+          <>
+            <Link className={styles.card} href="/siswa">
+              Data siswa
+            </Link>
+            <Link className={styles.card} href="/rombel">
+              Rombel
+            </Link>
+          </>
+        )}
+        {hasRole(...STUDENT_MANAGERS) && dataSource === 'dapodik' && (
+          <Link className={styles.card} href="/import">
+            Import Dapodik
+          </Link>
+        )}
         <IfCap name="gate.enabled">
           <span className={styles.card}>Gerbang</span>
         </IfCap>
