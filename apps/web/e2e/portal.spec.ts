@@ -57,6 +57,8 @@ test('Orang tua membuka tautan aksi, mengajukan izin, wali kelas menyetujui, sta
   const request = page.getByRole('listitem', { name: 'Izin ADITYA PRATAMA' });
   await expect(request).toContainText('tautan WhatsApp');
   await request.getByRole('button', { name: 'Setujui' }).click();
+  await expect(request).toHaveCount(0); // the list shows pending requests by default
+  await page.getByRole('button', { name: 'Semua' }).click();
   await expect(request).toContainText('Disetujui');
 
   // The worker applies the izin: the session shows Sakit, and so does the parent's page.
