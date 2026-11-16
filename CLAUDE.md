@@ -43,6 +43,16 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - Works on cheap Android phones: small bundles, no heavy animation, large text and 44px tap targets.
 - Colors only through tokens in @absah/ui/tokens.css (light + dark).
 
+## Session and workspace in the web
+- Staff pages live in app/(staf) under <WorkspaceProvider> (lib/workspace.tsx): it loads /me/context,
+  remembers the chosen school (localStorage, best effort), redirects to /masuk without a session and
+  to /keamanan/dua-langkah on TWO_FACTOR_REQUIRED. Account pages (masuk, undangan, keamanan) are in
+  app/(akun) and need no workspace.
+- Call the API with api(path, Contract, { method, body, schoolId, idempotencyKey }) from lib/api.ts.
+  Create one idempotency key per user action (newIdempotencyKey) and reuse it when retrying.
+- Better Auth endpoints go through lib/auth.ts. Invitation tokens are read from the #fragment, removed
+  from the address bar, and sent only in POST bodies.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
