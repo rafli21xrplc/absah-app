@@ -10,6 +10,7 @@ import { signOut } from '@/lib/auth';
 import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
+import { GATE_VIEWERS } from '@/lib/gate';
 import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
 import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
@@ -92,9 +93,13 @@ export default function StafHome() {
             Import Dapodik
           </Link>
         )}
-        <IfCap name="gate.enabled">
-          <span className={styles.card}>Gerbang</span>
-        </IfCap>
+        {hasRole(...GATE_VIEWERS) && (
+          <IfCap name="gate.enabled">
+            <Link className={styles.card} href="/gerbang">
+              Gerbang
+            </Link>
+          </IfCap>
+        )}
         <IfCap name="gate.pickup">
           <span className={styles.card}>Penjemputan</span>
         </IfCap>

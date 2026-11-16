@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import { API_ENV, API_PORT, API_SERVER_DIR, WEB_PORT, WEB_URL } from './e2e/env';
+import { API_ENV, API_PORT, API_SERVER_DIR, KIOSK_DIR, KIOSK_PORT, KIOSK_URL, WEB_PORT, WEB_URL } from './e2e/env';
 
 export default defineConfig({
   testDir: './e2e',
@@ -30,6 +30,14 @@ export default defineConfig({
       url: WEB_URL,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
+    },
+    {
+      // The kiosk as it ships: a static export (service worker included) talking to the API cross-origin.
+      command: `pnpm -C ${KIOSK_DIR} build && node e2e/static-server.ts ${KIOSK_DIR}/out ${KIOSK_PORT}`,
+      env: { NEXT_PUBLIC_API_URL: `http://localhost:${API_PORT}`, NEXT_TELEMETRY_DISABLED: '1' },
+      url: KIOSK_URL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 180_000,
     },
   ],
 });
