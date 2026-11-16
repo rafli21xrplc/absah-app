@@ -48,7 +48,7 @@ function storeSchool(id: string | null) {
  * Loads who the user is and the active school (GET /me/context), redirects to /masuk without a
  * session and to /keamanan/dua-langkah when the role needs TOTP. Feeds capabilities to <IfCap>.
  */
-export function WorkspaceProvider({ children }: { children: ReactNode }) {
+export function WorkspaceProvider({ children, signInPath = '/masuk' }: { children: ReactNode; signInPath?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const [state, setState] = useState<State>({ status: 'loading' });
@@ -70,13 +70,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         setState({ status: 'ready', me });
       } catch (err) {
         if (controller.signal.aborted) return;
-        if (err instanceof ApiError && err.status === 401) router.replace(`/masuk?lanjut=${encodeURIComponent(pathname)}`);
+        if (err instanceof ApiError && err.status === 401) router.replace(`${signInPath}?lanjut=${encodeURIComponent(pathname)}`);
         else if (err instanceof ApiError && err.code === 'TWO_FACTOR_REQUIRED') router.replace('/keamanan/dua-langkah');
         else setState({ status: 'error', message: err instanceof Error ? err.message : 'Gagal memuat data.' });
       }
     })();
     return () => controller.abort();
-  }, [schoolId, version, router, pathname]);
+  }, [schoolId, version, router, pathname, signInPath]);
 
   const selectSchool = useCallback((id: string | null) => {
     storeSchool(id);

@@ -72,3 +72,18 @@ test('Orang tua membuka tautan aksi, mengajukan izin, wali kelas menyetujui, sta
   await parentContext.close();
 });
 
+test('Aplikasi siswa bisa dipasang: manifest, ikon, service worker, masuk dengan WhatsApp', async ({ page, request }) => {
+  const manifest = (await (await request.get('/manifest.webmanifest')).json()) as { start_url: string; display: string; icons: { src: string; purpose?: string }[] };
+  expect(manifest).toMatchObject({ start_url: '/portal', display: 'standalone' });
+  expect(manifest.icons.some((i) => i.purpose === 'maskable')).toBe(true);
+  for (const icon of manifest.icons) expect((await request.get(icon.src)).headers()['content-type']).toBe('image/png');
+  expect((await request.get('/portal-sw.js')).headers()['cache-control']).toContain('no-store');
+
+  // Without a session the PWA asks for the WhatsApp number.
+  await page.goto('/portal');
+  await expect(page).toHaveURL(/\/masuk\/hp\?lanjut=%2Fportal$/);
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(0); // only portal pages carry it
+  await page.getByLabel('Nomor WhatsApp').fill('0812 0000 0000');
+  await page.getByRole('button', { name: 'Kirim kode' }).click();
+  await expect(page.getByLabel('Kode dari WhatsApp')).toBeVisible();
+});
