@@ -68,6 +68,15 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   (reused on retry). 409 details.reason = stale_preview -> offer "Muat ulang pratinjau" (POST /parse).
 - E2E runs absah-api http + worker (concurrently); fixtures come from absah-api packages/db/fixtures.
 
+## Schedule page (apps/web/app/(staf)/jadwal)
+- Tabs: Jadwal pelajaran (grid per rombel: days across, jam ke-n down; PUT /schedule/slots,
+  409 SCHEDULE_CONFLICT -> details.conflicts rendered with conflictText), Jam pelajaran (PUT
+  /schedule/periods replaces all days), Wali kelas (PATCH /classes/{id}), Import Excel (template
+  download with X-School-Id via fetch+blob, presigned upload, POST preview, POST commit with the
+  preview fingerprint; stale_preview -> re-run preview).
+- Roles (lib/schedule-access.ts): page for admin/operator/kepsek/wakasek (it lists rombel);
+  editing for admin/operator/wakasek. attendance.mode = 'daily' opens on Wali kelas; the grid is optional.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
