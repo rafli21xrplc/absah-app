@@ -1,6 +1,6 @@
 'use client';
 
-import { MeContextResponse } from '@absah/contracts';
+import { MeContextResponse, type Role } from '@absah/contracts';
 import { usePathname, useRouter } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { api, ApiError } from './api';
@@ -16,6 +16,10 @@ interface Workspace {
   me: Me;
   schoolId: string | null;
   isAdmin: boolean;
+  /** Roles in the active school. */
+  roles: readonly Role[];
+  /** True when the user has any of the roles in the active school. */
+  hasRole: (...roles: Role[]) => boolean;
   selectSchool: (id: string | null) => void;
   reload: () => void;
 }
@@ -87,6 +91,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     me: state.me,
     schoolId: state.me.active?.schoolId ?? null,
     isAdmin: state.me.active?.roles.includes('admin') ?? false,
+    roles: state.me.active?.roles ?? [],
+    hasRole: (...roles) => roles.some((r) => state.me.active?.roles.includes(r) ?? false),
     selectSchool,
     reload,
   };

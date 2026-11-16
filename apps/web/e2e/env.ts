@@ -7,6 +7,7 @@ export const API_PORT = 4710;
 export const WEB_URL = `http://localhost:${WEB_PORT}`;
 export const API_DIR = path.resolve(process.env.E2E_API_DIR ?? path.join(import.meta.dirname, '../../../../absah-api'));
 export const API_SERVER_DIR = path.join(API_DIR, 'apps/server');
+export const DAPODIK_FIXTURES = path.join(API_DIR, 'packages/db/fixtures/dapodik');
 
 /** Test-only secrets, same spirit as absah-api's test harness. */
 export const API_ENV: Record<string, string> = {
