@@ -86,6 +86,16 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   /koreksi: wakasek and kepsek approve or reject; others see their own requests.
 - E2E creates today's sessions with absah-api `attendance:generate --force` (helpers.generateSessions).
 
+## Izin pages (apps/web/app/(staf)/izin, izin/baru)
+- /izin lists GET /leave-requests?status=pending|all (the API limits what each user sees); staff
+  (guru, wali_kelas, wakasek, kepsek) get Setujui/Tolak on pending requests by others; requester or
+  decider can "Batalkan izin". Attachments open through GET /leave-requests/{id}/attachment (a
+  5-minute link, opened in a new tab; never put the link in our own URLs).
+- /izin/baru: students from GET /leave-requests/students, Sakit/Izin, dates (default today in the
+  school timezone, lib/leave.ts todayIn), reason, optional photo/PDF (presign -> PUT -> id).
+  Entered by the wali kelas = approved at once; the session screen shows the student fixed.
+- Parents get the same flow in the portal and action links (prompt 3.3).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
