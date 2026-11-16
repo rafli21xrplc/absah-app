@@ -53,6 +53,13 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - Better Auth endpoints go through lib/auth.ts. Invitation tokens are read from the #fragment, removed
   from the address bar, and sent only in POST bodies.
 
+## End-to-end tests (Playwright, apps/web/e2e)
+- `pnpm --filter @absah/web e2e` starts absah-api from ../absah-api (or E2E_API_DIR) on port 4710 and
+  Next on 3710 against E2E_DATABASE_URL (default: local absah_test). Schools are created with the
+  API's `school:create` CLI. Never point E2E_DATABASE_URL at a shared database.
+- Specs cannot import @absah/* source (Playwright does not transpile node_modules): check through the API.
+- CI job e2e checks out absah-api at the commit pinned in apps/web/package.json.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and

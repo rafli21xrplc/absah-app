@@ -36,14 +36,14 @@ importers:
   apps/kiosk:
     dependencies:
       '@absah/contracts':
-        specifier: github:rafli21xrplc/absah-api#b38ab16b948c522bdef7bcf1ede436b184485faa&path:/packages/contracts
-        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/b38ab16b948c522bdef7bcf1ede436b184485faa#path:/packages/contracts
+        specifier: github:rafli21xrplc/absah-api#74700113c42aa6fc500448385ab87952acd106a7&path:/packages/contracts
+        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/74700113c42aa6fc500448385ab87952acd106a7#path:/packages/contracts
       '@absah/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       next:
         specifier: ^16.4.6
-        version: 16.4.6(@babel/core@7.29.13)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -67,17 +67,17 @@ importers:
   apps/web:
     dependencies:
       '@absah/capabilities':
-        specifier: github:rafli21xrplc/absah-api#b38ab16b948c522bdef7bcf1ede436b184485faa&path:/packages/capabilities
-        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/b38ab16b948c522bdef7bcf1ede436b184485faa#path:/packages/capabilities
+        specifier: github:rafli21xrplc/absah-api#74700113c42aa6fc500448385ab87952acd106a7&path:/packages/capabilities
+        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/74700113c42aa6fc500448385ab87952acd106a7#path:/packages/capabilities
       '@absah/contracts':
-        specifier: github:rafli21xrplc/absah-api#b38ab16b948c522bdef7bcf1ede436b184485faa&path:/packages/contracts
-        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/b38ab16b948c522bdef7bcf1ede436b184485faa#path:/packages/contracts
+        specifier: github:rafli21xrplc/absah-api#74700113c42aa6fc500448385ab87952acd106a7&path:/packages/contracts
+        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/74700113c42aa6fc500448385ab87952acd106a7#path:/packages/contracts
       '@absah/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       next:
         specifier: ^16.4.6
-        version: 16.4.6(@babel/core@7.29.13)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -91,6 +91,9 @@ importers:
       '@absah/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@playwright/test':
+        specifier: ^1.65.1
+        version: 1.65.1
       '@types/react':
         specifier: ^19.3.0
         version: 19.3.0
@@ -123,12 +126,12 @@ importers:
 
 packages:
 
-  '@absah/capabilities@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/b38ab16b948c522bdef7bcf1ede436b184485faa#path:/packages/capabilities':
-    resolution: {path: /packages/capabilities, tarball: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/b38ab16b948c522bdef7bcf1ede436b184485faa}
+  '@absah/capabilities@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/74700113c42aa6fc500448385ab87952acd106a7#path:/packages/capabilities':
+    resolution: {path: /packages/capabilities, tarball: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/74700113c42aa6fc500448385ab87952acd106a7}
     version: 0.0.0
 
-  '@absah/contracts@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/b38ab16b948c522bdef7bcf1ede436b184485faa#path:/packages/contracts':
-    resolution: {path: /packages/contracts, tarball: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/b38ab16b948c522bdef7bcf1ede436b184485faa}
+  '@absah/contracts@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/74700113c42aa6fc500448385ab87952acd106a7#path:/packages/contracts':
+    resolution: {path: /packages/contracts, tarball: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/74700113c42aa6fc500448385ab87952acd106a7}
     version: 0.0.0
 
   '@asteasolutions/zod-to-openapi@9.1.0':
@@ -539,6 +542,11 @@ packages:
 
   '@oxc-project/types@0.156.0':
     resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
+
+  '@playwright/test@1.65.1':
+    resolution: {integrity: sha512-y+NCIRm2LvY4slUVWvGh1nujJ8RF/hEisIsq2mtUPgdQC4L701bq5hZGMhrpeXjACvwvO9tj5dJqhvM6TP9lbw==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   '@rolldown/binding-android-arm-eabi@1.2.19':
     resolution: {integrity: sha512-e+Ebe0WT+9tbXmNKPIiC8YrWAHYwug3m6i4p3rZGGulfZri1jtI4HslT+OZnFf/OIHowWF71DTlHwXBP2SiA7A==}
@@ -1806,6 +1814,16 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
+  playwright-core@1.65.1:
+    resolution: {integrity: sha512-hqPpz7blSMPxWVdoeE1yiBSzXsKiVOd2k+kjCvmUywD2GPO2Dd9HfcWnq9NN0GHbNZDFgZ9JfBFr+X5/BLo0qw==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.65.1:
+    resolution: {integrity: sha512-vJ1FuoOrNwOKHUIVEvSt3jT1L+wjjDpwhwIstKtfvTh8XIG4FG4bIFuvNdMxi81LGfAhUgUZleVFaOLY4RIUUw==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
@@ -2223,9 +2241,9 @@ packages:
 
 snapshots:
 
-  '@absah/capabilities@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/b38ab16b948c522bdef7bcf1ede436b184485faa#path:/packages/capabilities': {}
+  '@absah/capabilities@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/74700113c42aa6fc500448385ab87952acd106a7#path:/packages/capabilities': {}
 
-  '@absah/contracts@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/b38ab16b948c522bdef7bcf1ede436b184485faa#path:/packages/contracts':
+  '@absah/contracts@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/74700113c42aa6fc500448385ab87952acd106a7#path:/packages/contracts':
     dependencies:
       '@asteasolutions/zod-to-openapi': 9.1.0(zod@4.6.7)
       zod: 4.6.7
@@ -2614,6 +2632,10 @@ snapshots:
   '@nolyfill/is-core-module@1.0.39': {}
 
   '@oxc-project/types@0.156.0': {}
+
+  '@playwright/test@1.65.1':
+    dependencies:
+      playwright: 1.65.1
 
   '@rolldown/binding-android-arm-eabi@1.2.19':
     optional: true
@@ -3861,7 +3883,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next@16.4.6(@babel/core@7.29.13)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  next@16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       '@next/env': 16.4.6
       '@swc/helpers': 0.5.23
@@ -3880,6 +3902,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 16.4.6
       '@next/swc-win32-arm64-msvc': 16.4.6
       '@next/swc-win32-x64-msvc': 16.4.6
+      '@playwright/test': 1.65.1
       sharp: 0.35.5(@types/node@22.20.5)
     transitivePeerDependencies:
       - '@babel/core'
@@ -3978,6 +4001,12 @@ snapshots:
   picomatch@2.3.2: {}
 
   picomatch@4.0.7: {}
+
+  playwright-core@1.65.1: {}
+
+  playwright@1.65.1:
+    dependencies:
+      playwright-core: 1.65.1
 
   possible-typed-array-names@1.1.0: {}
 

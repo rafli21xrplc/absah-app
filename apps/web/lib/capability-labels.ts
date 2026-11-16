@@ -1,0 +1,34 @@
+import type { CapabilityKey } from '@absah/capabilities';
+
+/** How capabilities are named to school staff. */
+export const CAPABILITY_LABELS: Record<CapabilityKey, string> = {
+  'attendance.mode': 'Mode presensi',
+  'attendance.learningGroups': 'Kelompok belajar (mapel pilihan, moving class)',
+  'gate.enabled': 'Presensi gerbang',
+  'gate.pickup': 'Penjemputan dengan penjemput resmi',
+  'gate.visitors': 'Buku tamu',
+  'card.holder': 'Pemegang kartu QR',
+  'habits.kaih': 'Jurnal 7 Kebiasaan Anak Indonesia Hebat',
+  'religious.worship': 'Jurnal ibadah',
+  'religious.memorization': 'Setoran hafalan',
+  'academic.streams': 'Peminatan / jurusan',
+  'pkl.enabled': 'Praktik Kerja Lapangan (PKL)',
+  'pkl.tracer': 'Tracer study alumni',
+  'mbg.enabled': 'Laporan Makan Bergizi Gratis (MBG)',
+  'student.tppk': 'Kanal lapor TPPK',
+  'student.uks': 'Catatan UKS',
+  'data.source': 'Sumber data siswa',
+  'report.target': 'Ekspor rapor',
+};
+
+export const CAPABILITY_VALUE_LABELS: Record<string, string> = {
+  per_period: 'per jam pelajaran',
+  daily: 'harian oleh wali kelas',
+  student: 'siswa',
+  parent: 'orang tua',
+  off: 'tidak dipakai',
+  dapodik: 'Dapodik',
+  emis: 'EMIS',
+  erapor: 'e-Rapor',
+  rdm: 'RDM',
+};

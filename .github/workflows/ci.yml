@@ -32,3 +32,70 @@ jobs:
         run: pnpm turbo lint typecheck test
       - name: Build web and kiosk
         run: pnpm build
+
+  # End-to-end: the real absah-api (same commit the shared packages are pinned to) on a throwaway
+  # Postgres, plus the web app, driven by Playwright on laptop and phone viewports.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: absah
+          POSTGRES_PASSWORD: absah
+          POSTGRES_DB: absah_e2e
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U absah"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      # CI-only throwaway database credentials, not secrets.
+      E2E_DATABASE_URL: postgresql://absah:absah@localhost:5432/absah_e2e
+      E2E_API_DIR: ${{ github.workspace }}/absah-api
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: absah-app
+      - name: Find the absah-api commit pinned in apps/web/package.json
+        id: api
+        run: |
+          sha=$(node -p "JSON.parse(require('fs').readFileSync('absah-app/apps/web/package.json','utf8')).dependencies['@absah/contracts'].match(/#([0-9a-f]{40})/)?.[1] ?? 'main'")
+          echo "ref=$sha" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        with:
+          repository: rafli21xrplc/absah-api
+          ref: ${{ steps.api.outputs.ref }}
+          path: absah-api
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: absah-app/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: absah-app/.nvmrc
+          cache: pnpm
+          cache-dependency-path: |
+            absah-app/pnpm-lock.yaml
+            absah-api/pnpm-lock.yaml
+      - name: Install and migrate absah-api
+        working-directory: absah-api
+        run: |
+          pnpm install --frozen-lockfile
+          DATABASE_URL=$E2E_DATABASE_URL pnpm --filter @absah/db db:migrate
+      - name: Install absah-app and the browser
+        working-directory: absah-app
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter @absah/web exec playwright install --with-deps chromium
+      - name: Playwright
+        working-directory: absah-app
+        run: pnpm --filter @absah/web e2e
+      - uses: actions/upload-artifact@v5
+        if: failure()
+        with:
+          name: playwright-report
+          path: absah-app/apps/web/playwright-report
+          retention-days: 7
