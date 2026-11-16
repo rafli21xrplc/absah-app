@@ -66,6 +66,9 @@ export default function StafHome() {
         <Link className={styles.card} href="/hari-ini">
           Presensi hari ini
         </Link>
+        <Link className={styles.card} href="/izin">
+          Izin siswa
+        </Link>
         <Link className={styles.card} href="/koreksi">
           {hasRole(...CORRECTION_DECIDERS) ? 'Koreksi presensi' : 'Koreksi saya'}
         </Link>
