@@ -1,0 +1,92 @@
+/* Portal and action links: cheap phones first. Large text, no heavy animation, one column. */
+.main {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 16px;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+.eyebrow {
+  margin: 0;
+  color: var(--color-text-muted, #555);
+  font-size: 1rem;
+}
+.title {
+  margin: 4px 0 16px;
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+.card {
+  border: 1px solid var(--color-border, #d0d0d0);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: var(--color-surface, #fff);
+}
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+}
+.status {
+  display: inline-block;
+  padding: 2px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  background: var(--color-surface-muted, #eee);
+}
+.statusH {
+  background: #dff3e4;
+  color: #14532d;
+}
+.statusA {
+  background: #fde2e1;
+  color: #7f1d1d;
+}
+.statusS,
+.statusI,
+.statusT {
+  background: #fef3c7;
+  color: #78350f;
+}
+.muted {
+  color: var(--color-text-muted, #555);
+  font-size: 1rem;
+}
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border, #e5e5e5);
+}
+.list li:last-child {
+  border-bottom: 0;
+}
+.qr {
+  display: block;
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  margin: 8px auto;
+  background: #fff;
+  image-rendering: pixelated;
+}
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 8px 0;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.actions > * {
+  min-height: 48px;
+}

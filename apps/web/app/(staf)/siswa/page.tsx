@@ -166,6 +166,7 @@ function StudentsView() {
                 <th>NISN</th>
                 <th>Rombel</th>
                 <th>Status</th>
+                {canManage && <th>Kontak</th>}
                 {canManage && status !== 'active' && <th>Tindak lanjut</th>}
               </tr>
             </thead>
@@ -184,6 +185,13 @@ function StudentsView() {
                       <span className={styles.muted}>Tidak aktif</span>
                     )}
                   </td>
+                  {canManage && (
+                    <td>
+                      <Link href={`/siswa/kontak?id=${s.id}`} aria-label={`Kontak WhatsApp ${s.name}`}>
+                        Kontak
+                      </Link>
+                    </td>
+                  )}
                   {canManage && status !== 'active' && (
                     <td>
                       {s.enrollment?.missingSince && (

@@ -21,6 +21,8 @@ export interface ApiOptions {
   schoolId?: string | null;
   /** Idempotency-Key: one per user action, reused when the same action is retried. */
   idempotencyKey?: string;
+  /** Action link token (ORT-01), sent as `Authorization: Link <token>` instead of a session. */
+  linkToken?: string;
   baseUrl?: string;
   signal?: AbortSignal;
 }
@@ -31,11 +33,13 @@ export async function api<S extends z.ZodType>(path: string, schema: S, options:
   if (options.body !== undefined) headers['content-type'] = 'application/json';
   if (options.schoolId) headers['x-school-id'] = options.schoolId;
   if (options.idempotencyKey) headers['idempotency-key'] = options.idempotencyKey;
+  if (options.linkToken) headers.authorization = `Link ${options.linkToken}`;
   const res = await fetch(`${options.baseUrl ?? ''}/api/v1${path}`, {
     method: options.method ?? 'GET',
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
-    credentials: 'same-origin',
+    // A link page has no session to send; leaving cookies out keeps the link the only credential.
+    credentials: options.linkToken ? 'omit' : 'same-origin',
     signal: options.signal,
   });
   const json: unknown = await res.json().catch(() => null);
