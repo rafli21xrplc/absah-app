@@ -11,12 +11,14 @@ import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { GATE_VIEWERS } from '@/lib/gate';
+import { MBG_READERS } from '@/lib/mbg';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
 import { RECAP_READERS } from '@/lib/report';
 import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
 import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../shell.module.css';
+import { MbgCard } from './mbg/card';
 
 export default function StafHome() {
   const router = useRouter();
@@ -113,9 +115,11 @@ export default function StafHome() {
         <IfCap name="pkl.enabled">
           <span className={styles.card}>PKL</span>
         </IfCap>
-        <IfCap name="mbg.enabled">
-          <span className={styles.card}>MBG</span>
-        </IfCap>
+        {hasRole(...MBG_READERS) && (
+          <IfCap name="mbg.enabled">
+            <MbgCard />
+          </IfCap>
+        )}
         {hasRole(...NOTIFY_VIEWERS) && (
           <Link className={styles.card} href="/notifikasi">
             Notifikasi WhatsApp
