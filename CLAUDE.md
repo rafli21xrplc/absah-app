@@ -222,6 +222,16 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - e2e: tppk.spec.ts is the golden flow: admin refused before joining, team of 1 (warned), anonymous
   report from the poster link, wrong code, member opens case -> "Sedang ditangani", closes -> "Selesai".
 
+## Kegiatan (apps/web/app/(staf)/kegiatan, KEG-01)
+- Menu "Kegiatan" for every staff member: GET /activities answers all for ACTIVITY_OVERSEERS and only
+  the coached ones for others (lib/activities.ts). ACTIVITY_MANAGERS (admin, wakasek) create
+  (name, jenis, di/luar sekolah, hari, optional dates, pembina from /school/members) and (de)activate.
+- /kegiatan/[id]: pembina or managers edit the members (search GET /activities/students?q=, then one
+  PUT of the whole list) and "Presensi kegiatan hari ini" (POST /activities/{id}/sessions, no
+  Idempotency-Key: the API returns the same session) -> the usual /sesi/[id] screen. Rekap per month
+  from GET /activities/{id}/recap, separate from the class rekap. Hari ini labels these "Kegiatan".
+- e2e: kegiatan.spec.ts. helpers.acceptInvite waits until the app leaves /masuk.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
