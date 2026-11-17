@@ -70,7 +70,8 @@ export const randomDigits = (n: number) => Array.from({ length: n }, () => Math.
 const PASSWORD = 'kata-sandi-e2e-123';
 
 /** Invitation -> password -> sign in -> TOTP enrollment -> lands in the wizard. */
-export async function onboardAdmin(page: Page, inviteUrl: string, email: string) {
+/** Accepts an email invitation and signs in (staff without TOTP land in their workspace). */
+export async function acceptInvite(page: Page, inviteUrl: string, email: string) {
   await page.goto(inviteUrl);
   await page.getByLabel('Buat kata sandi').fill(PASSWORD);
   await page.getByRole('button', { name: 'Terima undangan' }).click();
@@ -79,6 +80,10 @@ export async function onboardAdmin(page: Page, inviteUrl: string, email: string)
   await page.getByRole('textbox', { name: 'Email' }).fill(email);
   await page.getByLabel('Kata sandi').fill(PASSWORD);
   await page.getByRole('button', { name: 'Masuk' }).click();
+}
+
+export async function onboardAdmin(page: Page, inviteUrl: string, email: string) {
+  await acceptInvite(page, inviteUrl, email);
 
   // Admins must enroll TOTP before acting in a school.
   await expect(page).toHaveURL(/\/keamanan\/dua-langkah$/);
