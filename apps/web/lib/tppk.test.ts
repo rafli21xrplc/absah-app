@@ -18,3 +18,21 @@ describe('TPPK labels', () => {
     expect(reportUrl('https://absah.id', '0190a7e2-0000-7000-8000-000000000001')).toBe('https://absah.id/lapor?s=0190a7e2-0000-7000-8000-000000000001');
   });
 });
+
+describe('staffCandidates', () => {
+  it('keeps active staff once, sorted by name', async () => {
+    const { staffCandidates } = await import('./tppk');
+    expect(
+      staffCandidates([
+        { userId: 'b', name: 'Budi', role: 'guru', status: 'active' },
+        { userId: 'b', name: 'Budi', role: 'wali_kelas', status: 'active' },
+        { userId: 'a', name: 'Ani', role: 'piket', status: 'active' },
+        { userId: 'c', name: 'Cici', role: 'guru', status: 'suspended' },
+        { userId: 'd', name: 'Dedi', role: 'orang_tua', status: 'active' },
+      ]),
+    ).toEqual([
+      { userId: 'a', name: 'Ani' },
+      { userId: 'b', name: 'Budi' },
+    ]);
+  });
+});

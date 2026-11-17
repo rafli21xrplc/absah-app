@@ -212,7 +212,15 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   credentials 'omit', so not even the session cookie travels. The tracking code is shown once
   (formatCode: XXXXX-XXXXX) and kept nowhere in the browser; the story is cleared after sending.
 - /lapor/lacak: GET /tppk/reports/track/{code} (status only: STATUS_LABELS). 429 has its own message.
-- e2e: tppk.spec.ts (anonymous report, wrong code, right code in lower case, unknown school).
+- Staff side (app/(staf)/tppk): TppkCards on home (behind student.tppk) fetch GET /tppk/members and
+  show "TPPK: laporan dan kasus" to members and "Tim TPPK" (with the below-3 warning) to the admin.
+  /tppk board (new reports = status diterima, open and closed cases), /tppk/laporan/[id] (story,
+  reporter or "Anonim", Buat kasus), /tppk/kasus/[id] (events, langkah/catatan, close with confirm,
+  reopen; one Idempotency-Key per write until it went through). /tppk/tim: admin picks active staff
+  (GET /school/members -> staffCandidates), canBeNotified badge, QR poster built after mount
+  (window.location.origin) to avoid a hydration mismatch.
+- e2e: tppk.spec.ts is the golden flow: admin refused before joining, team of 1 (warned), anonymous
+  report from the poster link, wrong code, member opens case -> "Sedang ditangani", closes -> "Selesai".
 
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through

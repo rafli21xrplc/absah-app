@@ -23,6 +23,7 @@ import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../shell.module.css';
 import { MbgCard } from './mbg/card';
+import { TppkCards } from './tppk/card';
 
 export default function StafHome() {
   const router = useRouter();
@@ -134,6 +135,9 @@ export default function StafHome() {
             </Link>
           </IfCap>
         )}
+        <IfCap name="student.tppk">
+          <TppkCards />
+        </IfCap>
         <IfCap name="gate.pickup">
           <span className={styles.card}>Penjemputan</span>
         </IfCap>

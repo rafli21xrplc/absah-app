@@ -36,3 +36,13 @@ export const reportUrl = (origin: string, schoolId: string) => `${origin}/lapor?
 
 /** Admin appoints the team (mirrors absah-api canAppointTppk). */
 export const TPPK_APPOINTERS: Role[] = ['admin'];
+
+export const CASE_STATUS_LABELS = { open: 'Ditangani', closed: 'Selesai' } as const;
+export const EVENT_LABELS = { catatan: 'Catatan', langkah: 'Langkah', ditutup: 'Ditutup', dibuka_kembali: 'Dibuka kembali' } as const;
+
+/** Staff who can be appointed: active staff, once each (a person may hold several roles). */
+export function staffCandidates(members: { userId: string; name: string; role: Role; status: string }[]): { userId: string; name: string }[] {
+  const seen = new Map<string, string>();
+  for (const m of members) if (m.status === 'active' && m.role !== 'orang_tua' && m.role !== 'siswa' && !seen.has(m.userId)) seen.set(m.userId, m.name);
+  return [...seen].map(([userId, name]) => ({ userId, name })).sort((a, b) => a.name.localeCompare(b.name, 'id'));
+}
