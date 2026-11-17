@@ -24,6 +24,25 @@ export function generateSessions(schoolId: string): void {
   });
 }
 
+/** Issues one month's Absah invoice now (absah-api `billing:issue`, instead of waiting for the 1st). */
+export function issueInvoice(schoolId: string, month: string): void {
+  execFileSync('pnpm', ['-s', 'billing:issue', '--school', schoolId, '--month', month], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    encoding: 'utf8',
+  });
+}
+
+/**
+ * What the fake gateway posts when the money of a payment arrives: absah-api FakePaymentProvider
+ * (charge ref "fake-<payment id>", x-absah-signature = sha256 HMAC of the raw body).
+ */
+export function fakeGatewayPaid(paymentId: string, amount: number): { body: string; headers: Record<string, string> } {
+  const body = JSON.stringify({ events: [{ providerRef: `fake-${paymentId}`, providerTxnId: `e2e-${paymentId}`, status: 'paid', amount, at: new Date().toISOString() }] });
+  const signature = `sha256=${createHmac('sha256', API_ENV.PAYMENT_WEBHOOK_SECRET ?? '').update(body).digest('hex')}`;
+  return { body, headers: { 'content-type': 'application/json', 'x-absah-signature': signature } };
+}
+
 function base32Decode(input: string): Buffer {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
   let bits = '';

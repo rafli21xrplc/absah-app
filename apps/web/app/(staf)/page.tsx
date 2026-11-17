@@ -12,6 +12,7 @@ import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { GATE_VIEWERS } from '@/lib/gate';
 import { MBG_READERS } from '@/lib/mbg';
+import { BILLING_READERS } from '@/lib/billing';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
 import { RECAP_READERS } from '@/lib/report';
 import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
@@ -123,6 +124,11 @@ export default function StafHome() {
         {hasRole(...NOTIFY_VIEWERS) && (
           <Link className={styles.card} href="/notifikasi">
             Notifikasi WhatsApp
+          </Link>
+        )}
+        {hasRole(...BILLING_READERS) && (
+          <Link className={styles.card} href="/tagihan">
+            Tagihan Absah
           </Link>
         )}
         {isAdmin && (

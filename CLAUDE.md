@@ -122,6 +122,15 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   settings form (PUT /mbg/settings: cutoff, PIC name; an empty number field keeps the stored number,
   "hapus" sends null). Numbers are shown masked only.
 
+## Billing page (apps/web/app/(staf)/tagihan, BIL)
+- Menu "Tagihan Absah" for BILLING_READERS (admin, kepsek; lib/billing.ts). /tagihan lists GET
+  /billing/invoices; /tagihan/[id] shows the formula (Rp10.000 x hari-siswa / hari), lines per student
+  (exact share, only the total is rounded) and, for the admin, "Bayar lewat Virtual Account / QRIS"
+  (POST /billing/invoices/{id}/payments, one Idempotency-Key per click). The page polls the payments
+  every 2 s while the worker opens the charge, every 10 s while waiting for the money.
+- E2E: absah-api runs PAYMENT_PROVIDER=fake; invoices come from `billing:issue` (helpers.issueInvoice),
+  the gateway's webhook is signed in the spec (helpers.fakeGatewayPaid), applied by bil.apply-payments.
+
 ## Action links and portal (apps/web/app/(portal), ORT-01/02)
 - /t: the action link page from a WhatsApp message, no login. The token arrives in the #fragment, is
   kept in sessionStorage for reloads (tab only) and removed from the address bar; calls send it as

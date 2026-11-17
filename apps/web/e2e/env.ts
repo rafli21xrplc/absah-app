@@ -27,4 +27,7 @@ export const API_ENV: Record<string, string> = {
   ENCRYPTION_KEYS: `e2e1:${Buffer.alloc(32, 9).toString('base64')}`,
   ENCRYPTION_ACTIVE_KEY_ID: 'e2e1',
   HASH_KEY: 'e2e-hash-key-e2e-hash-key-e2e-hash-key-00',
+  // Fake gateway (never in production); e2e signs its webhooks with this secret.
+  PAYMENT_PROVIDER: 'fake',
+  PAYMENT_WEBHOOK_SECRET: 'e2e-payment-webhook-secret',
 };
