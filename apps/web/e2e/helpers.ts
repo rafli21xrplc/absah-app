@@ -80,6 +80,8 @@ export async function acceptInvite(page: Page, inviteUrl: string, email: string)
   await page.getByRole('textbox', { name: 'Email' }).fill(email);
   await page.getByLabel('Kata sandi').fill(PASSWORD);
   await page.getByRole('button', { name: 'Masuk' }).click();
+  // Signed in once the app leaves /masuk (a page opened earlier would race the session cookie).
+  await page.waitForURL((url) => !url.pathname.startsWith('/masuk'));
 }
 
 export async function onboardAdmin(page: Page, inviteUrl: string, email: string) {

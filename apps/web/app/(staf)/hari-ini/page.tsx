@@ -62,7 +62,7 @@ export default function HariIniPage() {
         {data?.sessions.map((s) => (
           <li key={s.id}>
             <Link className={ui.sessionCard} href={`/sesi/${s.id}`}>
-              <span className={ui.sessionTime}>{s.period ? `${s.period.startsAt}–${s.period.endsAt}` : 'Harian'}</span>
+              <span className={ui.sessionTime}>{s.period ? `${s.period.startsAt}–${s.period.endsAt}` : s.mode === 'activity' ? 'Kegiatan' : 'Harian'}</span>
               <span className={ui.sessionTitle}>
                 {s.owner.name}
                 {s.subject ? ` · ${s.subject.name}` : ''}

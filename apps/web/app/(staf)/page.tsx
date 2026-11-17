@@ -87,6 +87,9 @@ export default function StafHome() {
             Jurnal mengajar
           </Link>
         )}
+        <Link className={styles.card} href="/kegiatan">
+          Kegiatan
+        </Link>
         {hasRole(...RECAP_READERS) && (
           <Link className={styles.card} href="/rekap">
             Rekap kehadiran
