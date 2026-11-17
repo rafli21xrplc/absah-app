@@ -150,7 +150,9 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   /masuk/hp and static assets (network first, cache offline); /api and staff pages are never cached.
 - Staff set WhatsApp numbers on /siswa/kontak?id=<studentId> (PUT /students/{id}/contacts; admin,
   operator, the wali kelas): guardians (messages, links) and the student's login. Numbers masked;
-  an empty field keeps the number.
+  an empty field keeps the number. The "Akses portal" tick per guardian sends guardians[].portal only
+  when it changed (the API links the account owning the number as orang_tua); the guardian block is
+  keyed on the saved portal state so form.reset() cannot bring back the old tick.
 - E2E gets the link with absah-api `notify:last-link` (helpers.lastActionLink, dev only).
 
 ## Kiosk app (apps/kiosk, GRB-02/03)
@@ -241,9 +243,21 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   canRetract (confirm). body null = "Pesan ditarik"; the admin sees the text with "Ditarik pengirim".
 - /penghubung: "Tulis ke orang tua" (GET /liaison/students?q=, students the user teaches),
   conversations (GET /liaison/threads with unread), admin "Jam layanan" (GET|PUT /liaison/settings).
-- /portal/penghubung: a parent's children (orang_tua link on /portal). Parents need an account linked
-  to guardians.user_id; no product flow creates one before the parent portal (5.7), so e2e
-  (penghubung.spec.ts) covers the staff side: admin as wali kelas writes, retracts, sets hours.
+- /portal/penghubung: a parent's children (orang_tua link on /portal). Parents get an account through
+  the "Akses portal" tick on /siswa/kontak (5.4) and log in with OTP on /masuk/hp.
+
+## Penjemputan (GRB-09/10; (portal)/portal/penjemput, (staf)/penjemputan, (portal)/t)
+- lib/pickup.ts: relation and status labels, toJpeg (canvas, longest side 960, quality 0.85) and
+  putPhoto (presigned PUT). The R2 bucket CORS must allow PUT from the web origin too.
+- /portal/penjemput (orang_tua, gate.pickup): per child the pending/approved penjemput, "Hapus"
+  (deactivate) and a form: name, relation, WhatsApp, photo (input capture=user), valid until. Photo
+  first (POST /pickup-guardian-photos + PUT), then POST /students/{id}/pickup-guardians.
+- /penjemputan (staff, gate.pickup; the API filters to the wali kelas's rombel): unlisted penjemput
+  held at the kiosk (photo, Izinkan pulang / Tolak), new penjemput from parents (photo, Setujui /
+  Tolak), and today's check-outs. Refreshes every 20 s. Photos are 5-minute presigned links shown in
+  <img> (next/image would cache them past expiry).
+- /t: when the link context has pickups, a "Penjemputan hari ini" card with the photo and
+  allow/deny (POST /links/pickups/{id}).
 
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
