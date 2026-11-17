@@ -71,6 +71,13 @@ export default function PortalHome() {
       <IfCap name="gate.enabled">
         <Cards schoolId={schoolId} />
       </IfCap>
+      {hasRole('orang_tua') && (
+        <IfCap name="portal.liaison">
+          <p>
+            <Link href="/portal/penghubung">Buku penghubung: pesan dengan wali kelas dan guru</Link>
+          </p>
+        </IfCap>
+      )}
       {data?.items.map((s) => (
         <section key={s.studentId} className={styles.card} aria-label={`Kehadiran ${s.name}`}>
           <h2>

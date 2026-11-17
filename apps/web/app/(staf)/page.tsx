@@ -90,6 +90,11 @@ export default function StafHome() {
         <Link className={styles.card} href="/kegiatan">
           Kegiatan
         </Link>
+        <IfCap name="portal.liaison">
+          <Link className={styles.card} href="/penghubung">
+            Buku penghubung
+          </Link>
+        </IfCap>
         {hasRole(...RECAP_READERS) && (
           <Link className={styles.card} href="/rekap">
             Rekap kehadiran
