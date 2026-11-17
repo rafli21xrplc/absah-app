@@ -274,6 +274,25 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - /t: when the link context has pickups, a "Penjemputan hari ini" card with the photo and
   allow/deny (POST /links/pickups/{id}).
 
+## Jurnal 7 KAIH (KEG-02; (portal)/portal/kebiasaan, (staf)/kebiasaan)
+- Shown when habits.kaih != 'off' (useCapability; the mode never comes from the level). lib/habits.ts:
+  labels, habitsBody (all seven, unticked false), mondayOf/addDays (UTC date math on ISO dates).
+- /portal/kebiasaan (siswa and orang_tua; children from GET /portal/attendance): GET /habits/{id}, the
+  last 7 days newest first; days >= editableFrom and not locked get checkboxes when canEdit (the
+  parent in mode parent, the student in mode student), PUT /habits/{id}/{date} with one
+  Idempotency-Key per set of ticks. Others read "x dari 7".
+- /kebiasaan (HABIT_SUMMARY_READERS; rombel from GET /reports/attendance/classes, which the API narrows
+  to a wali kelas's own): GET /classes/{id}/habits?weekStart (Monday), days filled and ticks per habit.
+
+## Golden e2e (5.4)
+- golden-sd.spec.ts: daily session + WA alpa, parent portal login (helpers.otpLogin reads the code with
+  absah-api `auth:last-otp`), penjemput with photo (helpers.TINY_PNG) approved on /penjemputan, kiosk
+  Pulang offline with the stored photo, unlisted penjemput (fake camera: launchOptions args in
+  playwright.config.ts, context permissions ['camera']) allowed by the other parent through /t.
+  gateFixture cards carry studentId; helpers.lastMessage gives the newest template code + link.
+- golden-smp.spec.ts: two lessons put on today's weekday through the API, per-period session filled,
+  the student's own login ticks 7 KAIH, the wali kelas reads the week on /kebiasaan.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and

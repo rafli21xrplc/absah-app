@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { STATUS_LABELS } from '@/lib/attendance';
 import { signOut } from '@/lib/auth';
-import { IfCap } from '@/lib/capabilities';
+import { IfCap, useCapability } from '@/lib/capabilities';
 import { loadKeys, storeKeys } from '@/lib/card';
 import { timeIn } from '@/lib/gate';
 import { useWorkspace } from '@/lib/workspace';
@@ -22,6 +22,7 @@ const dayLabel = (date: string) => new Intl.DateTimeFormat('id-ID', { timeZone: 
 export default function PortalHome() {
   const router = useRouter();
   const { me, schoolId, hasRole, selectSchool } = useWorkspace();
+  const kaih = useCapability('habits.kaih');
   const timezone = me.schools.find((s) => s.id === schoolId)?.timezone ?? 'Asia/Jakarta';
   const allowed = hasRole('siswa', 'orang_tua');
   const [data, setData] = useState<PortalAttendance | null>(null);
@@ -71,6 +72,11 @@ export default function PortalHome() {
       <IfCap name="gate.enabled">
         <Cards schoolId={schoolId} />
       </IfCap>
+      {kaih && kaih !== 'off' && (
+        <p>
+          <Link href="/portal/kebiasaan">7 Kebiasaan Anak Indonesia Hebat: isi jurnal hari ini</Link>
+        </p>
+      )}
       {hasRole('orang_tua') && (
         <IfCap name="gate.pickup">
           <p>

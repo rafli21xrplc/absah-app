@@ -11,6 +11,7 @@ import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { GATE_VIEWERS } from '@/lib/gate';
+import { HABIT_SUMMARY_READERS } from '@/lib/habits';
 import { JOURNAL_VIEWERS } from '@/lib/journal';
 import { VISITOR_VIEWERS } from '@/lib/visitors';
 import { UKS_STAFF } from '@/lib/uks';
@@ -30,6 +31,7 @@ export default function StafHome() {
   const { me, schoolId, isAdmin, hasRole, selectSchool } = useWorkspace();
   const dataSource = useCapability('data.source');
   const mode = useCapability('attendance.mode');
+  const kaih = useCapability('habits.kaih');
   const school = me.schools.find((s) => s.id === schoolId);
 
   // A new school's admin lands in the setup wizard until it is finished.
@@ -95,6 +97,11 @@ export default function StafHome() {
             Buku penghubung
           </Link>
         </IfCap>
+        {kaih && kaih !== 'off' && hasRole(...HABIT_SUMMARY_READERS) && (
+          <Link className={styles.card} href="/kebiasaan">
+            Jurnal 7 kebiasaan
+          </Link>
+        )}
         {hasRole(...RECAP_READERS) && (
           <Link className={styles.card} href="/rekap">
             Rekap kehadiran
