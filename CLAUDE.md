@@ -192,6 +192,10 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - PhotoCapture: front camera on demand, 640 px JPEG, camera stopped after the shot; never blocks the visit.
 - The kiosk PUTs cross-origin to storage: R2 bucket CORS must allow PUT from the kiosk origins (the API's
   dev/test storage stand-in does through kioskCors). Bump APP_VERSION with kiosk changes (0.4.0).
+- /tamu (menu "Buku tamu" for VISITOR_VIEWERS, lib/visitors.ts, when gate.enabled and gate.visitors):
+  GET /visitors?date&status (date defaults to today in the school timezone), "Tandai keluar" for
+  VISITOR_MANAGERS (PATCH /visitors/{id}/leave, one Idempotency-Key per guest), "Lihat foto" opens
+  the 5-minute link in a tab opened before the await (popup blockers). e2e: tamu.spec.ts.
 
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through

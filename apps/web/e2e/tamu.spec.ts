@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { KIOSK_URL } from './env';
 import { createSchool, onboardAdmin } from './helpers';
 
-test('Buku tamu di kios: tamu mengisi form, orang yang dituju dicatat, kios offline tidak mencatat ganda', async ({ page, browser }) => {
+test('Buku tamu: tamu mengisi form di kios (offline tidak mencatat ganda), piket menandai keluar', async ({ page, browser }) => {
   const { schoolId, inviteUrl, email } = createSchool('SMP Buku Tamu E2E', 'smp');
   await onboardAdmin(page, inviteUrl, email);
   const enabled = await page.request.put('/api/v1/school/capabilities', {
@@ -57,4 +57,16 @@ test('Buku tamu di kios: tamu mengisi form, orang yang dituju dicatat, kios offl
   await kiosk.getByRole('button', { name: 'Selesai' }).click();
   await expect(kiosk.getByTestId('kiosk-feedback')).toBeVisible();
   await kioskContext.close();
+
+  // Piket's side: the guest is listed and signed out once.
+  // (The home menu shows the setup wizard until setup is done, so open the page directly like the other specs.)
+  await page.goto('/tamu');
+  const guest = page.getByRole('listitem', { name: 'Tamu Pak Hendra' });
+  await expect(guest).toContainText('Dinas Pendidikan');
+  await expect(guest).toContainText('menemui Admin E2E');
+  await expect(page.getByText('1 tamu masih di sekolah.')).toBeVisible();
+  await guest.getByRole('button', { name: 'Tandai keluar' }).click();
+  await expect(page.getByText('0 tamu masih di sekolah.')).toBeVisible();
+  await expect(guest).toContainText('keluar');
+  await expect(guest.getByRole('button', { name: 'Tandai keluar' })).toHaveCount(0);
 });

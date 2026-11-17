@@ -12,6 +12,7 @@ import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { GATE_VIEWERS } from '@/lib/gate';
 import { JOURNAL_VIEWERS } from '@/lib/journal';
+import { VISITOR_VIEWERS } from '@/lib/visitors';
 import { MBG_READERS } from '@/lib/mbg';
 import { BILLING_READERS } from '@/lib/billing';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
@@ -114,6 +115,15 @@ export default function StafHome() {
             <Link className={styles.card} href="/gerbang">
               Gerbang
             </Link>
+          </IfCap>
+        )}
+        {hasRole(...VISITOR_VIEWERS) && (
+          <IfCap name="gate.enabled">
+            <IfCap name="gate.visitors">
+              <Link className={styles.card} href="/tamu">
+                Buku tamu
+              </Link>
+            </IfCap>
           </IfCap>
         )}
         <IfCap name="gate.pickup">
