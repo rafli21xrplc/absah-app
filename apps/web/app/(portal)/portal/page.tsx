@@ -72,6 +72,13 @@ export default function PortalHome() {
         <Cards schoolId={schoolId} />
       </IfCap>
       {hasRole('orang_tua') && (
+        <IfCap name="gate.pickup">
+          <p>
+            <Link href="/portal/penjemput">Penjemput anak: siapa saja yang boleh menjemput</Link>
+          </p>
+        </IfCap>
+      )}
+      {hasRole('orang_tua') && (
         <IfCap name="portal.liaison">
           <p>
             <Link href="/portal/penghubung">Buku penghubung: pesan dengan wali kelas dan guru</Link>

@@ -147,7 +147,9 @@ export default function StafHome() {
           <TppkCards />
         </IfCap>
         <IfCap name="gate.pickup">
-          <span className={styles.card}>Penjemputan</span>
+          <Link className={styles.card} href="/penjemputan">
+            Penjemputan
+          </Link>
         </IfCap>
         <IfCap name="pkl.enabled">
           <span className={styles.card}>PKL</span>

@@ -17,6 +17,7 @@ async function dayFor(ms: number): Promise<KioskDay> {
     lateAfter: '07:00',
     keys: [{ schoolDate: date, key: toBase64Url(await schoolDayKey(secret, date)) }],
     cards: [{ ...card, firstName: 'Nadia', className: '5A' }],
+    pickup: null,
   };
 }
 const tokenAt = async (ms: number, c = card, s = secret) =>

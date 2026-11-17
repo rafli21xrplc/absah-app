@@ -21,6 +21,8 @@ export const TEMPLATE_LABELS: Record<TemplateCode, string> = {
   mbg_count_corrected: 'Koreksi MBG',
   mbg_forecast: 'Prakiraan MBG',
   student_sent_home: 'Dipulangkan dari UKS',
+  student_picked_up: 'Dijemput pulang',
+  unlisted_pickup: 'Penjemput tidak terdaftar',
   tppk_report_received: 'Laporan TPPK baru',
   tppk_team_changed: 'Tim TPPK diubah',
 };

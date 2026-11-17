@@ -14,8 +14,8 @@ import styles from '../../data.module.css';
 const RELATION_LABELS: Record<GuardianRelation, string> = { ayah: 'Ayah', ibu: 'Ibu', wali: 'Wali' };
 
 /**
- * WhatsApp numbers of one student (ORT-02, NTF): guardians receive messages and action links; the
- * student's own number is their login for the Absah app. Numbers are shown masked; typing a new one
+ * WhatsApp numbers of one student (ORT-02, NTF): guardians receive messages and action links, and
+ * with portal access log in to the Absah app as orang tua; the student's own number is their login. Numbers are shown masked; typing a new one
  * replaces it, an empty field leaves it unchanged. The student id is in the query, never a name.
  */
 function ContactsView() {
@@ -40,13 +40,18 @@ function ContactsView() {
     const form = event.currentTarget;
     const data = new FormData(form);
     const typed = (name: string) => normalizePhone(String(data.get(name) ?? ''));
-    const body: { studentPhone?: string | null; guardians?: { guardianId: string; phone: string | null }[] } = {};
+    type GuardianChange = { guardianId: string; phone?: string | null; portal?: boolean };
+    const body: { studentPhone?: string | null; guardians?: GuardianChange[] } = {};
     if (typed('student')) body.studentPhone = typed('student');
     if (data.get('endStudent') === 'on') body.studentPhone = null;
-    const guardians = contacts.guardians.flatMap((g): { guardianId: string; phone: string | null }[] => {
+    const guardians = contacts.guardians.flatMap((g): GuardianChange[] => {
       if (data.get(`clear-${g.id}`) === 'on') return [{ guardianId: g.id, phone: null }];
+      const change: GuardianChange = { guardianId: g.id };
       const phone = typed(`guardian-${g.id}`);
-      return phone ? [{ guardianId: g.id, phone }] : [];
+      if (phone) change.phone = phone;
+      const portal = data.get(`portal-${g.id}`) === 'on';
+      if (portal !== g.portal) change.portal = portal;
+      return Object.keys(change).length > 1 ? [change] : [];
     });
     if (guardians.length) body.guardians = guardians;
     if (Object.keys(body).length === 0) return;
@@ -59,7 +64,7 @@ function ContactsView() {
       setKey(newIdempotencyKey());
       form.reset();
     } catch (err) {
-      if (err instanceof ApiError && err.code === 'VALIDATION_FAILED') setError('Periksa nomor WhatsApp: harus diawali 08 atau +628.');
+      if (err instanceof ApiError && err.code === 'VALIDATION_FAILED') setError('Periksa nomor WhatsApp: harus diawali 08 atau +628. Akses portal butuh nomor wali.');
       else setError(err instanceof ApiError ? err.message : 'Tidak tersimpan. Coba lagi.');
     } finally {
       setBusy(false);
@@ -87,12 +92,16 @@ function ContactsView() {
             <legend>Orang tua dan wali (menerima pesan dan tautan)</legend>
             {contacts.guardians.length === 0 && <p className={styles.muted}>Belum ada data wali. Wali ikut terisi dari import Dapodik.</p>}
             {contacts.guardians.map((g) => (
-              <div key={g.id}>
+              // Keyed on the saved state: form.reset() must not bring back the previous portal tick.
+              <div key={`${g.id}:${String(g.portal)}`}>
                 <label className={forms.field}>
                   <span className={forms.label}>
                     {RELATION_LABELS[g.relation]}: {g.name} {g.phone ? `(sekarang ${g.phone})` : '(belum ada nomor)'}
                   </span>
                   <input className={forms.input} name={`guardian-${g.id}`} type="tel" inputMode="tel" placeholder="0812 3456 7890" autoComplete="off" />
+                </label>
+                <label>
+                  <input type="checkbox" name={`portal-${g.id}`} defaultChecked={g.portal} /> Akses portal: {g.name} masuk ke aplikasi Absah dengan nomor ini
                 </label>
                 {g.phone && (
                   <label>
