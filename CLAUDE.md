@@ -181,6 +181,18 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   /teaching-journal/export.xlsx with X-School-Id and saves the blob (file name from Content-Disposition).
 - No e2e spec yet: a per_period school needs a schedule built through the UI; covered by lib tests.
 
+## Guest book at the kiosk (apps/kiosk, GRB-11)
+- The "Tamu" button on the scan screen shows only when GET /kiosk/visitor-hosts answers (404 =
+  school without gate.visitors, so null hosts and no button); hosts are refreshed every 30 min.
+- VisitorScreen (name, instansi, tujuan, optional host, optional photo) is online-only, unlike scans:
+  an offline send keeps the form and says so. lib/visitors.ts registerVisit: optional photo first
+  (POST /kiosk/visitor-photos -> PUT to the presigned URL exactly as given -> photoId), then POST
+  /kiosk/visitors. An Attempt (clientEventId + Idempotency-Keys + photo ids) lives until the visit
+  went through and is renewed when a field changes; a refused upload asks for a fresh link.
+- PhotoCapture: front camera on demand, 640 px JPEG, camera stopped after the shot; never blocks the visit.
+- The kiosk PUTs cross-origin to storage: R2 bucket CORS must allow PUT from the kiosk origins (the API's
+  dev/test storage stand-in does through kioskCors). Bump APP_VERSION with kiosk changes (0.4.0).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and

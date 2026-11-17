@@ -6,8 +6,9 @@ import { apiBaseUrl, createKioskApi, isRevoked, type KioskApi } from './kiosk-ap
 import { indexedDbStore, memoryStore, type KioskStore, type Pairing } from './store';
 import { syncQueue } from './sync';
 import { checkLocally, dayIsCurrent, isCardToken, type LocalVerdict } from './verify';
+import { loadHosts, registerVisit, type Attempt, type VisitorForm } from './visitors';
 
-export const APP_VERSION = '0.3.1';
+export const APP_VERSION = '0.4.0';
 const SYNC_EVERY_MS = 15_000;
 const HEARTBEAT_EVERY_MS = 60_000;
 const DAY_REFRESH_MS = 30 * 60_000;
@@ -29,6 +30,8 @@ export function useKiosk() {
   const store = useRef<KioskStore | null>(null);
   const api = useRef<KioskApi>(createKioskApi(apiBaseUrl()));
   const syncing = useRef(false);
+  /** Staff a guest can name; null while the school has no guest book (or it is not known yet). */
+  const [hosts, setHosts] = useState<{ id: string; name: string }[] | null>(null);
 
   const unpair = useCallback(async (revoked: boolean) => {
     await store.current?.clear();
@@ -59,6 +62,14 @@ export function useKiosk() {
         const day = await api.current('/kiosk/day', KioskDay, { token: pairing.token });
         await s.setDay(day);
         setState((prev) => (prev.phase === 'ready' ? { ...prev, day } : prev));
+      }),
+    [online],
+  );
+
+  const refreshHosts = useCallback(
+    () =>
+      online(async (pairing) => {
+        setHosts(await loadHosts(api.current, pairing.token));
       }),
     [online],
   );
@@ -107,15 +118,15 @@ export function useKiosk() {
       if (!dayIsCurrent(day ?? null, Date.now())) await refreshDay();
       await sync();
     };
-    void tick().then(heartbeat);
-    const timers = [setInterval(() => void tick(), SYNC_EVERY_MS), setInterval(() => void heartbeat(), HEARTBEAT_EVERY_MS), setInterval(() => void refreshDay(), DAY_REFRESH_MS)];
+    void tick().then(heartbeat).then(refreshHosts);
+    const timers = [setInterval(() => void tick(), SYNC_EVERY_MS), setInterval(() => void heartbeat(), HEARTBEAT_EVERY_MS), setInterval(() => void refreshDay(), DAY_REFRESH_MS), setInterval(() => void refreshHosts(), DAY_REFRESH_MS)];
     const back = () => void tick();
     window.addEventListener('online', back);
     return () => {
       timers.forEach(clearInterval);
       window.removeEventListener('online', back);
     };
-  }, [ready, refreshDay, sync, heartbeat]);
+  }, [ready, refreshDay, sync, heartbeat, refreshHosts]);
 
   const pair = useCallback(async (input: { pairingCode: string; name: string; idempotencyKey: string }) => {
     const res = await api.current('/kiosk/pair', PairKioskResponse, {
@@ -147,5 +158,17 @@ export function useKiosk() {
     [sync],
   );
 
-  return { state, pair, scan };
+  /** A guest signs in (GRB-11). Needs the network: errors reach the form, which says so. */
+  const registerVisitor = useCallback(async (form: VisitorForm, photo: Blob | null, attempt: Attempt): Promise<void> => {
+    const pairing = await store.current?.getPairing();
+    if (!pairing) throw new TypeError('not paired');
+    try {
+      await registerVisit({ api: api.current, token: pairing.token }, form, photo, attempt);
+    } catch (err) {
+      if (isRevoked(err)) await unpair(true);
+      throw err;
+    }
+  }, [unpair]);
+
+  return { state, pair, scan, hosts, registerVisitor };
 }
