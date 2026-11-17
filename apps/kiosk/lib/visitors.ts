@@ -41,11 +41,12 @@ export interface RegisterDeps {
   put?: typeof fetch;
 }
 
-async function uploadPhoto({ api, token, put = fetch }: RegisterDeps, photo: Blob, attempt: Attempt): Promise<string> {
+/** Presign + PUT once per Attempt; `path` is the kiosk's presign endpoint (guests or penjemput). */
+export async function uploadPhoto({ api, token, put = fetch }: RegisterDeps, photo: Blob, attempt: Attempt, path = '/kiosk/visitor-photos'): Promise<string> {
   if (attempt.photoId && attempt.uploaded) return attempt.photoId;
   try {
     if (!attempt.photoId || !attempt.upload) {
-      const res = await api('/kiosk/visitor-photos', CreateVisitorPhotoResponse, {
+      const res = await api(path, CreateVisitorPhotoResponse, {
         method: 'POST',
         token,
         idempotencyKey: attempt.photoKey,

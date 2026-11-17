@@ -28,7 +28,7 @@ function view(f: ScanFeedback) {
 }
 
 /** The gate screen: camera + USB scanner in, a large colored answer out (GRB-03). */
-export function ScanScreen({ state, scan, onVisitor }: { state: Ready; scan: (text: string) => Promise<ScanFeedback>; onVisitor?: () => void }) {
+export function ScanScreen({ state, scan, onVisitor, onCheckout }: { state: Ready; scan: (text: string) => Promise<ScanFeedback>; onVisitor?: () => void; onCheckout?: () => void }) {
   const [shown, setShown] = useState<ReturnType<typeof view> | null>(null);
   const last = useRef({ text: '', at: 0 });
   const hide = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -67,11 +67,18 @@ export function ScanScreen({ state, scan, onVisitor }: { state: Ready; scan: (te
           {state.day ? '' : ' · data hari ini belum terunduh'}
         </span>
       </header>
-      {onVisitor ? (
-        <button type="button" className={styles.guestButton} onClick={onVisitor}>
-          Tamu
-        </button>
-      ) : null}
+      <div className={styles.modeButtons}>
+        {onCheckout ? (
+          <button type="button" className={styles.guestButton} onClick={onCheckout}>
+            Pulang
+          </button>
+        ) : null}
+        {onVisitor ? (
+          <button type="button" className={styles.guestButton} onClick={onVisitor}>
+            Tamu
+          </button>
+        ) : null}
+      </div>
       <section className={styles.stage} style={shown ? { background: shown.color } : undefined} aria-live="assertive" data-testid="kiosk-feedback">
         {shown ? (
           <div className={styles.answer}>

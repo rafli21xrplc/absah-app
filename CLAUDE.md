@@ -195,11 +195,26 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   went through and is renewed when a field changes; a refused upload asks for a fresh link.
 - PhotoCapture: front camera on demand, 640 px JPEG, camera stopped after the shot; never blocks the visit.
 - The kiosk PUTs cross-origin to storage: R2 bucket CORS must allow PUT from the kiosk origins (the API's
-  dev/test storage stand-in does through kioskCors). Bump APP_VERSION with kiosk changes (0.4.0).
+  dev/test storage stand-in does through kioskCors). Bump APP_VERSION with kiosk changes.
 - /tamu (menu "Buku tamu" for VISITOR_VIEWERS, lib/visitors.ts, when gate.enabled and gate.visitors):
   GET /visitors?date&status (date defaults to today in the school timezone), "Tandai keluar" for
   VISITOR_MANAGERS (PATCH /visitors/{id}/leave, one Idempotency-Key per guest), "Lihat foto" opens
   the 5-minute link in a tab opened before the await (popup blockers). e2e: tamu.spec.ts.
+
+## Pulang at the kiosk (apps/kiosk, GRB-10)
+- The "Pulang" button shows only when the day download has pickup (school with gate.pickup).
+  CheckoutScreen: scan card -> checkForCheckout (lib/checkout.ts: same offline card check as arrivals,
+  then the student's approved penjemput from day.pickup; out:<date> in the kv store = already released
+  on this kiosk) -> photos to pick from -> confirm -> queued in IndexedDB store "checkouts" (DB version 2)
+  and sent by syncCheckouts after the scan queue (POST /kiosk/checkouts, 200 per batch; 404 = gate.pickup
+  off, queue dropped). The queue size in the header counts scans and check-outs.
+- Photos: day.pickup carries 5-minute links, so refreshDay copies them into store "photos" at once
+  (syncPhotos; photos of penjemput no longer listed are removed). Shown from blob: URLs, offline too.
+- "Penjemput tidak terdaftar" (online only): name + photo (PhotoCapture who="penjemput", required) ->
+  requestUnlisted (POST /kiosk/pickup-photos + PUT, POST /kiosk/unlisted-pickups; one Attempt until it
+  went through) -> waiting screen polling GET /kiosk/unlisted-pickups/{id} every 3 s: released = green
+  (and marked out), denied/expired = red. The student stays until a parent (link) or wali kelas decides.
+- APP_VERSION 0.5.0.
 
 ## UKS page (apps/web/app/(staf)/uks, KSW-08)
 - Menu "UKS" for UKS_STAFF (petugas_uks only, lib/uks.ts) when student.uks; even admins get 403 from
