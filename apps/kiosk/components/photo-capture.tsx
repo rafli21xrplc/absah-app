@@ -20,7 +20,7 @@ async function snapshot(video: HTMLVideoElement): Promise<Blob | null> {
  * Optional guest photo from the front camera. Opens only when asked, stops the camera as soon as
  * the photo is taken, and never blocks the visit: no camera simply means no photo.
  */
-export function PhotoCapture({ photo, onPhoto }: { photo: Blob | null; onPhoto: (blob: Blob | null) => void }) {
+export function PhotoCapture({ photo, onPhoto, who = 'tamu', optional = true }: { photo: Blob | null; onPhoto: (blob: Blob | null) => void; who?: string; optional?: boolean }) {
   const video = useRef<HTMLVideoElement>(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +67,7 @@ export function PhotoCapture({ photo, onPhoto }: { photo: Blob | null; onPhoto: 
     <div className={styles.photo}>
       {open ? (
         <>
-          <video ref={video} className={styles.pairCamera} muted playsInline aria-label="Kamera foto tamu" />
+          <video ref={video} className={styles.pairCamera} muted playsInline aria-label={`Kamera foto ${who}`} />
           <button type="button" className={styles.primary} onClick={() => void take()}>
             Ambil foto
           </button>
@@ -75,14 +75,14 @@ export function PhotoCapture({ photo, onPhoto }: { photo: Blob | null; onPhoto: 
       ) : preview ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element -- a local blob: URL, nothing to optimise */}
-          <img src={preview} alt="Foto tamu" className={styles.pairCamera} />
+          <img src={preview} alt={`Foto ${who}`} className={styles.pairCamera} />
           <button type="button" className={styles.secondary} onClick={() => onPhoto(null)}>
             Hapus foto
           </button>
         </>
       ) : (
         <button type="button" className={styles.secondary} onClick={() => setOpen(true)}>
-          Ambil foto (boleh dilewati)
+          {optional ? 'Ambil foto (boleh dilewati)' : `Ambil foto ${who}`}
         </button>
       )}
       {error ? (

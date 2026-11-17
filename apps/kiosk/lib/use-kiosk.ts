@@ -1,14 +1,15 @@
 'use client';
 
-import { KioskDay, KioskHeartbeatResponse, PairKioskResponse } from '@absah/contracts';
+import { KioskDay, KioskHeartbeatResponse, KioskUnlistedPickup, PairKioskResponse } from '@absah/contracts';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { apiBaseUrl, createKioskApi, isRevoked, type KioskApi } from './kiosk-api';
 import { indexedDbStore, memoryStore, type KioskStore, type Pairing } from './store';
 import { syncQueue } from './sync';
+import { checkForCheckout, requestUnlisted, syncCheckouts, syncPhotos, type CheckoutVerdict } from './checkout';
 import { checkLocally, dayIsCurrent, isCardToken, type LocalVerdict } from './verify';
 import { loadHosts, registerVisit, type Attempt, type VisitorForm } from './visitors';
 
-export const APP_VERSION = '0.4.0';
+export const APP_VERSION = '0.5.0';
 const SYNC_EVERY_MS = 15_000;
 const HEARTBEAT_EVERY_MS = 60_000;
 const DAY_REFRESH_MS = 30 * 60_000;
@@ -62,6 +63,8 @@ export function useKiosk() {
         const day = await api.current('/kiosk/day', KioskDay, { token: pairing.token });
         await s.setDay(day);
         setState((prev) => (prev.phase === 'ready' ? { ...prev, day } : prev));
+        // The photo links live 5 minutes: copy the penjemput photos onto the device right away.
+        await syncPhotos(s, day);
       }),
     [online],
   );
@@ -80,6 +83,7 @@ export function useKiosk() {
     try {
       await online(async (pairing, s) => {
         await syncQueue(s, api.current, pairing.token);
+        await syncCheckouts(s, api.current, pairing.token);
         setState((prev) => (prev.phase === 'ready' ? { ...prev, syncedAt: Date.now() } : prev));
       });
     } finally {
@@ -170,5 +174,55 @@ export function useKiosk() {
     }
   }, [unpair]);
 
-  return { state, pair, scan, hosts, registerVisitor };
+  /** Pulang mode (GRB-10): who may take this student, decided offline from the morning list. */
+  const checkoutScan = useCallback(async (text: string): Promise<CheckoutVerdict | null> => {
+    const s = store.current;
+    const token = text.trim();
+    if (!s || !isCardToken(token)) return { kind: 'rejected', reason: 'malformed' };
+    const day = await s.getDay();
+    if (!day) return null;
+    return checkForCheckout(day, await s.getOut(day.schoolDate), token, Date.now());
+  }, []);
+
+  /** The petugas confirmed a listed penjemput: queued, then sent in the background. */
+  const confirmCheckout = useCallback(
+    async (v: Extract<CheckoutVerdict, { kind: 'pick' }>, pickupGuardianId: string) => {
+      const s = store.current;
+      if (!s) return;
+      await s.enqueueCheckout({ clientEventId: crypto.randomUUID(), token: v.token, pickupGuardianId, checkedOutAt: v.scannedAt });
+      await s.addOut(v.schoolDate, v.cardId);
+      const queueSize = await s.queueSize();
+      setState((prev) => (prev.phase === 'ready' ? { ...prev, queueSize } : prev));
+      void sync();
+    },
+    [sync],
+  );
+
+  /** A student released through an allowed unlisted penjemput is out for the day on this kiosk too. */
+  const markOut = useCallback(async (schoolDate: string, cardId: string) => store.current?.addOut(schoolDate, cardId), []);
+
+  const withPairing = useCallback(
+    async <T>(step: (token: string) => Promise<T>): Promise<T> => {
+      const pairing = await store.current?.getPairing();
+      if (!pairing) throw new TypeError('not paired');
+      try {
+        return await step(pairing.token);
+      } catch (err) {
+        if (isRevoked(err)) await unpair(true);
+        throw err;
+      }
+    },
+    [unpair],
+  );
+
+  /** An unlisted penjemput (online only): name and photo, then the kiosk holds the student. */
+  const holdUnlisted = useCallback(
+    (input: { token: string; scannedAt: string; name: string; photo: Blob }, attempt: Attempt) => withPairing((token) => requestUnlisted({ api: api.current, token }, input, attempt)),
+    [withPairing],
+  );
+  const pollUnlisted = useCallback((id: string) => withPairing((token) => api.current(`/kiosk/unlisted-pickups/${id}`, KioskUnlistedPickup, { token })), [withPairing]);
+
+  const photoOf = useCallback(async (id: string) => (await store.current?.getPhoto(id)) ?? null, []);
+
+  return { state, pair, scan, hosts, registerVisitor, checkoutScan, confirmCheckout, markOut, holdUnlisted, pollUnlisted, photoOf };
 }

@@ -111,6 +111,18 @@
   display: grid;
   gap: 10px;
 }
+.modeButtons {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.modeButtons .guestButton {
+  position: static;
+}
+
 .guestButton {
   position: absolute;
   top: 8px;
@@ -123,4 +135,36 @@
   background: transparent;
   color: var(--absah-primary);
   cursor: pointer;
+}
+
+/* Pulang (GRB-10): the student's penjemput as large photo buttons. */
+.pickGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.pickCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  font: inherit;
+  font-size: 20px;
+  border-radius: var(--absah-radius);
+  border: 2px solid var(--absah-primary);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pickPhoto {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--absah-radius);
+  background: #ddd;
 }
