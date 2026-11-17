@@ -13,6 +13,7 @@ import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { GATE_VIEWERS } from '@/lib/gate';
 import { JOURNAL_VIEWERS } from '@/lib/journal';
 import { VISITOR_VIEWERS } from '@/lib/visitors';
+import { UKS_STAFF } from '@/lib/uks';
 import { MBG_READERS } from '@/lib/mbg';
 import { BILLING_READERS } from '@/lib/billing';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
@@ -124,6 +125,13 @@ export default function StafHome() {
                 Buku tamu
               </Link>
             </IfCap>
+          </IfCap>
+        )}
+        {hasRole(...UKS_STAFF) && (
+          <IfCap name="student.uks">
+            <Link className={styles.card} href="/uks">
+              UKS
+            </Link>
           </IfCap>
         )}
         <IfCap name="gate.pickup">

@@ -197,6 +197,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   VISITOR_MANAGERS (PATCH /visitors/{id}/leave, one Idempotency-Key per guest), "Lihat foto" opens
   the 5-minute link in a tab opened before the await (popup blockers). e2e: tamu.spec.ts.
 
+## UKS page (apps/web/app/(staf)/uks, KSW-08)
+- Menu "UKS" for UKS_STAFF (petugas_uks only, lib/uks.ts) when student.uks; even admins get 403 from
+  the API (the notes are medical). Find the student (GET /uks/students?q=, 2+ letters, debounced),
+  keluhan, tindakan, hasil (kembali kelas / istirahat / dipulangkan) -> POST /uks/visits with one
+  Idempotency-Key per visit (renewed on any change). "Dipulangkan" asks first: it marks the rest of the
+  day sakit and messages the parents. Below, the day's visits (GET /uks/visits?date=).
+- e2e: uks.spec.ts invites the petugas through POST /school/invitations and helpers.acceptInvite.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
