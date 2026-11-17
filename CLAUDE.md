@@ -205,6 +205,15 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   day sakit and messages the parents. Below, the day's visits (GET /uks/visits?date=).
 - e2e: uks.spec.ts invites the petugas through POST /school/invitations and helpers.acceptInvite.
 
+## Kanal lapor TPPK (apps/web/app/(lapor), KSW-06)
+- Public route group, no login, no service worker, noindex, no-referrer. /lapor?s=<schoolId> (QR poster,
+  lib/tppk.ts reportUrl) asks GET /tppk/channel/{id} first; unknown id or student.tppk off = "Kanal lapor
+  tidak tersedia". Anonymous is the default; an anonymous POST goes with api(..., { anonymous: true }) =
+  credentials 'omit', so not even the session cookie travels. The tracking code is shown once
+  (formatCode: XXXXX-XXXXX) and kept nowhere in the browser; the story is cleared after sending.
+- /lapor/lacak: GET /tppk/reports/track/{code} (status only: STATUS_LABELS). 429 has its own message.
+- e2e: tppk.spec.ts (anonymous report, wrong code, right code in lower case, unknown school).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
