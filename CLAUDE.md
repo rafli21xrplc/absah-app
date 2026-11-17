@@ -118,6 +118,8 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - Home card "MBG hari ini" (MbgCard) and /mbg for MBG_READERS (admin, operator, kepsek, wakasek;
   lib/mbg.ts) when mbg.enabled. GET /mbg/daily: pending = live numbers until the cutoff, counted =
   what the PIC received (rows marked "dikoreksi" after a correction), not_school_day.
+- "Prakiraan porsi (H-3)" (mbg/forecast.tsx, RKP-09): GET /mbg/forecast?date (default today + 3):
+  computed per rombel (siswa, izin, di luar sekolah, porsi) or pending (job at 13.00, school days only).
 - Admin only: "Hitung ulang dan kirim koreksi" (POST /mbg/daily/recount, counted days) and the
   settings form (PUT /mbg/settings: cutoff, PIC name; an empty number field keeps the stored number,
   "hapus" sends null). Numbers are shown masked only.
