@@ -114,6 +114,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   number, first name, attempts and a plain-words reason (errorLabel; the raw code stays visible).
 - Never show or log full phone numbers; the API already masks them.
 
+## MBG page (apps/web/app/(staf)/mbg, RKP-08)
+- Home card "MBG hari ini" (MbgCard) and /mbg for MBG_READERS (admin, operator, kepsek, wakasek;
+  lib/mbg.ts) when mbg.enabled. GET /mbg/daily: pending = live numbers until the cutoff, counted =
+  what the PIC received (rows marked "dikoreksi" after a correction), not_school_day.
+- Admin only: "Hitung ulang dan kirim koreksi" (POST /mbg/daily/recount, counted days) and the
+  settings form (PUT /mbg/settings: cutoff, PIC name; an empty number field keeps the stored number,
+  "hapus" sends null). Numbers are shown masked only.
+
 ## Action links and portal (apps/web/app/(portal), ORT-01/02)
 - /t: the action link page from a WhatsApp message, no login. The token arrives in the #fragment, is
   kept in sessionStorage for reloads (tab only) and removed from the address bar; calls send it as

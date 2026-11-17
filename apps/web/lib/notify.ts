@@ -16,6 +16,8 @@ export const TEMPLATE_LABELS: Record<TemplateCode, string> = {
   leave_approved: 'Izin disetujui',
   leave_rejected: 'Izin ditolak',
   login_otp: 'Kode masuk',
+  mbg_count: 'Jumlah hadir MBG',
+  mbg_count_corrected: 'Koreksi MBG',
 };
 
 /** Plain words for the common failure codes; the code itself stays visible for support. */
