@@ -1,0 +1,55 @@
+.messages {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.message {
+  max-width: 85%;
+  padding: 10px 12px;
+  border: 1px solid var(--absah-border);
+  border-radius: var(--absah-radius);
+  background: var(--absah-surface);
+  color: var(--absah-text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.mine {
+  composes: message;
+  justify-self: end;
+  border-color: var(--absah-primary);
+}
+.meta {
+  display: block;
+  font-size: 13px;
+  color: var(--absah-muted);
+}
+.retracted {
+  font-style: italic;
+  color: var(--absah-muted);
+}
+.compose {
+  display: grid;
+  gap: 8px;
+}
+.compose textarea {
+  min-height: 96px;
+  padding: 10px;
+  font: inherit;
+  border: 1px solid var(--absah-border);
+  border-radius: var(--absah-radius);
+  background: var(--absah-surface);
+  color: var(--absah-text);
+}
+.link {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--absah-muted);
+  font: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}

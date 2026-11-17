@@ -232,6 +232,17 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   from GET /activities/{id}/recap, separate from the class rekap. Hari ini labels these "Kegiatan".
 - e2e: kegiatan.spec.ts. helpers.acceptInvite waits until the app leaves /masuk.
 
+## Buku penghubung (ORT-07; app/_liaison shared, (staf)/penghubung, (portal)/portal/penghubung)
+- Behind portal.liaison. LiaisonThreadView (app/_liaison/thread.tsx) is shared by staff and parents:
+  GET /liaison/students/{id}, POST .../read after loading (z.null() for the 204), polls every 30 s
+  while visible, one Idempotency-Key per message (reset when the text changes), "Tarik pesan" while
+  canRetract (confirm). body null = "Pesan ditarik"; the admin sees the text with "Ditarik pengirim".
+- /penghubung: "Tulis ke orang tua" (GET /liaison/students?q=, students the user teaches),
+  conversations (GET /liaison/threads with unread), admin "Jam layanan" (GET|PUT /liaison/settings).
+- /portal/penghubung: a parent's children (orang_tua link on /portal). Parents need an account linked
+  to guardians.user_id; no product flow creates one before the parent portal (5.7), so e2e
+  (penghubung.spec.ts) covers the staff side: admin as wali kelas writes, retracts, sets hours.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
