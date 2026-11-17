@@ -11,6 +11,7 @@ import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { GATE_VIEWERS } from '@/lib/gate';
+import { JOURNAL_VIEWERS } from '@/lib/journal';
 import { MBG_READERS } from '@/lib/mbg';
 import { BILLING_READERS } from '@/lib/billing';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
@@ -78,6 +79,11 @@ export default function StafHome() {
         <Link className={styles.card} href="/koreksi">
           {hasRole(...CORRECTION_DECIDERS) ? 'Koreksi presensi' : 'Koreksi saya'}
         </Link>
+        {hasRole(...JOURNAL_VIEWERS) && mode === 'per_period' && (
+          <Link className={styles.card} href="/jurnal">
+            Jurnal mengajar
+          </Link>
+        )}
         {hasRole(...RECAP_READERS) && (
           <Link className={styles.card} href="/rekap">
             Rekap kehadiran

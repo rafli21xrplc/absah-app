@@ -18,6 +18,7 @@ export const TEMPLATE_LABELS: Record<TemplateCode, string> = {
   login_otp: 'Kode masuk',
   mbg_count: 'Jumlah hadir MBG',
   mbg_count_corrected: 'Koreksi MBG',
+  student_sent_home: 'Dipulangkan dari UKS',
 };
 
 /** Plain words for the common failure codes; the code itself stays visible for support. */
