@@ -20,13 +20,14 @@ export function ExportButtons({ semesterId, classId }: { semesterId: string; cla
   const target = useCapability('report.target') ?? 'erapor';
   const [busy, setBusy] = useState<ExportFormat | null>(null);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  // Stops polling when the page is left. Reset on mount: StrictMode mounts, cleans up and mounts again.
   const cancelled = useRef(false);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    cancelled.current = false;
+    return () => {
       cancelled.current = true;
-    },
-    [],
-  );
+    };
+  }, []);
 
   async function run(format: ExportFormat) {
     if (!schoolId) return;
@@ -34,8 +35,9 @@ export function ExportButtons({ semesterId, classId }: { semesterId: string; cla
     setMessage({ ok: true, text: 'Menyiapkan berkas…' });
     try {
       let job = await api('/exports', ExportJob, { method: 'POST', schoolId, idempotencyKey: newIdempotencyKey(), body: { format, semesterId, classId } });
-      while (job.status === 'queued' && !cancelled.current) {
+      while (job.status === 'queued') {
         await new Promise((r) => setTimeout(r, POLL_MS));
+        if (cancelled.current) return;
         job = await api(`/exports/${job.id}`, ExportJob, { schoolId });
       }
       if (job.status !== 'done') {

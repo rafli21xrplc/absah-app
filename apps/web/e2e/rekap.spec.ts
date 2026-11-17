@@ -24,8 +24,7 @@ test('Rekap: alpa hari ini masuk rekap rombel dan siswa, ekspor e-Rapor dibuat w
   await expect(page.getByText('Presensi tersimpan.')).toBeVisible();
 
   // Rekap per rombel: the current semester by default.
-  await page.goto('/');
-  await page.getByRole('link', { name: 'Rekap kehadiran' }).click();
+  await page.goto('/rekap');
   await expect(page.getByLabel('Periode')).toHaveValue(/[0-9a-f-]{36}/);
   const row = page.getByRole('row', { name: /VII A/ });
   await expect(row).toContainText('Admin E2E');
