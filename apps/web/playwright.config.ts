@@ -9,7 +9,13 @@ export default defineConfig({
   workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
-  use: { baseURL: WEB_URL, trace: 'retain-on-failure', locale: 'id-ID' },
+  use: {
+    baseURL: WEB_URL,
+    trace: 'retain-on-failure',
+    locale: 'id-ID',
+    // A fake camera for the kiosk's photo of an unlisted penjemput (contexts grant 'camera' themselves).
+    launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] },
+  },
   projects: [
     { name: 'laptop', use: { ...devices['Desktop Chrome'] } },
     { name: 'hp', use: { ...devices['Pixel 7'] } },

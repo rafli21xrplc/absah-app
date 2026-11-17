@@ -44,14 +44,14 @@ export function PhotoCapture({ photo, onPhoto, who = 'tamu', optional = true }: 
         await video.current.play();
       })
       .catch(() => {
-        setError('Kamera tidak bisa dibuka. Foto boleh dilewati.');
+        setError(optional ? 'Kamera tidak bisa dibuka. Foto boleh dilewati.' : 'Kamera tidak bisa dibuka. Hubungi guru piket.');
         setOpen(false);
       });
     return () => {
       stopped = true;
       stream?.getTracks().forEach((t) => t.stop());
     };
-  }, [open]);
+  }, [open, optional]);
 
   async function take() {
     const blob = video.current ? await snapshot(video.current) : null;

@@ -102,7 +102,7 @@ export async function onboardAdmin(page: Page, inviteUrl: string, email: string)
 export interface GateFixture {
   timezone: string;
   schoolDate: string;
-  cards: { cardId: string; deviceId: string; deviceKey: string }[];
+  cards: { cardId: string; deviceId: string; deviceKey: string; studentId: string }[];
 }
 
 /**
@@ -140,3 +140,39 @@ export function lastActionLink(schoolId: string): string | null {
   const result = JSON.parse(out.trim().split('\n').at(-1) ?? 'null') as { link: string | null } | null;
   return result?.link ?? null;
 }
+
+/** The school's newest WhatsApp message (template and action link), like lastActionLink. */
+export function lastMessage(schoolId: string): { templateCode: string; link: string | null } | null {
+  const out = execFileSync('pnpm', ['-s', 'notify:last-link', '--school', schoolId], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    encoding: 'utf8',
+  });
+  return JSON.parse(out.trim().split('\n').at(-1) ?? 'null') as { templateCode: string; link: string | null } | null;
+}
+
+/** The newest WhatsApp login code for a number (absah-api `auth:last-otp`, dev only). */
+export function lastOtp(phoneE164: string): string | null {
+  const out = execFileSync('pnpm', ['-s', 'auth:last-otp', '--phone', phoneE164], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    encoding: 'utf8',
+  });
+  return (JSON.parse(out.trim().split('\n').at(-1) ?? '{}') as { code: string | null }).code;
+}
+
+/** A parent or student logs in with WhatsApp OTP (number as typed, 08...) and lands on `next`. */
+export async function otpLogin(page: Page, localPhone: string, next: string) {
+  await page.goto(`/masuk/hp?lanjut=${encodeURIComponent(next)}`);
+  await page.getByLabel('Nomor WhatsApp').fill(localPhone);
+  await page.getByRole('button', { name: 'Kirim kode' }).click();
+  await expect(page.getByLabel('Kode dari WhatsApp')).toBeVisible();
+  const code = lastOtp(`+62${localPhone.replace(/^0/, '')}`);
+  if (!code) throw new Error('no login code');
+  await page.getByLabel('Kode dari WhatsApp').fill(code);
+  await page.getByRole('button', { name: 'Masuk' }).click();
+  await page.waitForURL((url) => url.pathname === next);
+}
+
+/** A 1x1 PNG: a photo for file inputs (the web turns it into a JPEG before upload). */
+export const TINY_PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
