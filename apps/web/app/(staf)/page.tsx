@@ -12,6 +12,7 @@ import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { GATE_VIEWERS } from '@/lib/gate';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
+import { RECAP_READERS } from '@/lib/report';
 import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
 import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
@@ -74,6 +75,11 @@ export default function StafHome() {
         <Link className={styles.card} href="/koreksi">
           {hasRole(...CORRECTION_DECIDERS) ? 'Koreksi presensi' : 'Koreksi saya'}
         </Link>
+        {hasRole(...RECAP_READERS) && (
+          <Link className={styles.card} href="/rekap">
+            Rekap kehadiran
+          </Link>
+        )}
         {hasRole(...STUDENT_READERS) && (
           <>
             <Link className={styles.card} href="/siswa">
