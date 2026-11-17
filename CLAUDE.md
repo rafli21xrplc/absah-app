@@ -172,6 +172,15 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - public/sw.js (registered in production builds only): network first, cache when offline, API
   never cached. Bump APP_VERSION (lib/use-kiosk.ts) with kiosk changes; heartbeat reports it.
 
+## Jurnal mengajar (apps/web/app/(staf)/jurnal, PRS-09)
+- The session screen (/sesi/[id]) shows "Topik pelajaran" for per_period sessions only (detail.mode),
+  sent as `topic` with the same submit (max 200; empty clears). Locked sessions show it read-only.
+- /jurnal (menu "Jurnal mengajar" for JOURNAL_VIEWERS when attendance.mode = per_period): month picker
+  (school timezone, lib/journal.ts monthIn), GET /teaching-journal grouped per teacher; a guru sees only
+  their own, JOURNAL_MANAGERS (admin, kepsek, wakasek) see all. "Unduh Excel" per teacher fetches
+  /teaching-journal/export.xlsx with X-School-Id and saves the blob (file name from Content-Disposition).
+- No e2e spec yet: a per_period school needs a schedule built through the UI; covered by lib tests.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
