@@ -25,9 +25,11 @@ export default function JurnalPage() {
 
   const load = useCallback(() => {
     if (!schoolId || !/^\d{4}-\d{2}$/.test(month)) return;
-    setError(null);
     api(`/teaching-journal?month=${month}`, JournalResponse, { schoolId })
-      .then(setJournal)
+      .then((j) => {
+        setJournal(j);
+        setError(null);
+      })
       .catch((err: unknown) => setError(err instanceof ApiError ? err.message : 'Tidak bisa memuat jurnal.'));
   }, [schoolId, month]);
   useEffect(load, [load]);
