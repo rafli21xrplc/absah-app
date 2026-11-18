@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { percent, periodFrom, periodQuery, semesterLabel } from './report';
+import { percent, periodFrom, periodQuery, semesterLabel, streamsOf } from './report';
 
 const semesters = [
   { id: '00000000-0000-4000-8000-000000000001', academicYear: '2026/2027', number: 1, startsOn: '2026-07-13', endsOn: '2026-12-19' },
@@ -29,5 +29,12 @@ describe('labels', () => {
     expect(percent(0.9123)).toBe('91,2%');
     expect(percent(1)).toBe('100%');
     expect(percent(null)).toBe('–');
+  });
+});
+
+describe('streamsOf', () => {
+  it('lists the jurusan present, in catalog order', () => {
+    expect(streamsOf([{ stream: 'ips' }, { stream: null }, { stream: 'ipa' }, { stream: 'ips' }])).toEqual(['ipa', 'ips']);
+    expect(streamsOf([{ stream: null }])).toEqual([]);
   });
 });

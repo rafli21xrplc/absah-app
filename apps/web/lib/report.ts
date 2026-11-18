@@ -1,4 +1,4 @@
-import type { ReportSemesterList, Role } from '@absah/contracts';
+import { CLASS_STREAMS, type ClassStream, type ReportSemesterList, type Role } from '@absah/contracts';
 
 /** Mirror absah-api report policies (the API enforces them). Teachers see only a rombel they are wali of. */
 export const RECAP_MANAGERS: Role[] = ['admin', 'operator', 'kepsek', 'wakasek'];
@@ -43,4 +43,11 @@ export function semesterLabel(s: Pick<Semester, 'number' | 'academicYear'>): str
 export function percent(rate: number | null): string {
   if (rate === null) return '–';
   return `${(Math.round(rate * 1000) / 10).toLocaleString('id-ID')}%`;
+}
+
+export const STREAM_LABELS: Record<ClassStream, string> = { ipa: 'IPA', ips: 'IPS', bahasa: 'Bahasa', keagamaan: 'Keagamaan' };
+
+/** Jurusan present among the rombel, in catalog order (AKD-11); empty for schools without jurusan. */
+export function streamsOf(items: readonly { stream: ClassStream | null }[]): ClassStream[] {
+  return CLASS_STREAMS.filter((s) => items.some((i) => i.stream === s));
 }

@@ -81,6 +81,19 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - Roles (lib/schedule-access.ts): page for admin/operator/kepsek/wakasek (it lists rombel);
   editing for admin/operator/wakasek. attendance.mode = 'daily' opens on Wali kelas; the grid is optional.
 
+- Kelompok belajar (AKD-10, tab when attendance.learningGroups): GET /learning-groups, POST to create
+  (name, mapel, guru), GET /learning-groups/{id} + PUT .../members (whole list; students picked per rombel
+  from GET /students?classId; 409 SCHEDULE_CONFLICT -> conflictText). The grid's owner select also lists
+  groups (value "class:<id>" | "group:<id>"), so group lessons are set like rombel lessons.
+
+## Jam siswa and jurusan (AKD-10, AKD-11)
+- /jam-siswa (menu for RECAP_READERS when attendance.mode = per_period): rombel from the rekap list (the API
+  narrows a wali kelas to their own), date (default today, school timezone), GET
+  /classes/{id}/student-hours: one column per session incl. learning groups ("—" = not the student's).
+- /rekap: "Jurusan" select when any rombel has a stream (lib/report.ts streamsOf, STREAM_LABELS); the list
+  is filtered client side and ExportButtons sends the same stream (whole-year export only).
+- ExportButtons labels RDM "(uji coba)"; 409 release_flag_off shows the API's message.
+
 ## Attendance pages (apps/web/app/(staf)/hari-ini, sesi/[id], koreksi)
 - Hari ini: GET /attendance/today?scope=mine|all (all for admin/operator/kepsek/wakasek/piket).
 - Session screen is built for one thumb: every student starts Hadir, five 44px choices per row,

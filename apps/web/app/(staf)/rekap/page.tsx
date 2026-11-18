@@ -1,9 +1,9 @@
 'use client';
 
-import { ClassRecapList } from '@absah/contracts';
+import { ClassRecapList, type ClassStream } from '@absah/contracts';
 import Link from 'next/link';
-import { Suspense } from 'react';
-import { COMPLIANCE_READERS, percent, periodQuery, RECAP_MANAGERS } from '@/lib/report';
+import { Suspense, useState } from 'react';
+import { COMPLIANCE_READERS, percent, periodQuery, RECAP_MANAGERS, STREAM_LABELS, streamsOf } from '@/lib/report';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../data.module.css';
 import { ExportButtons } from './export-buttons';
@@ -14,6 +14,10 @@ function RekapList() {
   const { hasRole } = useWorkspace();
   const { period, semesters } = usePeriod();
   const { data, error } = useReport(period ? `/reports/attendance/classes?from=${period.from}&to=${period.to}` : null, ClassRecapList);
+  // Jurusan (AKD-11): filtered here; the export asks the API for the same jurusan.
+  const [stream, setStream] = useState<ClassStream | ''>('');
+  const streams = data ? streamsOf(data.items) : [];
+  const rows = data?.items.filter((c) => !stream || c.stream === stream) ?? [];
 
   return (
     <main className={styles.main}>
@@ -27,6 +31,21 @@ function RekapList() {
         </p>
       )}
       {period && <PeriodPicker period={period} semesters={semesters} />}
+      {streams.length > 0 && (
+        <p>
+          <label>
+            Jurusan{' '}
+            <select value={stream} onChange={(e) => setStream(e.target.value as ClassStream | '')}>
+              <option value="">Semua jurusan</option>
+              {streams.map((s) => (
+                <option key={s} value={s}>
+                  {STREAM_LABELS[s]}
+                </option>
+              ))}
+            </select>
+          </label>
+        </p>
+      )}
       {error && <p role="alert">{error}</p>}
       {!data && !error && <p role="status">Memuat…</p>}
       {data && period && (
@@ -45,10 +64,11 @@ function RekapList() {
               </tr>
             </thead>
             <tbody>
-              {data.items.map((c) => (
+              {rows.map((c) => (
                 <tr key={c.id}>
                   <td>
                     <Link href={`/rekap/${c.id}?${periodQuery(period)}`}>{c.name}</Link>
+                    {c.stream && !stream && <span className={styles.muted}> · {STREAM_LABELS[c.stream]}</span>}
                   </td>
                   <td>{c.homeroom?.name ?? <span className={styles.muted}>Belum ada</span>}</td>
                   <td className={styles.num}>{c.students}</td>
@@ -61,11 +81,11 @@ function RekapList() {
               ))}
             </tbody>
           </table>
-          {data.items.length === 0 && <p className={styles.empty}>Belum ada rombel pada tahun ajaran aktif.</p>}
+          {rows.length === 0 && <p className={styles.empty}>Belum ada rombel pada tahun ajaran aktif.</p>}
         </div>
       )}
       <p className={styles.muted}>Angka dalam hari sekolah. Hadir = hadir + terlambat dibagi semua hari tercatat.</p>
-      {data && period?.semesterId && hasRole(...RECAP_MANAGERS) && <ExportButtons semesterId={period.semesterId} />}
+      {data && period?.semesterId && hasRole(...RECAP_MANAGERS) && <ExportButtons semesterId={period.semesterId} stream={stream || undefined} />}
     </main>
   );
 }
