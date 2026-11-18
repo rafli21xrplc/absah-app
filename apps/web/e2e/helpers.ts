@@ -24,6 +24,34 @@ export function generateSessions(schoolId: string): void {
   });
 }
 
+/** Opens a release flag for one school, as the Absah team does (absah-api `release:flag`). */
+export function releaseFlag(schoolId: string, flag: string): void {
+  execFileSync('pnpm', ['-s', 'release:flag', '--flag', flag, '--school', schoolId], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    stdio: ['ignore', 'pipe', 'inherit'],
+  });
+}
+
+/** Issues one month's Absah invoice now (absah-api `billing:issue`, instead of waiting for the 1st). */
+export function issueInvoice(schoolId: string, month: string): void {
+  execFileSync('pnpm', ['-s', 'billing:issue', '--school', schoolId, '--month', month], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    encoding: 'utf8',
+  });
+}
+
+/**
+ * What the fake gateway posts when the money of a payment arrives: absah-api FakePaymentProvider
+ * (charge ref "fake-<payment id>", x-absah-signature = sha256 HMAC of the raw body).
+ */
+export function fakeGatewayPaid(paymentId: string, amount: number): { body: string; headers: Record<string, string> } {
+  const body = JSON.stringify({ events: [{ providerRef: `fake-${paymentId}`, providerTxnId: `e2e-${paymentId}`, status: 'paid', amount, at: new Date().toISOString() }] });
+  const signature = `sha256=${createHmac('sha256', API_ENV.PAYMENT_WEBHOOK_SECRET ?? '').update(body).digest('hex')}`;
+  return { body, headers: { 'content-type': 'application/json', 'x-absah-signature': signature } };
+}
+
 function base32Decode(input: string): Buffer {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
   let bits = '';
@@ -51,7 +79,8 @@ export const randomDigits = (n: number) => Array.from({ length: n }, () => Math.
 const PASSWORD = 'kata-sandi-e2e-123';
 
 /** Invitation -> password -> sign in -> TOTP enrollment -> lands in the wizard. */
-export async function onboardAdmin(page: Page, inviteUrl: string, email: string) {
+/** Accepts an email invitation and signs in (staff without TOTP land in their workspace). */
+export async function acceptInvite(page: Page, inviteUrl: string, email: string) {
   await page.goto(inviteUrl);
   await page.getByLabel('Buat kata sandi').fill(PASSWORD);
   await page.getByRole('button', { name: 'Terima undangan' }).click();
@@ -60,6 +89,12 @@ export async function onboardAdmin(page: Page, inviteUrl: string, email: string)
   await page.getByRole('textbox', { name: 'Email' }).fill(email);
   await page.getByLabel('Kata sandi').fill(PASSWORD);
   await page.getByRole('button', { name: 'Masuk' }).click();
+  // Signed in once the app leaves /masuk (a page opened earlier would race the session cookie).
+  await page.waitForURL((url) => !url.pathname.startsWith('/masuk'));
+}
+
+export async function onboardAdmin(page: Page, inviteUrl: string, email: string) {
+  await acceptInvite(page, inviteUrl, email);
 
   // Admins must enroll TOTP before acting in a school.
   await expect(page).toHaveURL(/\/keamanan\/dua-langkah$/);
@@ -76,7 +111,7 @@ export async function onboardAdmin(page: Page, inviteUrl: string, email: string)
 export interface GateFixture {
   timezone: string;
   schoolDate: string;
-  cards: { cardId: string; deviceId: string; deviceKey: string }[];
+  cards: { cardId: string; deviceId: string; deviceKey: string; studentId: string }[];
 }
 
 /**
@@ -114,3 +149,39 @@ export function lastActionLink(schoolId: string): string | null {
   const result = JSON.parse(out.trim().split('\n').at(-1) ?? 'null') as { link: string | null } | null;
   return result?.link ?? null;
 }
+
+/** The school's newest WhatsApp message (template and action link), like lastActionLink. */
+export function lastMessage(schoolId: string): { templateCode: string; link: string | null } | null {
+  const out = execFileSync('pnpm', ['-s', 'notify:last-link', '--school', schoolId], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    encoding: 'utf8',
+  });
+  return JSON.parse(out.trim().split('\n').at(-1) ?? 'null') as { templateCode: string; link: string | null } | null;
+}
+
+/** The newest WhatsApp login code for a number (absah-api `auth:last-otp`, dev only). */
+export function lastOtp(phoneE164: string): string | null {
+  const out = execFileSync('pnpm', ['-s', 'auth:last-otp', '--phone', phoneE164], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    encoding: 'utf8',
+  });
+  return (JSON.parse(out.trim().split('\n').at(-1) ?? '{}') as { code: string | null }).code;
+}
+
+/** A parent or student logs in with WhatsApp OTP (number as typed, 08...) and lands on `next`. */
+export async function otpLogin(page: Page, localPhone: string, next: string) {
+  await page.goto(`/masuk/hp?lanjut=${encodeURIComponent(next)}`);
+  await page.getByLabel('Nomor WhatsApp').fill(localPhone);
+  await page.getByRole('button', { name: 'Kirim kode' }).click();
+  await expect(page.getByLabel('Kode dari WhatsApp')).toBeVisible();
+  const code = lastOtp(`+62${localPhone.replace(/^0/, '')}`);
+  if (!code) throw new Error('no login code');
+  await page.getByLabel('Kode dari WhatsApp').fill(code);
+  await page.getByRole('button', { name: 'Masuk' }).click();
+  await page.waitForURL((url) => url.pathname === next);
+}
+
+/** A 1x1 PNG: a photo for file inputs (the web turns it into a JPEG before upload). */
+export const TINY_PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');

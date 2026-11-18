@@ -27,10 +27,21 @@ interface Cell {
   period: number;
 }
 
-/** Weekly grid of one rombel: days across, jam pelajaran down. Click a cell to set its lesson. */
+/** "class:<id>" or "group:<id>": whose lessons the grid shows. */
+type Owner = `${'class' | 'group'}:${string}`;
+const ownerOf = (value: Owner) => {
+  const [type, id] = value.split(':') as ['class' | 'group', string];
+  return { type, id };
+};
+
+/**
+ * Weekly grid of one rombel or learning group (AKD-10): days across, jam pelajaran down. Click a cell
+ * to set its lesson.
+ */
 export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData; canEdit: boolean; onChanged: () => Promise<void> }) {
   const { schoolId } = useWorkspace();
-  const [classId, setClassId] = useState(data.classes.items[0]?.id ?? '');
+  const [owner, setOwner] = useState<Owner>(`class:${data.classes.items[0]?.id ?? ''}`);
+  const { type: ownerType, id: ownerId } = ownerOf(owner);
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
   const [selected, setSelected] = useState<Cell | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -39,11 +50,11 @@ export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData;
   const actionKey = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!schoolId || !classId) return;
-    api(`/schedule?classId=${classId}`, ScheduleResponse, { schoolId })
+    if (!schoolId || !ownerId) return;
+    api(`/schedule?${ownerType === 'class' ? 'classId' : 'groupId'}=${ownerId}`, ScheduleResponse, { schoolId })
       .then((r) => setSlots(r.slots))
-      .catch(() => setError('Tidak bisa memuat jadwal rombel.'));
-  }, [schoolId, classId]);
+      .catch(() => setError('Tidak bisa memuat jadwal.'));
+  }, [schoolId, ownerType, ownerId]);
 
   const days = data.periods.days.filter((d) => d.periods.length > 0);
   const numbers = useMemo(() => [...new Set(days.flatMap((d) => d.periods.map((p) => p.number)))].sort((a, b) => a - b), [days]);
@@ -92,7 +103,7 @@ export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData;
         subjectId = (await api('/subjects', Subject, { method: 'POST', body: { name: newName }, schoolId, idempotencyKey: `${key}-subject` })).id;
         await onChanged();
       }
-      const body = { ownerType: 'class', ownerId: classId, day: selected.day, period: selected.period, subjectId, teacherId };
+      const body = { ownerType, ownerId, day: selected.day, period: selected.period, subjectId, teacherId };
       const slot = await api('/schedule/slots', ScheduleSlot, { method: 'PUT', body, schoolId, idempotencyKey: key });
       setSlots((prev) => [...prev.filter((s) => !(s.day === slot.day && s.period === slot.period)), slot]);
       setSelected(null);
@@ -111,16 +122,25 @@ export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData;
   return (
     <section>
       <label className={forms.field}>
-        <span className={forms.label}>Rombel</span>
-        <select className={forms.input} value={classId} onChange={(e) => {
-            setClassId(e.target.value);
+        <span className={forms.label}>{data.groups.length > 0 ? 'Rombel atau kelompok' : 'Rombel'}</span>
+        <select className={forms.input} value={owner} onChange={(e) => {
+            setOwner(e.target.value as Owner);
             setSelected(null);
           }}>
           {data.classes.items.map((c) => (
-            <option key={c.id} value={c.id}>
+            <option key={c.id} value={`class:${c.id}`}>
               {c.name}
             </option>
           ))}
+          {data.groups.length > 0 && (
+            <optgroup label="Kelompok belajar">
+              {data.groups.map((g) => (
+                <option key={g.id} value={`group:${g.id}`}>
+                  {g.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
       </label>
 
@@ -170,7 +190,7 @@ export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData;
 
       {selected && canEdit && (
         <SlotEditor
-          key={`${classId}-${selected.day}-${selected.period}`}
+          key={`${owner}-${selected.day}-${selected.period}`}
           title={`${DAY_NAMES[selected.day]}, jam ke-${selected.period}`}
           data={data}
           lesson={lesson}

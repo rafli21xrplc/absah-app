@@ -1,4 +1,4 @@
-import type { MbgDaily, Role } from '@absah/contracts';
+import type { MbgDaily, MbgForecast, Role } from '@absah/contracts';
 import { timeIn } from './gate';
 
 /** Mirror absah-api MBG policies (the API enforces them). */
@@ -14,4 +14,13 @@ export function mbgStatusLine(daily: MbgDaily, timezone: string): string {
   if (daily.status === 'pending') return `Angka sementara. Dihitung dan dikirim ke PIC pukul ${clock(daily.cutoffTime)}.`;
   const counted = daily.countedAt ? `Dihitung pukul ${clock(timeIn(timezone, daily.countedAt))}` : 'Sudah dihitung';
   return daily.sentAt ? `${counted}, terkirim ke PIC.` : `${counted}. Belum ada nomor PIC, jadi tidak dikirim.`;
+}
+
+const longDate = (date: string) => new Intl.DateTimeFormat('id-ID', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${date}T00:00:00Z`));
+
+/** One line about the H-3 forecast (RKP-09): computed and sent, or when it will be. */
+export function forecastLine(f: MbgForecast, timezone: string): string {
+  if (f.status === 'pending') return `Prakiraan untuk ${longDate(f.date)} belum dihitung. Dihitung pukul 13.00 tiga hari sebelumnya, bila hari itu hari sekolah.`;
+  const at = f.computedAt ? ` pukul ${clock(timeIn(timezone, f.computedAt))}` : '';
+  return `Prakiraan untuk ${longDate(f.date)}, dihitung${at}${f.sentAt ? ' dan terkirim ke PIC' : '. Belum ada nomor PIC, jadi tidak dikirim'}.`;
 }

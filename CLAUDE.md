@@ -71,6 +71,8 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   /parse -> poll GET /imports/{id} -> preview -> POST /commit with one Idempotency-Key per click
   (reused on retry). 409 details.reason = stale_preview -> offer "Muat ulang pratinjau" (POST /parse).
 - E2E runs absah-api http + worker (concurrently); fixtures come from absah-api packages/db/fixtures.
+- The page follows data.source: dapodik -> POST /imports/dapodik, emis (madrasah, AKD-09) -> POST
+  /imports/emis; same upload/parse/preview/commit, only the wording differs (SOURCES in import/page.tsx).
 
 ## Schedule page (apps/web/app/(staf)/jadwal)
 - Tabs: Jadwal pelajaran (grid per rombel: days across, jam ke-n down; PUT /schedule/slots,
@@ -80,6 +82,19 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   preview fingerprint; stale_preview -> re-run preview).
 - Roles (lib/schedule-access.ts): page for admin/operator/kepsek/wakasek (it lists rombel);
   editing for admin/operator/wakasek. attendance.mode = 'daily' opens on Wali kelas; the grid is optional.
+
+- Kelompok belajar (AKD-10, tab when attendance.learningGroups): GET /learning-groups, POST to create
+  (name, mapel, guru), GET /learning-groups/{id} + PUT .../members (whole list; students picked per rombel
+  from GET /students?classId; 409 SCHEDULE_CONFLICT -> conflictText). The grid's owner select also lists
+  groups (value "class:<id>" | "group:<id>"), so group lessons are set like rombel lessons.
+
+## Jam siswa and jurusan (AKD-10, AKD-11)
+- /jam-siswa (menu for RECAP_READERS when attendance.mode = per_period): rombel from the rekap list (the API
+  narrows a wali kelas to their own), date (default today, school timezone), GET
+  /classes/{id}/student-hours: one column per session incl. learning groups ("—" = not the student's).
+- /rekap: "Jurusan" select when any rombel has a stream (lib/report.ts streamsOf, STREAM_LABELS); the list
+  is filtered client side and ExportButtons sends the same stream (whole-year export only).
+- ExportButtons labels RDM "(uji coba)"; 409 release_flag_off shows the API's message.
 
 ## Attendance pages (apps/web/app/(staf)/hari-ini, sesi/[id], koreksi)
 - Hari ini: GET /attendance/today?scope=mine|all (all for admin/operator/kepsek/wakasek/piket).
@@ -118,9 +133,20 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - Home card "MBG hari ini" (MbgCard) and /mbg for MBG_READERS (admin, operator, kepsek, wakasek;
   lib/mbg.ts) when mbg.enabled. GET /mbg/daily: pending = live numbers until the cutoff, counted =
   what the PIC received (rows marked "dikoreksi" after a correction), not_school_day.
+- "Prakiraan porsi (H-3)" (mbg/forecast.tsx, RKP-09): GET /mbg/forecast?date (default today + 3):
+  computed per rombel (siswa, izin, di luar sekolah, porsi) or pending (job at 13.00, school days only).
 - Admin only: "Hitung ulang dan kirim koreksi" (POST /mbg/daily/recount, counted days) and the
   settings form (PUT /mbg/settings: cutoff, PIC name; an empty number field keeps the stored number,
   "hapus" sends null). Numbers are shown masked only.
+
+## Billing page (apps/web/app/(staf)/tagihan, BIL)
+- Menu "Tagihan Absah" for BILLING_READERS (admin, kepsek; lib/billing.ts). /tagihan lists GET
+  /billing/invoices; /tagihan/[id] shows the formula (Rp10.000 x hari-siswa / hari), lines per student
+  (exact share, only the total is rounded) and, for the admin, "Bayar lewat Virtual Account / QRIS"
+  (POST /billing/invoices/{id}/payments, one Idempotency-Key per click). The page polls the payments
+  every 2 s while the worker opens the charge, every 10 s while waiting for the money.
+- E2E: absah-api runs PAYMENT_PROVIDER=fake; invoices come from `billing:issue` (helpers.issueInvoice),
+  the gateway's webhook is signed in the spec (helpers.fakeGatewayPaid), applied by bil.apply-payments.
 
 ## Action links and portal (apps/web/app/(portal), ORT-01/02)
 - /t: the action link page from a WhatsApp message, no login. The token arrives in the #fragment, is
@@ -139,7 +165,9 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   /masuk/hp and static assets (network first, cache offline); /api and staff pages are never cached.
 - Staff set WhatsApp numbers on /siswa/kontak?id=<studentId> (PUT /students/{id}/contacts; admin,
   operator, the wali kelas): guardians (messages, links) and the student's login. Numbers masked;
-  an empty field keeps the number.
+  an empty field keeps the number. The "Akses portal" tick per guardian sends guardians[].portal only
+  when it changed (the API links the account owning the number as orang_tua); the guardian block is
+  keyed on the saved portal state so form.reset() cannot bring back the old tick.
 - E2E gets the link with absah-api `notify:last-link` (helpers.lastActionLink, dev only).
 
 ## Kiosk app (apps/kiosk, GRB-02/03)
@@ -162,6 +190,131 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   red rejected with a short hint (lib/feedback.ts), plus a tone (lib/beep.ts).
 - public/sw.js (registered in production builds only): network first, cache when offline, API
   never cached. Bump APP_VERSION (lib/use-kiosk.ts) with kiosk changes; heartbeat reports it.
+
+## Jurnal mengajar (apps/web/app/(staf)/jurnal, PRS-09)
+- The session screen (/sesi/[id]) shows "Topik pelajaran" for per_period sessions only (detail.mode),
+  sent as `topic` with the same submit (max 200; empty clears). Locked sessions show it read-only.
+- /jurnal (menu "Jurnal mengajar" for JOURNAL_VIEWERS when attendance.mode = per_period): month picker
+  (school timezone, lib/journal.ts monthIn), GET /teaching-journal grouped per teacher; a guru sees only
+  their own, JOURNAL_MANAGERS (admin, kepsek, wakasek) see all. "Unduh Excel" per teacher fetches
+  /teaching-journal/export.xlsx with X-School-Id and saves the blob (file name from Content-Disposition).
+- No e2e spec yet: a per_period school needs a schedule built through the UI; covered by lib tests.
+
+## Guest book at the kiosk (apps/kiosk, GRB-11)
+- The "Tamu" button on the scan screen shows only when GET /kiosk/visitor-hosts answers (404 =
+  school without gate.visitors, so null hosts and no button); hosts are refreshed every 30 min.
+- VisitorScreen (name, instansi, tujuan, optional host, optional photo) is online-only, unlike scans:
+  an offline send keeps the form and says so. lib/visitors.ts registerVisit: optional photo first
+  (POST /kiosk/visitor-photos -> PUT to the presigned URL exactly as given -> photoId), then POST
+  /kiosk/visitors. An Attempt (clientEventId + Idempotency-Keys + photo ids) lives until the visit
+  went through and is renewed when a field changes; a refused upload asks for a fresh link.
+- PhotoCapture: front camera on demand, 640 px JPEG, camera stopped after the shot; never blocks the visit.
+- The kiosk PUTs cross-origin to storage: R2 bucket CORS must allow PUT from the kiosk origins (the API's
+  dev/test storage stand-in does through kioskCors). Bump APP_VERSION with kiosk changes.
+- /tamu (menu "Buku tamu" for VISITOR_VIEWERS, lib/visitors.ts, when gate.enabled and gate.visitors):
+  GET /visitors?date&status (date defaults to today in the school timezone), "Tandai keluar" for
+  VISITOR_MANAGERS (PATCH /visitors/{id}/leave, one Idempotency-Key per guest), "Lihat foto" opens
+  the 5-minute link in a tab opened before the await (popup blockers). e2e: tamu.spec.ts.
+
+## Pulang at the kiosk (apps/kiosk, GRB-10)
+- The "Pulang" button shows only when the day download has pickup (school with gate.pickup).
+  CheckoutScreen: scan card -> checkForCheckout (lib/checkout.ts: same offline card check as arrivals,
+  then the student's approved penjemput from day.pickup; out:<date> in the kv store = already released
+  on this kiosk) -> photos to pick from -> confirm -> queued in IndexedDB store "checkouts" (DB version 2)
+  and sent by syncCheckouts after the scan queue (POST /kiosk/checkouts, 200 per batch; 404 = gate.pickup
+  off, queue dropped). The queue size in the header counts scans and check-outs.
+- Photos: day.pickup carries 5-minute links, so refreshDay copies them into store "photos" at once
+  (syncPhotos; photos of penjemput no longer listed are removed). Shown from blob: URLs, offline too.
+- "Penjemput tidak terdaftar" (online only): name + photo (PhotoCapture who="penjemput", required) ->
+  requestUnlisted (POST /kiosk/pickup-photos + PUT, POST /kiosk/unlisted-pickups; one Attempt until it
+  went through) -> waiting screen polling GET /kiosk/unlisted-pickups/{id} every 3 s: released = green
+  (and marked out), denied/expired = red. The student stays until a parent (link) or wali kelas decides.
+- APP_VERSION 0.5.0.
+
+## UKS page (apps/web/app/(staf)/uks, KSW-08)
+- Menu "UKS" for UKS_STAFF (petugas_uks only, lib/uks.ts) when student.uks; even admins get 403 from
+  the API (the notes are medical). Find the student (GET /uks/students?q=, 2+ letters, debounced),
+  keluhan, tindakan, hasil (kembali kelas / istirahat / dipulangkan) -> POST /uks/visits with one
+  Idempotency-Key per visit (renewed on any change). "Dipulangkan" asks first: it marks the rest of the
+  day sakit and messages the parents. Below, the day's visits (GET /uks/visits?date=).
+- e2e: uks.spec.ts invites the petugas through POST /school/invitations and helpers.acceptInvite.
+
+## Kanal lapor TPPK (apps/web/app/(lapor), KSW-06)
+- Public route group, no login, no service worker, noindex, no-referrer. /lapor?s=<schoolId> (QR poster,
+  lib/tppk.ts reportUrl) asks GET /tppk/channel/{id} first; unknown id or student.tppk off = "Kanal lapor
+  tidak tersedia". Anonymous is the default; an anonymous POST goes with api(..., { anonymous: true }) =
+  credentials 'omit', so not even the session cookie travels. The tracking code is shown once
+  (formatCode: XXXXX-XXXXX) and kept nowhere in the browser; the story is cleared after sending.
+- /lapor/lacak: GET /tppk/reports/track/{code} (status only: STATUS_LABELS). 429 has its own message.
+- Staff side (app/(staf)/tppk): TppkCards on home (behind student.tppk) fetch GET /tppk/members and
+  show "TPPK: laporan dan kasus" to members and "Tim TPPK" (with the below-3 warning) to the admin.
+  /tppk board (new reports = status diterima, open and closed cases), /tppk/laporan/[id] (story,
+  reporter or "Anonim", Buat kasus), /tppk/kasus/[id] (events, langkah/catatan, close with confirm,
+  reopen; one Idempotency-Key per write until it went through). /tppk/tim: admin picks active staff
+  (GET /school/members -> staffCandidates), canBeNotified badge, QR poster built after mount
+  (window.location.origin) to avoid a hydration mismatch.
+- e2e: tppk.spec.ts is the golden flow: admin refused before joining, team of 1 (warned), anonymous
+  report from the poster link, wrong code, member opens case -> "Sedang ditangani", closes -> "Selesai".
+
+## Kegiatan (apps/web/app/(staf)/kegiatan, KEG-01)
+- Menu "Kegiatan" for every staff member: GET /activities answers all for ACTIVITY_OVERSEERS and only
+  the coached ones for others (lib/activities.ts). ACTIVITY_MANAGERS (admin, wakasek) create
+  (name, jenis, di/luar sekolah, hari, optional dates, pembina from /school/members) and (de)activate.
+- /kegiatan/[id]: pembina or managers edit the members (search GET /activities/students?q=, then one
+  PUT of the whole list) and "Presensi kegiatan hari ini" (POST /activities/{id}/sessions, no
+  Idempotency-Key: the API returns the same session) -> the usual /sesi/[id] screen. Rekap per month
+  from GET /activities/{id}/recap, separate from the class rekap. Hari ini labels these "Kegiatan".
+- e2e: kegiatan.spec.ts. helpers.acceptInvite waits until the app leaves /masuk.
+
+## Buku penghubung (ORT-07; app/_liaison shared, (staf)/penghubung, (portal)/portal/penghubung)
+- Behind portal.liaison. LiaisonThreadView (app/_liaison/thread.tsx) is shared by staff and parents:
+  GET /liaison/students/{id}, POST .../read after loading (z.null() for the 204), polls every 30 s
+  while visible, one Idempotency-Key per message (reset when the text changes), "Tarik pesan" while
+  canRetract (confirm). body null = "Pesan ditarik"; the admin sees the text with "Ditarik pengirim".
+- /penghubung: "Tulis ke orang tua" (GET /liaison/students?q=, students the user teaches),
+  conversations (GET /liaison/threads with unread), admin "Jam layanan" (GET|PUT /liaison/settings).
+- /portal/penghubung: a parent's children (orang_tua link on /portal). Parents get an account through
+  the "Akses portal" tick on /siswa/kontak (5.4) and log in with OTP on /masuk/hp.
+
+## Penjemputan (GRB-09/10; (portal)/portal/penjemput, (staf)/penjemputan, (portal)/t)
+- lib/pickup.ts: relation and status labels, toJpeg (canvas, longest side 960, quality 0.85) and
+  putPhoto (presigned PUT). The R2 bucket CORS must allow PUT from the web origin too.
+- /portal/penjemput (orang_tua, gate.pickup): per child the pending/approved penjemput, "Hapus"
+  (deactivate) and a form: name, relation, WhatsApp, photo (input capture=user), valid until. Photo
+  first (POST /pickup-guardian-photos + PUT), then POST /students/{id}/pickup-guardians.
+- /penjemputan (staff, gate.pickup; the API filters to the wali kelas's rombel): unlisted penjemput
+  held at the kiosk (photo, Izinkan pulang / Tolak), new penjemput from parents (photo, Setujui /
+  Tolak), and today's check-outs. Refreshes every 20 s. Photos are 5-minute presigned links shown in
+  <img> (next/image would cache them past expiry).
+- /t: when the link context has pickups, a "Penjemputan hari ini" card with the photo and
+  allow/deny (POST /links/pickups/{id}).
+
+## Jurnal 7 KAIH (KEG-02; (portal)/portal/kebiasaan, (staf)/kebiasaan)
+- Shown when habits.kaih != 'off' (useCapability; the mode never comes from the level). lib/habits.ts:
+  labels, habitsBody (all seven, unticked false), mondayOf/addDays (UTC date math on ISO dates).
+- /portal/kebiasaan (siswa and orang_tua; children from GET /portal/attendance): GET /habits/{id}, the
+  last 7 days newest first; days >= editableFrom and not locked get checkboxes when canEdit (the
+  parent in mode parent, the student in mode student), PUT /habits/{id}/{date} with one
+  Idempotency-Key per set of ticks. Others read "x dari 7".
+- /kebiasaan (HABIT_SUMMARY_READERS; rombel from GET /reports/attendance/classes, which the API narrows
+  to a wali kelas's own): GET /classes/{id}/habits?weekStart (Monday), days filled and ticks per habit.
+
+## Setoran hafalan (KEG-03; (staf)/hafalan, (portal)/portal/hafalan, app/_hafalan)
+- Behind religious.memorization (madrasah). /hafalan for MEMORIZATION_WRITERS (guru_tahfidz, admin;
+  lib/memorization.ts): find the student (GET /memorization-logs/students?q=, 2+ letters), surah select
+  (SURAH_OPTIONS from contracts SURAH_NAMES/SURAH_AYAT, ayat inputs capped at the surah), ayat awal/akhir,
+  optional juz/nilai/catatan -> POST /memorization-logs, one Idempotency-Key per setoran (reset on change).
+- HafalanHistory (app/_hafalan/history.tsx, GET /memorization-logs?studentId) is shared by the staff page
+  and /portal/hafalan (student, and each child of a parent from GET /portal/attendance).
+
+## Golden e2e (5.4)
+- golden-sd.spec.ts: daily session + WA alpa, parent portal login (helpers.otpLogin reads the code with
+  absah-api `auth:last-otp`), penjemput with photo (helpers.TINY_PNG) approved on /penjemputan, kiosk
+  Pulang offline with the stored photo, unlisted penjemput (fake camera: launchOptions args in
+  playwright.config.ts, context permissions ['camera']) allowed by the other parent through /t.
+  gateFixture cards carry studentId; helpers.lastMessage gives the newest template code + link.
+- golden-smp.spec.ts: two lessons put on today's weekday through the API, per-period session filled,
+  the student's own login ticks 7 KAIH, the wali kelas reads the week on /kebiasaan.
 
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through

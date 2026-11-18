@@ -17,6 +17,7 @@ export const CAPABILITY_LABELS: Record<CapabilityKey, string> = {
   'mbg.enabled': 'Laporan Makan Bergizi Gratis (MBG)',
   'student.tppk': 'Kanal lapor TPPK',
   'student.uks': 'Catatan UKS',
+  'portal.liaison': 'Buku penghubung',
   'data.source': 'Sumber data siswa',
   'report.target': 'Ekspor rapor',
 };

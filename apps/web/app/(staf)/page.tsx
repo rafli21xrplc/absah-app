@@ -11,7 +11,13 @@ import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { GATE_VIEWERS } from '@/lib/gate';
+import { HABIT_SUMMARY_READERS } from '@/lib/habits';
+import { JOURNAL_VIEWERS } from '@/lib/journal';
+import { VISITOR_VIEWERS } from '@/lib/visitors';
+import { UKS_STAFF } from '@/lib/uks';
+import { MEMORIZATION_WRITERS } from '@/lib/memorization';
 import { MBG_READERS } from '@/lib/mbg';
+import { BILLING_READERS } from '@/lib/billing';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
 import { RECAP_READERS } from '@/lib/report';
 import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
@@ -19,12 +25,14 @@ import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../shell.module.css';
 import { MbgCard } from './mbg/card';
+import { TppkCards } from './tppk/card';
 
 export default function StafHome() {
   const router = useRouter();
   const { me, schoolId, isAdmin, hasRole, selectSchool } = useWorkspace();
   const dataSource = useCapability('data.source');
   const mode = useCapability('attendance.mode');
+  const kaih = useCapability('habits.kaih');
   const school = me.schools.find((s) => s.id === schoolId);
 
   // A new school's admin lands in the setup wizard until it is finished.
@@ -77,6 +85,29 @@ export default function StafHome() {
         <Link className={styles.card} href="/koreksi">
           {hasRole(...CORRECTION_DECIDERS) ? 'Koreksi presensi' : 'Koreksi saya'}
         </Link>
+        {hasRole(...JOURNAL_VIEWERS) && mode === 'per_period' && (
+          <Link className={styles.card} href="/jurnal">
+            Jurnal mengajar
+          </Link>
+        )}
+        <Link className={styles.card} href="/kegiatan">
+          Kegiatan
+        </Link>
+        <IfCap name="portal.liaison">
+          <Link className={styles.card} href="/penghubung">
+            Buku penghubung
+          </Link>
+        </IfCap>
+        {kaih && kaih !== 'off' && hasRole(...HABIT_SUMMARY_READERS) && (
+          <Link className={styles.card} href="/kebiasaan">
+            Jurnal 7 kebiasaan
+          </Link>
+        )}
+        {hasRole(...RECAP_READERS) && mode === 'per_period' && (
+          <Link className={styles.card} href="/jam-siswa">
+            Jam siswa
+          </Link>
+        )}
         {hasRole(...RECAP_READERS) && (
           <Link className={styles.card} href="/rekap">
             Rekap kehadiran
@@ -97,9 +128,9 @@ export default function StafHome() {
             {mode === 'daily' ? 'Wali kelas dan jadwal' : 'Jadwal pelajaran'}
           </Link>
         )}
-        {hasRole(...STUDENT_MANAGERS) && dataSource === 'dapodik' && (
+        {hasRole(...STUDENT_MANAGERS) && (dataSource === 'dapodik' || dataSource === 'emis') && (
           <Link className={styles.card} href="/import">
-            Import Dapodik
+            Import {dataSource === 'emis' ? 'EMIS' : 'Dapodik'}
           </Link>
         )}
         {hasRole(...GATE_VIEWERS) && (
@@ -109,8 +140,36 @@ export default function StafHome() {
             </Link>
           </IfCap>
         )}
+        {hasRole(...VISITOR_VIEWERS) && (
+          <IfCap name="gate.enabled">
+            <IfCap name="gate.visitors">
+              <Link className={styles.card} href="/tamu">
+                Buku tamu
+              </Link>
+            </IfCap>
+          </IfCap>
+        )}
+        {hasRole(...MEMORIZATION_WRITERS) && (
+          <IfCap name="religious.memorization">
+            <Link className={styles.card} href="/hafalan">
+              Setoran hafalan
+            </Link>
+          </IfCap>
+        )}
+        {hasRole(...UKS_STAFF) && (
+          <IfCap name="student.uks">
+            <Link className={styles.card} href="/uks">
+              UKS
+            </Link>
+          </IfCap>
+        )}
+        <IfCap name="student.tppk">
+          <TppkCards />
+        </IfCap>
         <IfCap name="gate.pickup">
-          <span className={styles.card}>Penjemputan</span>
+          <Link className={styles.card} href="/penjemputan">
+            Penjemputan
+          </Link>
         </IfCap>
         <IfCap name="pkl.enabled">
           <span className={styles.card}>PKL</span>
@@ -123,6 +182,11 @@ export default function StafHome() {
         {hasRole(...NOTIFY_VIEWERS) && (
           <Link className={styles.card} href="/notifikasi">
             Notifikasi WhatsApp
+          </Link>
+        )}
+        {hasRole(...BILLING_READERS) && (
+          <Link className={styles.card} href="/tagihan">
+            Tagihan Absah
           </Link>
         )}
         {isAdmin && (

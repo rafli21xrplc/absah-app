@@ -36,6 +36,9 @@ test('MBG: admin mengatur jam batas dan PIC, alpa tidak dihitung hadir', async (
   await page.goto('/mbg');
   // 3 of 4 in VII A present; the alpa student gets no meal. Same before and after the cutoff.
   await expect(page.getByRole('row', { name: /VII A/ }).getByRole('cell').nth(1)).toHaveText('3');
+  // The H-3 forecast is computed at 13.00 by the worker job; a new school has none yet.
+  await expect(page.getByRole('heading', { name: 'Prakiraan porsi (H-3)' })).toBeVisible();
+  await expect(page.getByText(/belum dihitung\. Dihitung pukul 13\.00/)).toBeVisible();
 
   const phone = `0812${String(randomInt(10_000_000, 99_999_999))}`;
   await page.getByLabel('Jam batas').fill('09:15');

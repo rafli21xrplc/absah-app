@@ -1,12 +1,13 @@
 'use client';
 
-import { ActionLinkContext, ActionLinkLeave, CardDeviceKeys, type LeaveKind } from '@absah/contracts';
+import { ActionLinkContext, ActionLinkLeave, CardDeviceKeys, LinkHeldPickups, PickupPhotoLink, type LeaveKind, type LinkHeldPickup } from '@absah/contracts';
 import { Button } from '@absah/ui';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError } from '@/lib/api';
 import { STATUS_LABELS } from '@/lib/attendance';
 import { timeIn } from '@/lib/gate';
 import { dateRangeLabel, LEAVE_KIND_LABELS, LEAVE_STATUS_LABELS } from '@/lib/leave';
+import { EVENT_STATUS_LABELS } from '@/lib/pickup';
 import forms from '../../forms.module.css';
 import { CardQr } from '../card-qr';
 import { StatusBadge } from '../status-badge';
@@ -81,6 +82,8 @@ export default function ActionLinkPage() {
       <h1 className={styles.title}>
         {ctx.student.firstName} · {ctx.student.className}
       </h1>
+
+      {ctx.pickups.length > 0 && <LinkPickups token={token} timezone={ctx.school.timezone} firstName={ctx.student.firstName} initial={ctx.pickups} />}
 
       <section className={styles.card} aria-labelledby="hari-ini">
         <h2 id="hari-ini">Hari ini, {dateLabel(ctx.today.date)}</h2>
@@ -229,6 +232,72 @@ function LinkCard({ token, name }: { token: string; name: string }) {
           </Button>
         </div>
       )}
+      {error && <p role="alert">{error}</p>}
+    </section>
+  );
+}
+
+/**
+ * GRB-10: someone not on the list of penjemput is at the gate. The parent sees their photo and
+ * allows or refuses; the child waits at school until then.
+ */
+function LinkPickups({ token, timezone, firstName, initial }: { token: string; timezone: string; firstName: string; initial: LinkHeldPickup[] }) {
+  const [pickups, setPickups] = useState(initial);
+  const [photos, setPhotos] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function decide(id: string, decision: 'allow' | 'deny') {
+    setBusy(true);
+    setError(null);
+    try {
+      setPickups((await api(`/links/pickups/${id}`, LinkHeldPickups, { method: 'POST', linkToken: token, body: { decision } })).pickups);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Belum terkirim. Periksa internet lalu coba lagi.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function photo(id: string) {
+    try {
+      const link = await api(`/links/pickups/${id}/photo`, PickupPhotoLink, { linkToken: token });
+      setPhotos((p) => ({ ...p, [id]: link.url }));
+    } catch {
+      setError('Foto tidak bisa dibuka.');
+    }
+  }
+
+  return (
+    <section className={styles.card} aria-labelledby="jemput">
+      <h2 id="jemput">Penjemputan hari ini</h2>
+      {pickups.map((p) => (
+        <div key={p.id}>
+          <p>
+            <strong>{p.pickupName}</strong> ingin menjemput {firstName} ({timeIn(timezone, p.requestedAt)}) · {EVENT_STATUS_LABELS[p.status]}
+          </p>
+          {photos[p.id] ? (
+            // eslint-disable-next-line @next/next/no-img-element -- a 5-minute presigned link; next/image would cache it past expiry
+            <img src={photos[p.id]} alt={`Foto ${p.pickupName}`} width={240} />
+          ) : (
+            p.status === 'held' && (
+              <Button variant="secondary" onClick={() => void photo(p.id)}>
+                Lihat foto penjemput
+              </Button>
+            )
+          )}
+          {p.status === 'held' && (
+            <div className={styles.actions}>
+              <Button disabled={busy} onClick={() => void decide(p.id, 'allow')}>
+                Izinkan {firstName} pulang bersama {p.pickupName}
+              </Button>
+              <Button variant="secondary" disabled={busy} onClick={() => void decide(p.id, 'deny')}>
+                Tolak
+              </Button>
+            </div>
+          )}
+        </div>
+      ))}
       {error && <p role="alert">{error}</p>}
     </section>
   );

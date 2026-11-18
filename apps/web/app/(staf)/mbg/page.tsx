@@ -8,6 +8,7 @@ import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { normalizePhone } from '@/lib/auth';
 import { clock, MBG_MANAGERS, mbgStatusLine } from '@/lib/mbg';
 import { useWorkspace } from '@/lib/workspace';
+import { MbgForecastSection } from './forecast';
 import forms from '../../forms.module.css';
 import styles from '../data.module.css';
 
@@ -142,6 +143,7 @@ export default function MbgPage() {
           )}
         </>
       )}
+      {schoolId && <MbgForecastSection schoolId={schoolId} timezone={timezone} />}
       {settings && (
         <section className={styles.section} aria-labelledby="pengaturan">
           <h2 id="pengaturan">Pengaturan</h2>
