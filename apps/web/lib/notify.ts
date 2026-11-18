@@ -25,6 +25,8 @@ export const TEMPLATE_LABELS: Record<TemplateCode, string> = {
   unlisted_pickup: 'Penjemput tidak terdaftar',
   tppk_report_received: 'Laporan TPPK baru',
   tppk_team_changed: 'Tim TPPK diubah',
+  pkl_mentor_assigned: 'Akses pembimbing industri',
+  pkl_checkin_missing: 'Pengingat check-in PKL',
 };
 
 /** Plain words for the common failure codes; the code itself stays visible for support. */
