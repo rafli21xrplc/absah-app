@@ -24,6 +24,15 @@ export function generateSessions(schoolId: string): void {
   });
 }
 
+/** Opens a release flag for one school, as the Absah team does (absah-api `release:flag`). */
+export function releaseFlag(schoolId: string, flag: string): void {
+  execFileSync('pnpm', ['-s', 'release:flag', '--flag', flag, '--school', schoolId], {
+    cwd: API_SERVER_DIR,
+    env: { ...process.env, ...API_ENV },
+    stdio: ['ignore', 'pipe', 'inherit'],
+  });
+}
+
 /** Issues one month's Absah invoice now (absah-api `billing:issue`, instead of waiting for the 1st). */
 export function issueInvoice(schoolId: string, month: string): void {
   execFileSync('pnpm', ['-s', 'billing:issue', '--school', schoolId, '--month', month], {

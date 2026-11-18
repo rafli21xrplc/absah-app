@@ -11,6 +11,7 @@ export const KIOSK_DIR = path.resolve(import.meta.dirname, '../../kiosk');
 export const API_DIR = path.resolve(process.env.E2E_API_DIR ?? path.join(import.meta.dirname, '../../../../absah-api'));
 export const API_SERVER_DIR = path.join(API_DIR, 'apps/server');
 export const DAPODIK_FIXTURES = path.join(API_DIR, 'packages/db/fixtures/dapodik');
+export const EMIS_FIXTURES = path.join(API_DIR, 'packages/db/fixtures/emis');
 
 /** Test-only secrets, same spirit as absah-api's test harness. */
 export const API_ENV: Record<string, string> = {

@@ -11,7 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@absah/contracts": "github:rafli21xrplc/absah-api#52734a67318b8c8fda0aa2ff0599955b4675ca82&path:/packages/contracts",
+    "@absah/contracts": "github:rafli21xrplc/absah-api#f605d995e5c3032e9675dec314ef42065e45a409&path:/packages/contracts",
     "@absah/ui": "workspace:*",
     "jsqr": "1.4.0",
     "next": "^16.4.6",
