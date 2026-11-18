@@ -40,3 +40,24 @@ describe('clockIn', () => {
     expect(clockIn('2027-01-12T00:52:00Z', 'Asia/Makassar')).toBe('08.52');
   });
 });
+
+describe('readPosition', () => {
+  const geo = (outcome: { coords?: { latitude: number; longitude: number; accuracy: number }; code?: number }): Geolocation =>
+    ({
+      getCurrentPosition: (ok: PositionCallback, fail?: PositionErrorCallback | null) => {
+        if (outcome.coords) ok({ coords: outcome.coords } as GeolocationPosition);
+        else fail?.({ code: outcome.code ?? 2 } as GeolocationPositionError);
+      },
+    }) as unknown as Geolocation;
+
+  it('reads one position with a rounded accuracy', async () => {
+    const { readPosition } = await import('./pkl');
+    await expect(readPosition(geo({ coords: { latitude: -6.2383, longitude: 106.9756, accuracy: 12.6 } }))).resolves.toEqual({ latitude: -6.2383, longitude: 106.9756, accuracyM: 13 });
+  });
+
+  it('explains a refused permission and a missing GPS', async () => {
+    const { readPosition } = await import('./pkl');
+    await expect(readPosition(geo({ code: 1 }))).rejects.toThrow(/Izin lokasi ditolak/);
+    await expect(readPosition(undefined)).rejects.toThrow(/Nyalakan GPS/);
+  });
+});

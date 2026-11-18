@@ -331,6 +331,20 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   never locations), "Konfirmasi n siswa hadir" (POST /pkl/checkins/confirm {date}), "Sanggah" with a
   reason (POST /pkl/checkins/{id}/dispute). /portal sends an industry supervisor to /dudi.
 
+## PKL for the student ((portal)/portal/pkl, PKL-02/03)
+- Link on /portal for siswa when pkl.enabled. GET /pkl/me: DUDI, today's hours, supervisors, today's
+  check-in/out (never coordinates). "Check-in sekarang" / "Check-out pulang" read the location once
+  (lib/pkl.ts readPosition: high accuracy, 20 s, no cache; geoErrorMessage for denied/timeout/no GPS),
+  then POST /pkl/checkins. One Attempt {key, body} per press is resent unchanged after a network error
+  (a new position would be another body: 422 on the same key); any API answer ends it (409 reloads).
+- Jurnal hari ini: optional photo (toJpeg) or PDF -> POST /pkl/journals/attachments + putPhoto, then
+  POST /pkl/journals; "Jurnal saya" is PklJournals without the student column.
+- e2e golden-smk.spec.ts: DUDI (today's hours start half an hour from now, so the check-in is on time),
+  batch placement with a pembimbing industri, two students' phones as contexts with geolocation (one at
+  the gate, one ~900 m away), the supervisor confirms with one tap on /dudi and approves the journal, the
+  guru pembimbing decides the far check-in on /pkl/tinjauan. Select by role (combobox name), not
+  getByLabel: a wrapping <label> includes the option texts.
+
 ## Golden e2e (5.4)
 - golden-sd.spec.ts: daily session + WA alpa, parent portal login (helpers.otpLogin reads the code with
   absah-api `auth:last-otp`), penjemput with photo (helpers.TINY_PNG) approved on /penjemputan, kiosk
