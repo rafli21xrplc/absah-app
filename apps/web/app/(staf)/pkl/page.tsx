@@ -55,6 +55,8 @@ export default function PklPage() {
         </Link>
         <h1 className={styles.title}>PKL</h1>
         <nav className={styles.toolbar} aria-label="Menu PKL">
+          <Link href="/pkl/tinjauan">Tinjauan kehadiran</Link>
+          <Link href="/pkl/jurnal">Jurnal siswa</Link>
           {hasRole(...PKL_OVERSEERS) && <Link href="/pkl/dudi">Mitra DUDI</Link>}
           {manager && <Link href="/pkl/penempatan">Tempatkan siswa</Link>}
         </nav>

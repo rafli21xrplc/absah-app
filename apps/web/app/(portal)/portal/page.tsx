@@ -58,7 +58,7 @@ export default function PortalHome() {
     return (
       <main className={styles.main}>
         <p>Halaman ini untuk siswa dan orang tua.</p>
-        <Link href="/">Ke beranda staf</Link>
+        {hasRole('pembimbing_industri') ? <Link href="/dudi">Ke halaman pembimbing industri</Link> : <Link href="/">Ke beranda staf</Link>}
       </main>
     );
   }
