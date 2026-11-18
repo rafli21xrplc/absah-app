@@ -57,3 +57,31 @@ export function workHoursLabel(hours: DudiWorkDay[], dayLabels: Record<number, s
 /** "07.52" on the school clock (CLAUDE.md rule 6). */
 export const clockIn = (iso: string, timezone: string) =>
   new Intl.DateTimeFormat('id-ID', { timeZone: timezone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(iso)).replace(':', '.');
+
+export interface Position {
+  latitude: number;
+  longitude: number;
+  accuracyM: number;
+}
+
+/** Why the location could not be read, in plain words (GeolocationPositionError codes). */
+export function geoErrorMessage(code: number): string {
+  if (code === 1) return 'Izin lokasi ditolak. Buka pengaturan browser, izinkan lokasi untuk situs ini, lalu coba lagi.';
+  if (code === 3) return 'Lokasi belum terbaca. Pindah ke dekat jendela atau luar ruangan, lalu coba lagi.';
+  return 'Lokasi tidak tersedia. Nyalakan GPS di HP, lalu coba lagi.';
+}
+
+/** Reads the location once, only when the student presses the button (no background tracking). */
+export function readPosition(geo: Geolocation | undefined = typeof navigator === 'undefined' ? undefined : navigator.geolocation): Promise<Position> {
+  return new Promise((resolve, reject) => {
+    if (!geo) {
+      reject(new Error(geoErrorMessage(2)));
+      return;
+    }
+    geo.getCurrentPosition(
+      (p) => resolve({ latitude: p.coords.latitude, longitude: p.coords.longitude, accuracyM: Math.round(p.coords.accuracy) }),
+      (e) => reject(new Error(geoErrorMessage(e.code))),
+      { enableHighAccuracy: true, timeout: 20_000, maximumAge: 0 },
+    );
+  });
+}
