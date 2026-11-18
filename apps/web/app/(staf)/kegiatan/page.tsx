@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ACTIVITY_MANAGERS, DAY_LABELS, DAYS, KIND_LABELS, KINDS, LOCATION_LABELS, LOCATIONS, scheduleLabel } from '@/lib/activities';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { staffCandidates } from '@/lib/tppk';
+import { useCapability } from '@/lib/capabilities';
 import { useWorkspace } from '@/lib/workspace';
 import forms from '../../forms.module.css';
 import styles from '../data.module.css';
@@ -64,6 +65,8 @@ function NewActivity({ schoolId, onDone }: { schoolId: string | null; onDone: ()
   const [staff, setStaff] = useState<{ userId: string; name: string }[]>([]);
   const [name, setName] = useState('');
   const [kind, setKind] = useState<ActivityKind>('ekskul');
+  // KEG-03: ibadah berjamaah only where religious.worship is on (the API refuses it otherwise).
+  const worship = useCapability('religious.worship') === true;
   const [location, setLocation] = useState<ActivityLocation>('sekolah');
   const [days, setDays] = useState<number[]>([]);
   const [startsOn, setStartsOn] = useState('');
@@ -132,9 +135,9 @@ function NewActivity({ schoolId, onDone }: { schoolId: string | null; onDone: ()
             setKind(e.target.value as ActivityKind);
           }}
         >
-          {KINDS.map((k) => (
+          {KINDS.filter((k) => k !== 'ibadah' || worship).map((k) => (
             <option key={k} value={k}>
-              {KIND_LABELS[k]}
+              {k === 'ibadah' ? 'Ibadah berjamaah' : KIND_LABELS[k]}
             </option>
           ))}
         </select>
