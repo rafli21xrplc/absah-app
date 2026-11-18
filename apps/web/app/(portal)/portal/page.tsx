@@ -77,6 +77,11 @@ export default function PortalHome() {
           <Link href="/portal/kebiasaan">7 Kebiasaan Anak Indonesia Hebat: isi jurnal hari ini</Link>
         </p>
       )}
+      <IfCap name="religious.memorization">
+        <p>
+          <Link href="/portal/hafalan">Hafalan Al-Qur&apos;an: riwayat setoran</Link>
+        </p>
+      </IfCap>
       {hasRole('orang_tua') && (
         <IfCap name="gate.pickup">
           <p>

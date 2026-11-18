@@ -18,11 +18,19 @@ const POLL_LIMIT = 120;
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Dapodik import (AKD-03): upload the export, check the preview, then apply it. */
+/** Wording per data.source: Dapodik (schools) or EMIS (madrasah, AKD-09); same flow behind both. */
+const SOURCES = {
+  dapodik: { name: 'Dapodik', file: 'Berkas Daftar Peserta Didik (.xlsx)', hint: 'Di Dapodik: menu Peserta Didik, lalu unduh Excel.' },
+  emis: { name: 'EMIS', file: 'Berkas data siswa EMIS (.xlsx)', hint: 'Di EMIS: menu Siswa, lalu ekspor data siswa ke Excel.' },
+} as const;
+
+/** Student import (AKD-03, AKD-09): upload the export, check the preview, then apply it. */
 export default function ImportPage() {
   const { schoolId, hasRole } = useWorkspace();
   const source = useCapability('data.source');
   const allowed = hasRole(...STUDENT_MANAGERS);
+  const from = source ?? 'dapodik';
+  const words = SOURCES[from];
   const [current, setCurrent] = useState<Import | null>(null);
   const [recent, setRecent] = useState<Import[]>([]);
   const [step, setStep] = useState<'idle' | 'uploading' | 'parsing' | 'committing'>('idle');
@@ -74,7 +82,7 @@ export default function ImportPage() {
     event.preventDefault();
     const file = new FormData(event.currentTarget).get('file');
     if (!(file instanceof File) || file.size === 0) {
-      setError('Pilih berkas .xlsx hasil ekspor Dapodik.');
+      setError(`Pilih berkas .xlsx hasil ekspor ${words.name}.`);
       return;
     }
     if (file.size > IMPORT_MAX_BYTES) {
@@ -84,7 +92,7 @@ export default function ImportPage() {
     void run(async () => {
       setStep('uploading');
       const contentType = file.type === XLSX_CONTENT_TYPE ? XLSX_CONTENT_TYPE : 'application/octet-stream';
-      const created = await api('/imports/dapodik', CreateImportResponse, {
+      const created = await api(`/imports/${from}`, CreateImportResponse, {
         method: 'POST',
         body: { fileName: file.name, fileSize: file.size, contentType },
         schoolId,
@@ -113,17 +121,6 @@ export default function ImportPage() {
       </main>
     );
   }
-  if (source && source !== 'dapodik') {
-    return (
-      <main className={styles.main}>
-        <Link className={styles.back} href="/">
-          ← Beranda
-        </Link>
-        <h1 className={styles.title}>Import data siswa</h1>
-        <p>Sekolah Anda memakai {source.toUpperCase()}. Import dari {source.toUpperCase()} tersedia di pembaruan berikutnya.</p>
-      </main>
-    );
-  }
 
   const busyText = { uploading: 'Mengunggah berkas…', parsing: 'Membaca berkas… biasanya kurang dari satu menit.', committing: 'Menerapkan perubahan…' };
 
@@ -132,16 +129,15 @@ export default function ImportPage() {
       <Link className={styles.back} href="/">
         ← Beranda
       </Link>
-      <h1 className={styles.title}>Import data siswa dari Dapodik</h1>
+      <h1 className={styles.title}>Import data siswa dari {words.name}</h1>
 
       {(!current || current.status === 'failed' || current.status === 'committed') && (
         <form className={styles.dropzone} onSubmit={upload}>
           <label className={forms.field}>
-            <span className={forms.label}>Berkas Daftar Peserta Didik (.xlsx)</span>
+            <span className={forms.label}>{words.file}</span>
             <input className={forms.input} name="file" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
             <span className={forms.hint}>
-              Di Dapodik: menu Peserta Didik, lalu unduh Excel. Data yang sudah ada tidak dihapus; Anda melihat pratinjau dulu sebelum
-              menerapkan.
+              {words.hint} Data yang sudah ada tidak dihapus; Anda melihat pratinjau dulu sebelum menerapkan.
             </span>
           </label>
           <div>
