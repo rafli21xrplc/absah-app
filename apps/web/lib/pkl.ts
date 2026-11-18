@@ -53,3 +53,7 @@ export function workHoursLabel(hours: DudiWorkDay[], dayLabels: Record<number, s
   }
   return hours.map((h) => `${dayLabels[h.day]} ${clock(h.startsAt)}–${clock(h.endsAt)}`).join(', ');
 }
+
+/** "07.52" on the school clock (CLAUDE.md rule 6). */
+export const clockIn = (iso: string, timezone: string) =>
+  new Intl.DateTimeFormat('id-ID', { timeZone: timezone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(iso)).replace(':', '.');

@@ -319,6 +319,18 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   pembimbing (GET /pkl/school-mentors), optional pembimbing industri (name + WhatsApp, normalizePhone).
   409 overlap lists the picked students named in details.enrollmentIds.
 
+## PKL review and industry supervisor (PKL-02/03; (staf)/pkl/tinjauan, (staf)/pkl/jurnal, (dudi)/dudi, app/_pkl)
+- /pkl/tinjauan: GET /pkl/reviews (the API gives the guru pembimbing their own, managers all): check-in
+  time (school clock, lib/pkl.ts clockIn), distance, GPS accuracy, reasons, dispute text, or "Tidak ada
+  check-in"; H/T/S/I/A buttons POST /pkl/days/{sessionId}/decide, one Idempotency-Key per (day, status).
+- PklJournals (app/_pkl/journals.tsx) is shared by /pkl/jurnal, /dudi/jurnal and the student portal:
+  GET /pkl/journals[?query], attachment through the 5-minute link (tab opened before the await),
+  Setujui / Minta revisi (note required) when canReview and submitted.
+- /dudi: WorkspaceProvider with signInPath /masuk/hp (the WhatsApp message links /dudi; after OTP the
+  login page returns there via ?lanjut). pembimbing_industri only. GET /pkl/supervision?date (statuses,
+  never locations), "Konfirmasi n siswa hadir" (POST /pkl/checkins/confirm {date}), "Sanggah" with a
+  reason (POST /pkl/checkins/{id}/dispute). /portal sends an industry supervisor to /dudi.
+
 ## Golden e2e (5.4)
 - golden-sd.spec.ts: daily session + WA alpa, parent portal login (helpers.otpLogin reads the code with
   absah-api `auth:last-otp`), penjemput with photo (helpers.TINY_PNG) approved on /penjemputan, kiosk
