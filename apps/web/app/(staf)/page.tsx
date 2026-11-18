@@ -102,6 +102,11 @@ export default function StafHome() {
             Jurnal 7 kebiasaan
           </Link>
         )}
+        {hasRole(...RECAP_READERS) && mode === 'per_period' && (
+          <Link className={styles.card} href="/jam-siswa">
+            Jam siswa
+          </Link>
+        )}
         {hasRole(...RECAP_READERS) && (
           <Link className={styles.card} href="/rekap">
             Rekap kehadiran
