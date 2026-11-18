@@ -15,6 +15,7 @@ import { HABIT_SUMMARY_READERS } from '@/lib/habits';
 import { JOURNAL_VIEWERS } from '@/lib/journal';
 import { VISITOR_VIEWERS } from '@/lib/visitors';
 import { UKS_STAFF } from '@/lib/uks';
+import { MEMORIZATION_WRITERS } from '@/lib/memorization';
 import { MBG_READERS } from '@/lib/mbg';
 import { BILLING_READERS } from '@/lib/billing';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
@@ -127,9 +128,9 @@ export default function StafHome() {
             {mode === 'daily' ? 'Wali kelas dan jadwal' : 'Jadwal pelajaran'}
           </Link>
         )}
-        {hasRole(...STUDENT_MANAGERS) && dataSource === 'dapodik' && (
+        {hasRole(...STUDENT_MANAGERS) && (dataSource === 'dapodik' || dataSource === 'emis') && (
           <Link className={styles.card} href="/import">
-            Import Dapodik
+            Import {dataSource === 'emis' ? 'EMIS' : 'Dapodik'}
           </Link>
         )}
         {hasRole(...GATE_VIEWERS) && (
@@ -146,6 +147,13 @@ export default function StafHome() {
                 Buku tamu
               </Link>
             </IfCap>
+          </IfCap>
+        )}
+        {hasRole(...MEMORIZATION_WRITERS) && (
+          <IfCap name="religious.memorization">
+            <Link className={styles.card} href="/hafalan">
+              Setoran hafalan
+            </Link>
           </IfCap>
         )}
         {hasRole(...UKS_STAFF) && (

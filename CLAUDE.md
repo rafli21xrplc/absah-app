@@ -71,6 +71,8 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   /parse -> poll GET /imports/{id} -> preview -> POST /commit with one Idempotency-Key per click
   (reused on retry). 409 details.reason = stale_preview -> offer "Muat ulang pratinjau" (POST /parse).
 - E2E runs absah-api http + worker (concurrently); fixtures come from absah-api packages/db/fixtures.
+- The page follows data.source: dapodik -> POST /imports/dapodik, emis (madrasah, AKD-09) -> POST
+  /imports/emis; same upload/parse/preview/commit, only the wording differs (SOURCES in import/page.tsx).
 
 ## Schedule page (apps/web/app/(staf)/jadwal)
 - Tabs: Jadwal pelajaran (grid per rombel: days across, jam ke-n down; PUT /schedule/slots,
@@ -296,6 +298,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   Idempotency-Key per set of ticks. Others read "x dari 7".
 - /kebiasaan (HABIT_SUMMARY_READERS; rombel from GET /reports/attendance/classes, which the API narrows
   to a wali kelas's own): GET /classes/{id}/habits?weekStart (Monday), days filled and ticks per habit.
+
+## Setoran hafalan (KEG-03; (staf)/hafalan, (portal)/portal/hafalan, app/_hafalan)
+- Behind religious.memorization (madrasah). /hafalan for MEMORIZATION_WRITERS (guru_tahfidz, admin;
+  lib/memorization.ts): find the student (GET /memorization-logs/students?q=, 2+ letters), surah select
+  (SURAH_OPTIONS from contracts SURAH_NAMES/SURAH_AYAT, ayat inputs capped at the surah), ayat awal/akhir,
+  optional juz/nilai/catatan -> POST /memorization-logs, one Idempotency-Key per setoran (reset on change).
+- HafalanHistory (app/_hafalan/history.tsx, GET /memorization-logs?studentId) is shared by the staff page
+  and /portal/hafalan (student, and each child of a parent from GET /portal/attendance).
 
 ## Golden e2e (5.4)
 - golden-sd.spec.ts: daily session + WA alpa, parent portal login (helpers.otpLogin reads the code with
