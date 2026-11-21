@@ -191,6 +191,9 @@ export default function StafHome() {
             Tagihan Absah
           </Link>
         )}
+        <Link className={styles.card} href="/pengaturan">
+          Notifikasi di HP ini
+        </Link>
         {isAdmin && (
           <Link className={styles.card} href="/setup">
             Pengaturan sekolah

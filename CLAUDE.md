@@ -193,6 +193,21 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   are listed; the page says safety messages always arrive. One Idempotency-Key per save, renewed on any change.
   The number is shown masked and changed by the school, not here.
 
+## Staff Web Push (NTF-06; (staf)/pengaturan, lib/push.ts, public/portal-sw.js)
+- /pengaturan ("Notifikasi di HP ini", home card for every staff member): GET /push/config { publicKey | null } ->
+  pushAvailability (unsupported / off / denied / ready) -> Notification.requestPermission() on the click ->
+  register /portal-sw.js (scope /) -> pushManager.subscribe({ userVisibleOnly, applicationServerKey }) ->
+  PUT /push/subscriptions (subscribeBody checks the browser's JSON against the contract). "Matikan" posts
+  /push/subscriptions/remove and unsubscribes the browser only when no other school still uses it (flags
+  absah.push.<schoolId> in localStorage, best effort: the server does not say which endpoint is registered where).
+  The browser holds one subscription, the API keeps it per school, so staff of several schools turn it on per school.
+- ONE service worker: portal-sw.js already owns scope "/", and a second script at the same scope would REPLACE it
+  (breaking the portal's offline card or the push, depending on who registered last). So push and
+  notificationclick handlers live in portal-sw.js; the click opens only a path of this app (safePath), never
+  another site. The payload is {title, body, url, tag}; `tag` collapses repeats with renotify.
+- Never show anything personal in a push; the API sends generic text. Not covered by e2e (Playwright cannot get a
+  real push service): the helpers are unit tested and the API side has its own tests.
+
 ## Kiosk app (apps/kiosk, GRB-02/03)
 - One page, three phases (lib/use-kiosk.ts): loading -> unpaired (PairScreen: one-time code typed,
   scanned with the camera or a USB scanner; one Idempotency-Key per code) -> ready (ScanScreen).
