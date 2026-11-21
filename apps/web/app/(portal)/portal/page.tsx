@@ -104,6 +104,11 @@ export default function PortalHome() {
         </p>
       </IfCap>
       {hasRole('orang_tua') && (
+        <p>
+          <Link href="/portal/preferensi">Pesan WhatsApp: pilih yang ingin diterima</Link>
+        </p>
+      )}
+      {hasRole('orang_tua') && (
         <IfCap name="gate.pickup">
           <p>
             <Link href="/portal/penjemput">Penjemput anak: siapa saja yang boleh menjemput</Link>
