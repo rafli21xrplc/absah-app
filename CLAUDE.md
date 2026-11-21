@@ -392,6 +392,13 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - golden-smp.spec.ts: two lessons put on today's weekday through the API, per-period session filled,
   the student's own login ticks 7 KAIH, the wali kelas reads the week on /kebiasaan.
 
+- golden-ortu.spec.ts (5.7i): two schools with the Dapodik roster (each admin in its own context), ONE parent
+  number opened for Aditya at school A and Bunga at school B through /siswa/kontak, then the portal: "Pilih anak"
+  with both children and their schools, choosing a child shows only that child and switches the school, 90-day
+  history, and /portal/preferensi saved per school (B changed, A still default). Ends with an API check that
+  school A lists only Aditya. A held late message is NOT asserted here (it depends on the real clock): api
+  test/notify-preferences.test.ts covers it.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
