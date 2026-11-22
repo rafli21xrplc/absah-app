@@ -20,6 +20,7 @@ export const CAPABILITY_LABELS: Record<CapabilityKey, string> = {
   'student.points': 'Poin kesiswaan, ambang, dan tugas tindak lanjut',
   'student.counseling': 'Catatan BK',
   'student.early_warning': 'Peringatan dini kehadiran',
+  'teacher.attendance': 'Presensi, izin, dan pengganti guru',
   'portal.liaison': 'Buku penghubung',
   'data.source': 'Sumber data siswa',
   'report.target': 'Ekspor rapor',

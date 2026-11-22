@@ -438,6 +438,17 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   with no form. Not run locally (stale servers on 4710/3710); CI is the judge. Not covered: evidence upload (needs the
   object store; api tests cover the contract), the 18.00 early-warning job and push (clock/VAPID), parent WhatsApp.
 
+## Guru: absen dan izin (apps/web/app/(staf)/absen-guru, izin-guru; GRU-01/02)
+- Pins api 5786750 (capability teacher.attendance, TEACHER_* role constants). lib/teacher.ts builds its role lists from the
+  contracts' constants (TEACHER_CHECKIN_ROLES, TEACHER_LEAVE_DECIDERS, ...) instead of copying them.
+- /absen-guru (TEACHER_CHECKIN): GET /teacher-attendance/today, then "Absen masuk" / "Absen pulang" ("Perbarui jam
+  pulang" once out; the latest wins). The API decides late against the school start; the page only says it
+  (checkInSummary, times on the school clock through clockLabel, never UTC). One idempotency key per tap until it
+  went through. Not a school day: no button.
+- /izin-guru: teachers ask (kind, dates, reason) and withdraw their own izin (mayCancelTeacherLeave mirrors the API);
+  TEACHER_LEAVE_DECIDING (wakasek, kepsek, admin) see the pending queue minus their own and approve or reject with an
+  optional note. Cards on the home page by role + capability.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
