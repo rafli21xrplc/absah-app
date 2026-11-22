@@ -561,6 +561,18 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   students to chase first (boardOrder). Updated time is the server's, on the school clock. No names here: the lists stay on /gerbang.
 - e2e papan-kedatangan.spec.ts: board opens at 0, a manual arrival made through the API shows up without a reload.
 
+## Ekspor data sekolah (PLT-11; (staf)/ekspor-data, lib/workspace-export.ts)
+- Home card "Ekspor data sekolah" for the admin only (isAdmin; the API gives 403 to others). /ekspor-data: tick "Sertakan berkas
+  unggahan" (default on), "Minta ekspor" = POST /workspace/exports with ONE Idempotency-Key per form state (renewed on a change, kept
+  after a lost reply, dropped after any API answer; 409 = one is already being built, shown from the API). GET /workspace/exports is
+  polled every 3 s only while a row is `queued` (the button then says "Sedang dibuat" and is disabled).
+- Done rows show tables, files, size, "termasuk data TPPK" only when the API says includesTppk (the admin must be on the TPPK team
+  to get that schema), and "Tersedia sampai" = finished + WORKSPACE_EXPORT_RETENTION_DAYS (7). "Unduh" opens a tab inside the click
+  (popup blockers), asks GET .../download for the 5-minute link and points the tab at it; 409 expired/not_ready reloads the list.
+  Every download is audited by the API. The page never reads or parses the ZIP.
+- e2e ekspor-data.spec.ts: admin of the SD fixture requests, the worker finishes (up to 90 s), the link serves a ZIP containing
+  tabel/students.csv and README.txt.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and

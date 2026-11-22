@@ -268,6 +268,11 @@ export default function StafHome() {
           Notifikasi di HP ini
         </Link>
         {isAdmin && (
+          <Link className={styles.card} href="/ekspor-data">
+            Ekspor data sekolah
+          </Link>
+        )}
+        {isAdmin && (
           <Link className={styles.card} href="/setup">
             Pengaturan sekolah
           </Link>
