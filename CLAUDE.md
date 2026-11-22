@@ -472,6 +472,16 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   count -> candidates (the absent teacher is not offered) -> assign -> report row of Pak Pengganti shows 1 mengganti and
   Bu Wali's daily detail opens. Clash prevention is the API's tests (teacher-substitutes), not repeated here.
 
+## Tagihan siswa and ujian: shared helpers (5.10; lib/student-billing.ts, lib/exam.ts)
+- lib/billing.ts is the school's own Absah SUBSCRIPTION ("Tagihan Absah", /tagihan). Student fees (SPP, kegiatan; TGH) live in
+  lib/student-billing.ts with pages under /tagihan-siswa and /portal/tagihan; the roles come from the contracts
+  (BILLING_MANAGERS = bendahara + admin write, BILLING_READERS add kepsek + wakasek). rupiah/dateLabel/groupDigits are reused
+  from lib/billing.ts. evenInstallments splits an amount into n monthly parts that add up exactly (first parts carry the odd
+  rupiah); addMonths keeps the last day of a short month; parseRupiah reads "250.000", never decimals.
+- lib/exam.ts: role lists from the contracts (EXAM_MANAGERS wakasek+admin, EXAM_VIEWERS add kepsek+wali_kelas), reasonLabel
+  (own attendance % and the minimum, count of open installments, never an amount), ruleSummary, examWindowLabel and
+  checkInProblem (API reason/cardReason -> what the pengawas does next).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
