@@ -20,6 +20,7 @@ import { UKS_STAFF } from '@/lib/uks';
 import { MEMORIZATION_WRITERS } from '@/lib/memorization';
 import { MBG_READERS } from '@/lib/mbg';
 import { BILLING_READERS } from '@/lib/billing';
+import { STUDENT_BILLING_READING } from '@/lib/student-billing';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
 import { RECAP_READERS } from '@/lib/report';
 import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
@@ -248,6 +249,13 @@ export default function StafHome() {
           <Link className={styles.card} href="/tagihan">
             Tagihan Absah
           </Link>
+        )}
+        {hasRole(...STUDENT_BILLING_READING) && (
+          <IfCap name="student.billing">
+            <Link className={styles.card} href="/tagihan-siswa">
+              Tagihan siswa
+            </Link>
+          </IfCap>
         )}
         <Link className={styles.card} href="/pengaturan">
           Notifikasi di HP ini
