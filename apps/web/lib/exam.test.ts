@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkInProblem, examWindowLabel, reasonLabel, ruleSummary } from './exam';
+import { checkInProblem, EMPTY_PERIOD_FORM, examWindowLabel, formFromPeriod, periodBody, periodProblem, reasonLabel, ruleSummary } from './exam';
 
 describe('reasonLabel', () => {
   it('says the student’s own number and the minimum, and how many installments are open, never an amount', () => {
@@ -36,5 +36,34 @@ describe('checkInProblem', () => {
     expect(checkInProblem({ reason: 'not_exam_day' })).toBe('Hari ini bukan hari ujian ini.');
     expect(checkInProblem({ reason: 'something_new' })).toBe('Tidak bisa mencatat kedatangan.');
     expect(checkInProblem(undefined)).toBe('Tidak bisa mencatat kedatangan.');
+  });
+});
+
+
+describe('period form', () => {
+  const ok = { ...EMPTY_PERIOD_FORM, name: 'PTS Ganjil', startsOn: '2026-12-01', endsOn: '2026-12-05' };
+
+  it('names what is wrong, in the order the form is read', () => {
+    expect(periodProblem(ok)).toBeNull();
+    expect(periodProblem({ ...ok, name: 'a' })).toMatch(/Nama/);
+    expect(periodProblem({ ...ok, startsOn: '' })).toMatch(/tanggal/);
+    expect(periodProblem({ ...ok, endsOn: '2026-11-30' })).toBe('Tanggal selesai sebelum tanggal mulai.');
+    expect(periodProblem({ ...ok, minText: '0' })).toMatch(/1 sampai 100/);
+    expect(periodProblem({ ...ok, minText: '75,5' })).toMatch(/1 sampai 100/);
+    expect(periodProblem({ ...ok, useMin: false, minText: 'abc' })).toBeNull(); // not used, not checked
+    expect(periodProblem({ ...ok, attendanceFrom: '2026-12-02' })).toMatch(/sebelum ujian/);
+  });
+
+  it('sends no attendance rule when it is off, and fee types only with the paid rule', () => {
+    expect(periodBody({ ...ok, useMin: false })).toMatchObject({ minAttendance: null, attendanceFrom: null, feeTypeIds: [] });
+    expect(periodBody({ ...ok, requirePaid: true, feeTypeIds: ['a'] })).toMatchObject({ minAttendance: 75, requirePaid: true, feeTypeIds: ['a'] });
+    expect(periodBody({ ...ok, requirePaid: false, feeTypeIds: ['a'] }).feeTypeIds).toEqual([]);
+  });
+
+  it('fills the form from a period and back again', () => {
+    const period = { id: 'x', name: 'PAS', academicYear: { id: 'y', name: '2026/2027' }, startsOn: '2026-12-01', endsOn: '2026-12-05', minAttendance: null, attendanceFrom: '2026-07-13', excusedCounts: false, requirePaid: true, feeTypeIds: ['f'], closed: false };
+    const form = formFromPeriod(period);
+    expect(form).toMatchObject({ useMin: false, attendanceFrom: '2026-07-13', excusedCounts: false, requirePaid: true, feeTypeIds: ['f'] });
+    expect(periodBody(form)).toEqual({ name: 'PAS', startsOn: '2026-12-01', endsOn: '2026-12-05', minAttendance: null, attendanceFrom: '2026-07-13', excusedCounts: false, requirePaid: true, feeTypeIds: ['f'] });
   });
 });

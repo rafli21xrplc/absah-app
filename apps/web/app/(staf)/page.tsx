@@ -21,6 +21,7 @@ import { MEMORIZATION_WRITERS } from '@/lib/memorization';
 import { MBG_READERS } from '@/lib/mbg';
 import { BILLING_READERS } from '@/lib/billing';
 import { STUDENT_BILLING_READING } from '@/lib/student-billing';
+import { EXAM_VIEWING } from '@/lib/exam';
 import { NOTIFY_VIEWERS } from '@/lib/notify';
 import { RECAP_READERS } from '@/lib/report';
 import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
@@ -257,6 +258,11 @@ export default function StafHome() {
             </Link>
           </IfCap>
         )}
+        <IfCap name="exam.enabled">
+          <Link className={styles.card} href="/ujian">
+            {hasRole(...EXAM_VIEWING) ? 'Ujian' : 'Ruang ujian saya'}
+          </Link>
+        </IfCap>
         <Link className={styles.card} href="/pengaturan">
           Notifikasi di HP ini
         </Link>
