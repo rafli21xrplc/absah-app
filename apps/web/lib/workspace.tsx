@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { api, ApiError } from './api';
 import { CapabilitiesProvider } from './capabilities';
+import { contextCacheKey, isTransient, offlineStore } from './offline-queue';
 
 type Me = MeContextResponse;
 type State =
@@ -68,8 +69,18 @@ export function WorkspaceProvider({ children, signInPath = '/masuk' }: { childre
           ? await api('/me/context', MeContextResponse, { schoolId: chosen, signal: controller.signal })
           : base;
         setState({ status: 'ready', me });
+        void offlineStore().keep(contextCacheKey, me);
       } catch (err) {
         if (controller.signal.aborted) return;
+        if (isTransient(err)) {
+          // No signal: the copy of the last answer keeps the session screens usable (PRS-08).
+          const copy = MeContextResponse.safeParse((await offlineStore().cached(contextCacheKey))?.value);
+          if (copy.success) {
+            if (copy.data.active && copy.data.active.schoolId !== schoolId) setSchoolId(copy.data.active.schoolId);
+            setState({ status: 'ready', me: copy.data });
+            return;
+          }
+        }
         if (err instanceof ApiError && err.status === 401) router.replace(`${signInPath}?lanjut=${encodeURIComponent(pathname)}`);
         else if (err instanceof ApiError && err.code === 'TWO_FACTOR_REQUIRED') router.replace('/keamanan/dua-langkah');
         else setState({ status: 'error', message: err instanceof Error ? err.message : 'Gagal memuat data.' });

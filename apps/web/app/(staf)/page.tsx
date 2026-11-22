@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { api } from '@/lib/api';
 import { signOut } from '@/lib/auth';
+import { offlineStore } from '@/lib/offline-queue';
 import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
@@ -282,6 +283,7 @@ export default function StafHome() {
           variant="secondary"
           onClick={() =>
             void signOut().then(() => {
+              void offlineStore().clearCached(); // rosters kept for offline use do not stay on the phone
               selectSchool(null);
               router.replace('/masuk');
             })
