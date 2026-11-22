@@ -1,6 +1,6 @@
 import { TEACHER_LEAVE_KINDS } from '@absah/contracts';
 import { describe, expect, it } from 'vitest';
-import { candidateNotes, checkInSummary, clockLabel, mayCancelTeacherLeave, sessionTimeLabel, startLabel, TEACHER_CHECKIN, TEACHER_DAY_LABELS, TEACHER_LEAVE_DECIDING, TEACHER_LEAVE_KIND_LABELS, teacherLeaveProblem } from './teacher';
+import { candidateNotes, checkInSummary, clockLabel, leaveDays, mayCancelTeacherLeave, monthLabel, rateLabel, shiftMonth, sessionTimeLabel, startLabel, TEACHER_CHECKIN, TEACHER_DAY_LABELS, TEACHER_LEAVE_DECIDING, TEACHER_LEAVE_KIND_LABELS, teacherLeaveProblem } from './teacher';
 
 describe('teacher labels', () => {
   it('name every izin kind the API knows, and every day status of the report', () => {
@@ -68,5 +68,26 @@ describe('candidateNotes', () => {
   it('says who is already at school, the subject and the load', () => {
     expect(candidateNotes({ checkedIn: true, sameSubject: true, substitutionsThisMonth: 2 })).toBe('Sudah absen · Mapel sama · 2× mengganti bulan ini');
     expect(candidateNotes({ checkedIn: false, sameSubject: false, substitutionsThisMonth: 0 })).toBe('Belum absen · Belum mengganti bulan ini');
+  });
+});
+
+describe('month helpers', () => {
+  it('writes the month in Indonesian and steps over year ends', () => {
+    expect(monthLabel('2026-11')).toBe('November 2026');
+    expect(monthLabel('2027-01')).toBe('Januari 2027');
+    expect(shiftMonth('2026-11', 1)).toBe('2026-12');
+    expect(shiftMonth('2026-12', 1)).toBe('2027-01');
+    expect(shiftMonth('2027-01', -1)).toBe('2026-12');
+    expect(shiftMonth('2026-03', -1)).toBe('2026-02');
+  });
+});
+
+describe('rateLabel and leaveDays', () => {
+  it('uses the decimal comma and a dash without school days', () => {
+    expect(rateLabel(62.5)).toBe('62,5%');
+    expect(rateLabel(100)).toBe('100%');
+    expect(rateLabel(0)).toBe('0%');
+    expect(rateLabel(null)).toBe('–');
+    expect(leaveDays({ sakit: 1, izin: 2, dinas: 3 })).toBe(6);
   });
 });

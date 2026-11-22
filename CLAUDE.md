@@ -457,6 +457,13 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   in, same subject, fewest this month; the page only prints why via candidateNotes) and POST /substitutions. On a 409 the
   reason is shown and the candidate list reloads, since someone else may have just taken that teacher.
 
+## Kehadiran guru (apps/web/app/(staf)/laporan-guru; GRU-04)
+- /laporan-guru (TEACHER_REPORT_READING = kepsek, wakasek, admin): GET /teacher-attendance/report?month=, month stepper
+  (no going past this month), totals line, a table per teacher; clicking a name refetches with teacherId for the day by
+  day with check-in/out times on the school clock. A "no record" day is never labelled alpa. Only the answer to the
+  current month/teacher is shown (loaded.key), never the previous month's while loading.
+- No export yet; the API has none (JSON only).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and

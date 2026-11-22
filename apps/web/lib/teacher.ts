@@ -59,3 +59,24 @@ export function candidateNotes(c: { checkedIn: boolean; sameSubject: boolean; su
   const notes = [c.checkedIn ? 'Sudah absen' : 'Belum absen', ...(c.sameSubject ? ['Mapel sama'] : []), c.substitutionsThisMonth === 0 ? 'Belum mengganti bulan ini' : `${c.substitutionsThisMonth}× mengganti bulan ini`];
   return notes.join(' · ');
 }
+
+const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+/** "November 2026" for "2026-11". */
+export function monthLabel(month: string): string {
+  const [year, m] = month.split('-');
+  return `${MONTHS[Number(m) - 1] ?? month} ${year}`;
+}
+
+/** The month before or after "YYYY-MM" (December rolls into January of the next year). */
+export function shiftMonth(month: string, by: 1 | -1): string {
+  const [year, m] = month.split('-').map(Number) as [number, number];
+  const index = year * 12 + (m - 1) + by;
+  return `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, '0')}`;
+}
+
+/** "62,5%" (Indonesian decimal comma), or a dash when the month has no school days yet. */
+export const rateLabel = (rate: number | null): string => (rate === null ? '–' : `${String(rate).replace('.', ',')}%`);
+
+/** Days on approved izin in one number (sakit + izin + dinas). */
+export const leaveDays = (leave: { sakit: number; izin: number; dinas: number }): number => leave.sakit + leave.izin + leave.dinas;
