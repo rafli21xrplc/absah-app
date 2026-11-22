@@ -14,6 +14,7 @@ import { GATE_VIEWERS } from '@/lib/gate';
 import { HABIT_SUMMARY_READERS } from '@/lib/habits';
 import { JOURNAL_VIEWERS } from '@/lib/journal';
 import { VISITOR_VIEWERS } from '@/lib/visitors';
+import { POINT_RECORDERS } from '@/lib/ksw';
 import { UKS_STAFF } from '@/lib/uks';
 import { MEMORIZATION_WRITERS } from '@/lib/memorization';
 import { MBG_READERS } from '@/lib/mbg';
@@ -165,6 +166,13 @@ export default function StafHome() {
           <IfCap name="student.uks">
             <Link className={styles.card} href="/uks">
               UKS
+            </Link>
+          </IfCap>
+        )}
+        {hasRole(...POINT_RECORDERS) && (
+          <IfCap name="student.points">
+            <Link className={styles.card} href="/poin">
+              Poin kesiswaan
             </Link>
           </IfCap>
         )}

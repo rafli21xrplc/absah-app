@@ -9,6 +9,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   guru: 'Guru',
   piket: 'Guru piket',
   petugas_uks: 'Petugas UKS',
+  guru_bk: 'Guru BK',
   guru_tahfidz: 'Guru tahfidz',
   tppk: 'Anggota TPPK',
   pembina: 'Pembina',
