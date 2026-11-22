@@ -47,3 +47,15 @@ export function checkEvidence(file: { size: number; type: string }): EvidenceChe
 export function totalsLine(violationPoints: number, achievementPoints: number): string {
   return `${signedPoints(violationPoints)} poin pelanggaran, ${signedPoints(achievementPoints)} poin prestasi`;
 }
+
+/** The points a form sends for a rule: the person types how many (1..100), the kind gives the sign. */
+export function signedForKind(kind: PointKind, amount: number): number {
+  const n = Math.abs(Math.trunc(amount));
+  return kind === 'violation' ? -n : n;
+}
+
+/** The number shown in the "how many points" box when editing a rule. */
+export const amountOf = (points: number): number => Math.abs(points);
+
+/** Valid amount of a rule's points as typed (1..100, whole numbers). */
+export const isValidAmount = (amount: number): boolean => Number.isInteger(amount) && amount >= 1 && amount <= 100;

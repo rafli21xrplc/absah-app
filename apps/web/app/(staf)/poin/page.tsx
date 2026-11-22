@@ -30,6 +30,9 @@ export default function PoinPage() {
           ← Beranda
         </Link>
         <h1 className={styles.title}>Poin kesiswaan</h1>
+        <p>
+          <Link href="/poin/aturan">Aturan poin dan ambang</Link>
+        </p>
         {notice && (
           <p role="status">
             Tersimpan: {notice.student}, {notice.entry.rule} ({signedPoints(notice.entry.points)}).{' '}
