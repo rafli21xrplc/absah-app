@@ -30,7 +30,7 @@ test('Tagihan siswa: admin membuat jenis, menerbitkan ke rombel dua kali, membat
   await page.goto('/tagihan-siswa/terbitkan');
   await page.getByLabel('Jenis tagihan').selectOption({ label: 'SPP (Rp250.000)' });
   await page.getByLabel(/^Periode/).fill('2026-11');
-  await page.getByLabel('Rombel').selectOption({ index: 1 });
+  await page.getByRole('combobox', { name: /^Rombel/ }).selectOption({ index: 1 });
   await page.getByLabel('Jatuh tempo', { exact: true }).fill('2099-12-10');
   await page.getByRole('button', { name: 'Terbitkan' }).click();
   await expect(page.getByRole('status').filter({ hasText: /tagihan dibuat, total/ })).toBeVisible();
