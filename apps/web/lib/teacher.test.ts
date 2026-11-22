@@ -1,6 +1,6 @@
 import { TEACHER_LEAVE_KINDS } from '@absah/contracts';
 import { describe, expect, it } from 'vitest';
-import { checkInSummary, clockLabel, mayCancelTeacherLeave, startLabel, TEACHER_CHECKIN, TEACHER_DAY_LABELS, TEACHER_LEAVE_DECIDING, TEACHER_LEAVE_KIND_LABELS, teacherLeaveProblem } from './teacher';
+import { candidateNotes, checkInSummary, clockLabel, mayCancelTeacherLeave, sessionTimeLabel, startLabel, TEACHER_CHECKIN, TEACHER_DAY_LABELS, TEACHER_LEAVE_DECIDING, TEACHER_LEAVE_KIND_LABELS, teacherLeaveProblem } from './teacher';
 
 describe('teacher labels', () => {
   it('name every izin kind the API knows, and every day status of the report', () => {
@@ -54,5 +54,19 @@ describe('teacherLeaveProblem', () => {
     expect(teacherLeaveProblem({ startsOn: '', endsOn: '2026-11-25', reason: 'x' })).toBe('Isi tanggal mulai dan selesai.');
     expect(teacherLeaveProblem({ startsOn: '2026-11-26', endsOn: '2026-11-25', reason: 'x' })).toBe('Tanggal selesai sebelum tanggal mulai.');
     expect(teacherLeaveProblem({ startsOn: '2026-11-24', endsOn: '2026-11-24', reason: '   ' })).toBe('Tulis alasannya.');
+  });
+});
+
+describe('sessionTimeLabel', () => {
+  it('names the lesson and its time, or a daily session', () => {
+    expect(sessionTimeLabel({ number: 2, startsAt: '07:40', endsAt: '08:20' })).toBe('Jam ke-2 (07.40–08.20)');
+    expect(sessionTimeLabel(null)).toBe('Sesi harian');
+  });
+});
+
+describe('candidateNotes', () => {
+  it('says who is already at school, the subject and the load', () => {
+    expect(candidateNotes({ checkedIn: true, sameSubject: true, substitutionsThisMonth: 2 })).toBe('Sudah absen · Mapel sama · 2× mengganti bulan ini');
+    expect(candidateNotes({ checkedIn: false, sameSubject: false, substitutionsThisMonth: 0 })).toBe('Belum absen · Belum mengganti bulan ini');
   });
 });
