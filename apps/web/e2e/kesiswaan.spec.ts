@@ -33,7 +33,7 @@ test('Kesiswaan: aturan, poin melewati ambang, tugas tindak lanjut, pembatalan, 
   await page.getByRole('button', { name: 'ADITYA PRATAMA · VII A' }).click();
   await page.getByRole('button', { name: 'Simpan' }).click();
   await expect(page.getByText('Pilih aturannya.')).toBeVisible();
-  await page.getByLabel('Aturan', { exact: true }).selectOption({ label: 'Kedisiplinan · Membolos (-30)' });
+  await page.getByRole('combobox').selectOption({ label: 'Kedisiplinan · Membolos (-30)' });
   await page.getByLabel('Catatan (boleh dikosongkan)').fill('Tidak masuk setelah istirahat');
   page.once('dialog', (d) => void d.accept());
   await page.getByRole('button', { name: 'Simpan' }).click();
@@ -59,7 +59,7 @@ test('Kesiswaan: aturan, poin melewati ambang, tugas tindak lanjut, pembatalan, 
   await page.goto('/poin');
   await page.getByLabel('Cari siswa').fill('aditya');
   await page.getByRole('button', { name: 'ADITYA PRATAMA · VII A' }).click();
-  await page.getByLabel('Aturan', { exact: true }).selectOption({ label: 'Kedisiplinan · Membolos (-30)' });
+  await page.getByRole('combobox').selectOption({ label: 'Kedisiplinan · Membolos (-30)' });
   page.once('dialog', (d) => void d.accept());
   await page.getByRole('button', { name: 'Simpan' }).click();
   await page.getByRole('link', { name: 'Lihat poin siswa' }).click();
