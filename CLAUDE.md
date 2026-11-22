@@ -431,6 +431,13 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   complete just reloads the list. The note text lives only in component state and the response, never in logs,
   localStorage or analytics; do not add it to any of those.
 
+## Kesiswaan e2e (e2e/kesiswaan.spec.ts)
+- One golden path: admin writes a rule (Membolos, -30) and a threshold (25), records it for ADITYA (confirm dialog), sees
+  -30 on the profile, closes the follow-up task that the threshold made, reverses a second entry (reason required),
+  then a guru BK (invited by the admin) writes a note with a planned follow-up, closes it, and the admin reads it
+  with no form. Not run locally (stale servers on 4710/3710); CI is the judge. Not covered: evidence upload (needs the
+  object store; api tests cover the contract), the 18.00 early-warning job and push (clock/VAPID), parent WhatsApp.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
