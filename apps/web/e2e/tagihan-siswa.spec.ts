@@ -34,6 +34,8 @@ test('Tagihan siswa: admin membuat jenis, menerbitkan ke rombel dua kali, membat
   await page.getByLabel('Jatuh tempo', { exact: true }).fill('2099-12-10');
   await page.getByRole('button', { name: 'Terbitkan' }).click();
   await expect(page.getByRole('status').filter({ hasText: /tagihan dibuat, total/ })).toBeVisible();
+  // The same click again replays the same answer (one Idempotency-Key per form state); a changed form is a new request.
+  await page.getByLabel(/^Judul/).fill('SPP November');
   await page.getByRole('button', { name: 'Terbitkan' }).click();
   await expect(page.getByRole('status').filter({ hasText: /sudah punya tagihan ini/ })).toBeVisible();
 
