@@ -14,7 +14,7 @@ import { GATE_VIEWERS } from '@/lib/gate';
 import { HABIT_SUMMARY_READERS } from '@/lib/habits';
 import { JOURNAL_VIEWERS } from '@/lib/journal';
 import { VISITOR_VIEWERS } from '@/lib/visitors';
-import { EARLY_WARNING_READERS, FOLLOWUP_READERS, POINT_RECORDERS } from '@/lib/ksw';
+import { BK_READERS, EARLY_WARNING_READERS, FOLLOWUP_READERS, POINT_RECORDERS } from '@/lib/ksw';
 import { UKS_STAFF } from '@/lib/uks';
 import { MEMORIZATION_WRITERS } from '@/lib/memorization';
 import { MBG_READERS } from '@/lib/mbg';
@@ -187,6 +187,13 @@ export default function StafHome() {
           <IfCap name="student.early_warning">
             <Link className={styles.card} href="/peringatan-dini">
               Peringatan dini
+            </Link>
+          </IfCap>
+        )}
+        {hasRole(...BK_READERS) && (
+          <IfCap name="student.counseling">
+            <Link className={styles.card} href="/bk">
+              Catatan BK
             </Link>
           </IfCap>
         )}
