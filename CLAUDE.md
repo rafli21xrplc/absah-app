@@ -495,6 +495,17 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - /rekap: GET /student-billing/recap?month=&feeTypeId=: money received that month by day and method, a notice when payments
   were flagged (counted for nothing), and owed per rombel. Only the answer to the current month/filter is shown (loaded.key).
 
+## Tagihan sekolah for parents and students ((portal)/portal/tagihan; TGH-03)
+- Link on /portal behind student.billing. GET /student-billing/mine (the caller's own children, by guardians.user_id, or the
+  student themself), grouped per child (first name + rombel), bills to pay first, "Sudah lunas" folded. One installment is
+  offered at a time (nextInstallment); a multi-installment bill lists all its cicilan.
+- Pay: "Bayar lewat Virtual Account" / "Bayar lewat QRIS" -> POST /student-billing/installments/{id}/payments, one
+  Idempotency-Key per click. While a charge is open (requested/pending) the buttons are hidden and the screen polls every 2 s
+  (worker opening the VA/QR) or 10 s (waiting for the money); expired/failed shows "minta yang baru". The VA is shown in
+  groups of four (groupDigits) with the bank and expiry on the school clock; QRIS is drawn from qrString with `qrcode`.
+  409 payments_unavailable (no PaymentProvider) shows the API's message ("Hubungi sekolah").
+- No amounts or bills in the WhatsApp reminder: it only says something is due and links to the portal.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
