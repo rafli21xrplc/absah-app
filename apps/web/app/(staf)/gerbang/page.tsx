@@ -45,6 +45,9 @@ export default function GerbangPage() {
           ← Beranda
         </Link>
         <h1 className={styles.title}>Gerbang hari ini</h1>
+        <Link className={styles.notice} href="/gerbang/papan">
+          Papan kedatangan per rombel (diperbarui tiap 5 detik)
+        </Link>
         {hasRole(...KIOSK_MANAGERS) && (
           <Link className={styles.notice} href="/gerbang/kios">
             Kelola kios gerbang

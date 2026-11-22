@@ -39,3 +39,22 @@
   word-break: break-all;
   user-select: all;
 }
+.board {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.board th,
+.board td {
+  padding: 10px 8px;
+  text-align: right;
+  border-bottom: 1px solid var(--absah-border);
+}
+.board th:first-child {
+  text-align: left;
+}
+.board td[data-chase='true'] {
+  font-weight: 700;
+  color: var(--absah-warning, var(--absah-text));
+}
