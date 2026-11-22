@@ -103,6 +103,11 @@ export default function PortalHome() {
           <Link href="/portal/hafalan">Hafalan Al-Qur&apos;an: riwayat setoran</Link>
         </p>
       </IfCap>
+      <IfCap name="exam.enabled">
+        <p>
+          <Link href="/portal/ujian">Kartu ujian: ruang, tempat duduk, dan syarat</Link>
+        </p>
+      </IfCap>
       <IfCap name="student.billing">
         <p>
           <Link href="/portal/tagihan">Tagihan sekolah: lihat dan bayar</Link>

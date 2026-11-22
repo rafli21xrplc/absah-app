@@ -521,6 +521,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   the same dynamic card QR as the daily card) or "Catat hadir" (POST /attendance, manual); refusals read through
   checkInProblem. A student who may not sit shows "Belum boleh ujian" with no button. There is no camera scanner on this page.
 
+## Kartu ujian for parents and students ((portal)/portal/ujian; UJN-01/03)
+- Link on /portal behind exam.enabled. GET /exam/mine (own children only), exams that are not over by the school date.
+  examCardView(exam, today) decides: `show` (exam day, may sit, not yet in) draws CardQr from the keys the daily card
+  already stored on this phone (`absah.card.{studentId}`, the same QR the gate reads, so nothing new is stored); without
+  keys it points to the portal home to activate the card. `blocked` lists the reasons (reasonLabel, never amounts) and
+  says to contact the school; `before` says whether the child may sit now; `arrived` says the child is checked in.
+- The room and seat show as soon as the school arranges them ("Ruang belum diatur sekolah" until then).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
