@@ -23,14 +23,11 @@ test('Ekspor data sekolah: admin meminta, pekerja menyelesaikan, berkas ZIP bisa
   await expect(page.getByText('Siap diunduh')).toBeVisible({ timeout: 90_000 });
   await expect(page.getByText(/\d+ tabel/)).toBeVisible();
 
-  const opened = context.waitForEvent('page');
+  // "Unduh" opens a tab (a download never navigates it) and the link is what the API answered.
+  const answered = page.waitForResponse((r) => r.url().endsWith('/download') && r.request().method() === 'GET');
   await page.getByRole('button', { name: /^Unduh data-sekolah-/ }).click();
-  const tab = await opened;
-  const url = await new Promise<string>((resolve) => {
-    const check = () => (tab.url().startsWith('http') && !tab.url().startsWith('about:') ? resolve(tab.url()) : setTimeout(check, 200));
-    check();
-  }).catch(() => tab.url());
-  await tab.close().catch(() => undefined);
+  const { url } = (await (await answered).json()) as { url: string };
+  for (const tab of context.pages()) if (tab !== page) await tab.close().catch(() => undefined);
 
   const file = await page.request.get(url);
   expect(file.status()).toBe(200);
