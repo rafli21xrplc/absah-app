@@ -30,6 +30,7 @@ import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
 import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../shell.module.css';
+import { ChangelogNotice } from './changelog-notice';
 import { MbgCard } from './mbg/card';
 import { TppkCards } from './tppk/card';
 
@@ -81,6 +82,7 @@ export default function StafHome() {
         {school.name} · {LEVEL_LABELS[school.level]}
       </p>
       <h1 className={styles.title}>Halo, {me.user.name}</h1>
+      <ChangelogNotice />
       <nav className={styles.list} aria-label="Menu">
         {hasRole(...DASHBOARD_READERS) && (
           <Link className={styles.card} href="/dasbor">
@@ -103,6 +105,9 @@ export default function StafHome() {
         )}
         <Link className={styles.card} href="/kegiatan">
           Kegiatan
+        </Link>
+        <Link className={styles.card} href="/rilis">
+          Catatan rilis
         </Link>
         <IfCap name="pkl.enabled">
           <Link className={styles.card} href="/pkl">
