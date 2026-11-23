@@ -35,6 +35,9 @@ test('Integrasi: admin membuat kunci API, kunci itu membaca presensi, dicabut di
 
   await page.getByRole('button', { name: 'Sudah saya simpan' }).click();
   await expect(page.getByText(key)).toHaveCount(0);
+  // The list is read when the page opens: the key was used through the API meanwhile, so it shows "Belum dipakai" until the page is read again.
+  await expect(page.getByText('Belum dipakai')).toBeVisible();
+  await page.reload();
   await expect(page.getByText('Aktif').first()).toBeVisible();
 
   page.once('dialog', (d) => void d.accept());
