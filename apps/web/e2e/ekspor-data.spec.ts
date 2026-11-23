@@ -12,8 +12,8 @@ test('Ekspor data sekolah: admin meminta, pekerja menyelesaikan, berkas ZIP bisa
   await page.getByRole('button', { name: 'Terapkan 10 perubahan' }).click({ timeout: 60_000 });
   await expect(page.getByText(/Import diterapkan ke tahun ajaran/)).toBeVisible();
 
-  await page.goto('/');
-  await page.getByRole('link', { name: 'Ekspor data sekolah' }).click();
+  // Open it directly: the home page sends an admin of a school still in setup to /setup.
+  await page.goto('/ekspor-data');
   await expect(page.getByText('Belum ada ekspor.')).toBeVisible();
   await page.getByRole('button', { name: 'Minta ekspor' }).click();
   await expect(page.getByText(/Ekspor diminta/)).toBeVisible();
