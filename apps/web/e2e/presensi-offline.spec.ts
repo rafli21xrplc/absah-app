@@ -26,7 +26,22 @@ test('Guru mengisi dua sesi tanpa sinyal, lalu terkirim otomatis saat sinyal kem
   await page.goto('/hari-ini');
   await expect(page.getByRole('link', { name: /VII A/ })).toContainText('Belum diisi');
   await expect(page.getByRole('link', { name: /VII B/ })).toContainText('Belum diisi');
-  await page.waitForLoadState('networkidle');
+  // Both rosters are kept on the phone before the signal drops (the page keeps polling, so "network idle" never comes).
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          new Promise<number>((resolve) => {
+            const open = indexedDB.open('absah-staff-offline');
+            open.onsuccess = () => {
+              const keys = open.result.transaction('cache').objectStore('cache').getAllKeys();
+              keys.onsuccess = () => resolve((keys.result as string[]).filter((k) => k.startsWith('session:')).length);
+            };
+            open.onerror = () => resolve(0);
+          }),
+      ),
+    )
+    .toBe(2);
 
   await page.route('**/api/v1/**', (route) => route.abort('internetdisconnected'));
 
