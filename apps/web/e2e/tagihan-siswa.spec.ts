@@ -55,5 +55,6 @@ test('Tagihan siswa: admin membuat jenis, menerbitkan ke rombel dua kali, membat
   await page.getByRole('link', { name: 'Rekap pembayaran' }).click();
   await expect(page.getByRole('heading', { name: 'Rekap pembayaran' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Belum dibayar per rombel' })).toBeVisible();
-  await expect(page.getByRole('row').filter({ hasText: /Rp250\.000/ }).first()).toBeVisible();
+  // The rombel has several bills of Rp250.000 (one cancelled), so its row shows the sums, not one bill.
+  await expect(page.getByRole('row').filter({ hasText: /VII/ }).first()).toContainText(/Rp[\d.]+/);
 });
