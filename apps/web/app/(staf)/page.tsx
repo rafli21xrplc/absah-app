@@ -284,6 +284,13 @@ export default function StafHome() {
           </Link>
         )}
         {isAdmin && (
+          <IfCap name="platform.openApi">
+            <Link className={styles.card} href="/integrasi">
+              Integrasi (API dan webhook)
+            </Link>
+          </IfCap>
+        )}
+        {isAdmin && (
           <Link className={styles.card} href="/setup">
             Pengaturan sekolah
           </Link>
