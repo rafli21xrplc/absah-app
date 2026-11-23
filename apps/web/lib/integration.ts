@@ -1,4 +1,4 @@
-import { API_KEY_MAX_RATE, API_KEY_MIN_RATE, WEBHOOK_TEST_EVENT, WEBHOOK_URL_MAX, type ApiKey, type ApiKeyScope, type WebhookDelivery, type WebhookEventType } from '@absah/contracts';
+import { API_KEY_MAX_RATE, API_KEY_MIN_RATE, WEBHOOK_AUTO_DISABLE_AFTER, WEBHOOK_TEST_EVENT, WEBHOOK_URL_MAX, type ApiKey, type ApiKeyScope, type Webhook, type WebhookDelivery, type WebhookEventType } from '@absah/contracts';
 
 /** How a key's permission is named to the admin. */
 export const SCOPE_LABELS: Record<ApiKeyScope, string> = {
@@ -64,3 +64,9 @@ export function deliveryError(code: string | null): string {
 
 /** True while some call still waits, so the list keeps asking. */
 export const anyPending = (items: readonly Pick<WebhookDelivery, 'status'>[]): boolean => items.some((i) => i.status === 'pending');
+
+/** On, off by the admin, or off because Absah stopped after too many failed calls. */
+export type HookState = 'on' | 'off' | 'auto_off';
+export const hookState = (h: Pick<Webhook, 'active' | 'disabledReason'>): HookState => (h.active ? 'on' : h.disabledReason ? 'auto_off' : 'off');
+export const HOOK_STATE_LABELS: Record<HookState, string> = { on: 'Aktif', off: 'Dimatikan', auto_off: 'Dimatikan otomatis' };
+export const AUTO_OFF_NOTE = `Absah berhenti mengirim karena ${WEBHOOK_AUTO_DISABLE_AFTER} pengiriman terakhir gagal berturut-turut. Perbaiki penerimanya, lalu nyalakan lagi dan kirim tes.`;

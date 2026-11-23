@@ -5,7 +5,7 @@ import { Button } from '@absah/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
-import { anyPending, DELIVERY_STATUS_LABELS, deliveryError, EVENT_LABELS, eventLabel, toggle, webhookInput } from '@/lib/integration';
+import { anyPending, AUTO_OFF_NOTE, DELIVERY_STATUS_LABELS, deliveryError, EVENT_LABELS, eventLabel, HOOK_STATE_LABELS, hookState, toggle, webhookInput } from '@/lib/integration';
 import forms from '../../forms.module.css';
 import styles from '../data.module.css';
 import local from './integrasi.module.css';
@@ -201,8 +201,13 @@ export function Webhooks({ schoolId }: { schoolId: string }) {
         {items?.map((h) => (
           <li key={h.id} className={styles.notice}>
             <p>
-              <strong>{h.urlPreview}</strong> · <span className={h.active ? styles.badgeOk : styles.badgeWarn}>{h.active ? 'Aktif' : 'Dimatikan'}</span>
+              <strong>{h.urlPreview}</strong> · <span className={h.active ? styles.badgeOk : hookState(h) === 'auto_off' ? styles.badgeBad : styles.badgeWarn}>{HOOK_STATE_LABELS[hookState(h)]}</span>
             </p>
+            {hookState(h) === 'auto_off' && (
+              <p className={forms.error} role="status">
+                {AUTO_OFF_NOTE}
+              </p>
+            )}
             <p className={styles.muted}>{h.events.map((e) => EVENT_LABELS[e]).join(' · ')}</p>
             <div className={local.row}>
               <Button variant="secondary" onClick={() => void patch(h, { active: !h.active })}>
