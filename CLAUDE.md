@@ -536,7 +536,7 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   parent login, scanning needs a card phone, both covered by the API tests and the pure helpers. CI judges these specs.
 
 ## Sesi offline (PRS-08; lib/offline-queue.ts, lib/sync-sessions.ts, (staf)/offline-sync.tsx)
-- Pins api e11b771 (POST /sessions/{id}/sync, GET /gate/board, /workspace/exports). The staff layout mounts <OfflineSync>:
+- Pins api e11b771 (later bumped: see apps/web/package.json; POST /sessions/{id}/sync, GET /gate/board, /workspace/exports). The staff layout mounts <OfflineSync>:
   it sends the queue on load, on `online`, when the tab is visible and every 15 s while something waits, and shows what
   happened per session (terkirim / koreksi diajukan because the session was locked meanwhile / tidak ada perubahan /
   tidak terkirim + the API's reason). Nothing is dropped silently: only an API answer (even a refusal) removes an item;
