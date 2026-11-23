@@ -13,8 +13,8 @@
     "e2e": "playwright test"
   },
   "dependencies": {
-    "@absah/capabilities": "github:rafli21xrplc/absah-api#52f6dbf9cc2df9887c853ef67877ca2acc44c246&path:/packages/capabilities",
-    "@absah/contracts": "github:rafli21xrplc/absah-api#52f6dbf9cc2df9887c853ef67877ca2acc44c246&path:/packages/contracts",
+    "@absah/capabilities": "github:rafli21xrplc/absah-api#3111f6cf8167f156ec4b2d33b9766b81e6a5a282&path:/packages/capabilities",
+    "@absah/contracts": "github:rafli21xrplc/absah-api#3111f6cf8167f156ec4b2d33b9766b81e6a5a282&path:/packages/contracts",
     "@absah/ui": "workspace:*",
     "next": "^16.4.6",
     "qrcode": "1.5.4",

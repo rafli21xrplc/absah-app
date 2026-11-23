@@ -40,8 +40,22 @@ test('Rekap: alpa hari ini masuk rekap rombel dan siswa, ekspor e-Rapor dibuat w
   await page.getByRole('button', { name: 'Excel untuk e-Rapor' }).click();
   expect((await download).suggestedFilename()).toMatch(/^rekap-kehadiran-.*-sem[12]-VII-A\.xlsx$/);
 
+  // Rapor karakter (KEG-04): the same rombel, one PDF page per student.
+  const character = page.waitForEvent('download', { timeout: 60_000 });
+  await page.getByRole('button', { name: 'Rapor karakter (PDF)' }).click();
+  expect((await character).suggestedFilename()).toMatch(/^rapor-karakter-.*-sem[12]-VII-A\.pdf$/);
+
   // Session filling report (RKP-04).
   await page.getByRole('link', { name: '← Rekap semua rombel' }).click();
   await page.getByRole('link', { name: /pengisian sesi/ }).click();
   await expect(page.getByRole('row', { name: /Admin E2E/ })).toContainText('100%');
+
+  // Dasbor kepala sekolah (RKP-05): today's attendance and session fill, the same 75% as the rekap.
+  await page.goto('/dasbor');
+  await expect(page.getByRole('heading', { name: 'Dasbor kepala sekolah' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Kehadiran hari ini/ })).toContainText('75%');
+  await expect(page.getByRole('link', { name: /Pengisian sesi/ })).toContainText(/1 dari \d+ sesi sudah diisi/);
+  await page.goto('/dasbor/yayasan');
+  await expect(page.getByRole('heading', { name: 'Dasbor yayasan' })).toBeVisible();
+  await expect(page.getByText(/belum memimpin sekolah yang tergabung dalam yayasan/)).toBeVisible();
 });

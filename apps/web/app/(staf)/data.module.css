@@ -142,3 +142,37 @@
   border-radius: var(--absah-radius);
   background: var(--absah-surface);
 }
+
+/* Dasbor (RKP-05, RKP-06): the trend is a list of bars, no chart library. */
+.trend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.trend li {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr 3.5rem;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+}
+.bar {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--absah-border);
+  overflow: hidden;
+}
+.bar > span {
+  display: block;
+  height: 100%;
+  background: var(--absah-hadir, var(--absah-primary));
+}
+.risk {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}

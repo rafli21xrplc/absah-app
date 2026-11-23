@@ -589,3 +589,13 @@ rombel = class group; wali kelas = homeroom teacher; guru mapel = subject teache
 piket = duty teacher; S/I/A = sakit/izin/alpa, H = hadir, T = terlambat; izin = leave request;
 TPPK = school anti-violence team; UKS = school clinic; PKL = industry internship (SMK);
 DUDI = industry partner; 7 KAIH = seven habits journal; MBG = free school meal program.
+
+## Dasbor dan rapor karakter (RKP-05, RKP-06, KEG-04)
+- `/dasbor` (admin, kepsek, wakasek; card on the home page): GET /dashboard/principal. Tiles link to the report they summarise (/rekap,
+  /rekap/kepatuhan, /peringatan-dini, /mbg); `atRisk` and `mbg` are null when the school lacks the capability, so those tiles are
+  simply absent. The trend is a list of CSS bars (data.module.css .trend), no chart library; a day without rekap is an empty bar.
+- `/dasbor/yayasan` (RKP-06): GET /dashboard/collections has no school header; the API reads every school in its own tenant. The
+  link on /dasbor only shows when that list is not empty. Schools are listed lowest attendance first (lib/dashboard.ts schoolsByAttention).
+- Rapor karakter (KEG-04) is a button on the rombel's rekap page (ExportButtons with classId): POST /exports/character-reports, then
+  the same poll-and-download loop as the rekap files. e2e: rekap.spec.ts covers all three.
+
