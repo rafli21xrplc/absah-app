@@ -599,3 +599,10 @@ DUDI = industry partner; 7 KAIH = seven habits journal; MBG = free school meal p
 - Rapor karakter (KEG-04) is a button on the rombel's rekap page (ExportButtons with classId): POST /exports/character-reports, then
   the same poll-and-download loop as the rekap files. e2e: rekap.spec.ts covers all three.
 
+## Penilaian DUDI (PKL-04)
+- Staff `/pkl/penilaian` (link on /pkl): managers edit the aspects (AspectsEditor: the WHOLE list is saved with one PUT, up/down
+  reorder, existing aspects keep their id so the API can tell edit from add/retire) and everyone who may read sees the results table
+  plus Unduh Excel/PDF (blob download like /jurnal). The industry supervisor's pages are `/dudi/penilaian` (his students and whether
+  the form is open) and `/dudi/penilaian/[id]` (one 0-100 field per aspect, only while the window is `open`). lib/pkl-assessment.ts holds
+  the validation (`aspectsRequest`, `scoresRequest`) and the lines (`assessmentNote`). e2e: golden-smk.spec.ts (placement ends in 10 days).
+

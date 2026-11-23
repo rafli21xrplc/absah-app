@@ -63,7 +63,8 @@ test('SMK: DUDI dan penempatan, check-in di lokasi dikonfirmasi pembimbing indus
     await page.getByLabel('Cari siswa').fill(name);
     await page.getByRole('button', { name: new RegExp(`^\\+ ${name}`) }).click();
   }
-  const end = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
+  // Ends in 10 days: the DUDI assessment form opens 14 days before the end (PKL-04).
+  const end = new Date(Date.now() + 10 * 86_400_000).toISOString().slice(0, 10);
   await page.getByLabel('Selesai').fill(end);
   await page.getByLabel('Guru pembimbing').selectOption({ label: 'Admin E2E' });
   await page.getByLabel('Nama pembimbing industri (boleh nanti)').fill('Pak Hendra');
@@ -102,6 +103,27 @@ test('SMK: DUDI dan penempatan, check-in di lokasi dikonfirmasi pembimbing indus
   await expect(journal.getByRole('button', { name: 'Lihat lampiran' })).toBeVisible();
   await journal.getByRole('button', { name: 'Setujui' }).click();
   await expect(journal).toContainText('Disetujui');
+
+  // PKL-04: the humas sets the aspects, Pak Hendra grades Aditya near the end of the placement, the results download as Excel.
+  await page.goto('/pkl/penilaian');
+  await page.getByRole('button', { name: 'Tambah aspek' }).click();
+  await page.getByLabel('Nama aspek 1').fill('Disiplin');
+  await page.getByLabel('Bobot aspek 1').fill('2');
+  await page.getByRole('button', { name: 'Tambah aspek' }).click();
+  await page.getByLabel('Nama aspek 2').fill('Keterampilan teknis');
+  await page.getByRole('button', { name: 'Simpan aspek' }).click();
+  await expect(page.getByText('Aspek penilaian tersimpan.')).toBeVisible();
+  await hendra.goto('/dudi/penilaian');
+  await hendra.getByRole('listitem', { name: 'ADITYA PRATAMA' }).getByRole('link', { name: 'Isi penilaian' }).click();
+  await hendra.getByLabel('Disiplin (0-100)').fill('90');
+  await hendra.getByLabel('Keterampilan teknis (0-100)').fill('70');
+  await hendra.getByRole('button', { name: 'Simpan penilaian' }).click();
+  await expect(hendra.getByText('Penilaian tersimpan.')).toBeVisible();
+  await page.goto('/pkl/penilaian');
+  await expect(page.getByRole('row', { name: /ADITYA PRATAMA/ })).toContainText('83,3'); // (90 x 2 + 70 x 1) / 3
+  const results = page.waitForEvent('download', { timeout: 60_000 });
+  await page.getByRole('button', { name: 'Unduh Excel' }).click();
+  expect((await results).suggestedFilename()).toMatch(/^penilaian-dudi-\d{4}-\d{2}-\d{2}\.xlsx$/);
 
   // The guru pembimbing decides Bunga's day; the queue is then empty.
   await page.goto('/pkl/tinjauan');

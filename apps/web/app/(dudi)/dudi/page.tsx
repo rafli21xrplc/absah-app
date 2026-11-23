@@ -141,6 +141,8 @@ export default function DudiHome() {
       </ul>
       <p>Check-in yang tidak disanggah dalam 24 jam dianggap benar.</p>
       <Link href="/dudi/jurnal">Jurnal siswa</Link>
+      {' · '}
+      <Link href="/dudi/penilaian">Penilaian siswa</Link>
     </main>
   );
 }
