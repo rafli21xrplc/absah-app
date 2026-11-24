@@ -11,6 +11,7 @@ import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
 import { GATE_VIEWERS } from '@/lib/gate';
+import { NOTIFY_VIEWERS } from '@/lib/notify';
 import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
 import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
@@ -109,6 +110,11 @@ export default function StafHome() {
         <IfCap name="mbg.enabled">
           <span className={styles.card}>MBG</span>
         </IfCap>
+        {hasRole(...NOTIFY_VIEWERS) && (
+          <Link className={styles.card} href="/notifikasi">
+            Notifikasi WhatsApp
+          </Link>
+        )}
         {isAdmin && (
           <Link className={styles.card} href="/setup">
             Pengaturan sekolah
