@@ -224,3 +224,62 @@ export const JadwalMingguan: Story = {
     </PageMain>
   ),
 };
+
+const STAFF: [string, string, string, 'Aktif' | 'Undangan terkirim' | 'Dinonaktifkan', boolean][] = [
+  ['Hendra Setiawan', 'hendra@absah.test', 'Admin', 'Aktif', true],
+  ['Sari Dewanti', 'sari@absah.test', 'Guru', 'Aktif', false],
+  ['Sari Dewanti', 'sari@absah.test', 'Wali kelas', 'Aktif', false],
+  ['Dra. Maryati', 'maryati@absah.test', 'Anggota TPPK', 'Aktif', false],
+  ['Nurhayati, S.Kep.', 'Masuk dengan WhatsApp', 'Petugas UKS', 'Undangan terkirim', false],
+  ['Yoga Pradana', 'yoga@absah.test', 'Guru', 'Undangan terkirim', false],
+  ['Darto', 'Masuk dengan WhatsApp', 'Guru piket', 'Dinonaktifkan', false],
+];
+
+/** Guru dan staf: one row per role, because the server switches a role on or off, not a person. */
+export const GuruDanStaf: Story = {
+  render: () => (
+    <PageMain width="xl">
+      <DataHeader title="Guru dan staf" subtitle="6 orang · 4 akses aktif · 2 undangan menunggu · 1 dinonaktifkan" actions={<Button>Undang staf</Button>} />
+      <DataToolbar search={{ label: 'Cari guru atau staf', value: '', onChange: () => undefined, placeholder: 'Nama atau email' }}>
+        <Field label="Peran" className="min-w-52">
+          <Select defaultValue="">
+            <option value="">Semua peran</option>
+          </Select>
+        </Field>
+        <SegmentedControl label="Status" value="all" onChange={() => undefined} options={[{ value: 'all', label: 'Semua' }, { value: 'active', label: 'Aktif' }, { value: 'invited', label: 'Menunggu' }, { value: 'suspended', label: 'Nonaktif' }]} />
+      </DataToolbar>
+      <Table caption="Daftar guru dan staf" className="min-w-180">
+        <TableHead>
+          <TableRow>
+            {['Nama', 'Peran', 'Akun', 'Tindakan'].map((h) => (
+              <Th key={h}>{h}</Th>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {STAFF.map(([name, contact, role, status, mine]) => (
+            <TableRow key={name + role}>
+              <Th scope="row" className="font-normal">
+                <span className="flex flex-col">
+                  <span className="text-body-strong text-tinta">
+                    {name}
+                    {mine && <span className="ml-2 text-small font-normal text-tinta-muted">(Anda)</span>}
+                  </span>
+                  <span className="text-small text-tinta-muted">{contact}</span>
+                </span>
+              </Th>
+              <Td>{role}</Td>
+              <Td>
+                <span className={status === 'Aktif' ? 'text-body-strong text-hadir' : status === 'Undangan terkirim' ? 'text-body-strong text-telat' : 'text-body-strong text-tinta-muted'}>{status}</span>
+              </Td>
+              <Td>
+                {!mine && status === 'Aktif' && <Button variant="secondary" aria-label={`Nonaktifkan ${name} sebagai ${role}`}>Nonaktifkan</Button>}
+                {!mine && status === 'Dinonaktifkan' && <Button variant="secondary" aria-label={`Aktifkan ${name} sebagai ${role}`}>Aktifkan</Button>}
+              </Td>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </PageMain>
+  ),
+};

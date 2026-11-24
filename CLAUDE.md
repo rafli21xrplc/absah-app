@@ -738,6 +738,8 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - Mengeluarkan orang dari daftar = `ExitDialog` (alertdialog): menyebut data tidak dihapus, alasan wajib dipilih dulu (tidak ada yang terpilih
   sebelumnya, tombol mati sampai dipilih), satu Idempotency-Key per (baris, jawaban). Jangan `window.confirm`.
 - Tombol tanpa endpoint **dihapus**, tidak dimatikan: Tambah siswa, Ubah identitas siswa, Ekspor Excel (belum ada di absah-api; dicatat di PR U6b).
+- Guru dan staf (`/staf`): satu baris per keanggotaan (peran), karena `PATCH /school/members/:id` mengaktifkan atau menonaktifkan satu peran, bukan satu
+  orang. Admin tidak ditawari menonaktifkan dirinya sendiri (API menolak). Tautan undangan hanya tampil sekali (dari respons POST), maka disalin dari drawer.
 - Jumlah total tidak ditulis bila API tidak mengirimnya (daftar siswa memakai cursor tanpa total): subtitle memakai jumlah rombel dari `/classes`.
 
 ### Selesai berarti
