@@ -50,13 +50,23 @@ test('Orang tua membuka tautan aksi, mengajukan izin, wali kelas menyetujui, sta
   await expect(parent.getByRole('list', { name: 'Izin terakhir' })).toContainText('Menunggu');
   await expect(parent.getByText(/Tautan ini sudah dipakai/)).toBeVisible();
 
-  // The wali kelas approves.
+  // The admin decides on "Hari ini" (U6a): the row names the request, Setujui asks first and says what it changes.
+  await page.goto('/dasbor');
+  const waiting = page.getByRole('region', { name: 'Izin menunggu persetujuan' });
+  await expect(waiting).toContainText('ADITYA PRATAMA');
+  await expect(waiting).toContainText('Demam sejak semalam');
+  await waiting.getByRole('button', { name: 'Setujui izin ADITYA PRATAMA' }).click();
+  const ask = page.getByRole('alertdialog', { name: 'Setujui izin ADITYA PRATAMA?' });
+  await expect(ask).toContainText('dicatat Sakit');
+  await expect(ask).toContainText('tidak bisa diubah');
+  await ask.getByRole('button', { name: 'Setujui' }).click();
+  await expect(page.getByText('Izin ADITYA PRATAMA disetujui.')).toBeVisible();
+  await expect(waiting.getByRole('button', { name: 'Setujui izin ADITYA PRATAMA' })).toHaveCount(0);
+
+  // The same request, as the wali kelas sees it on /izin.
   await page.goto('/izin');
-  const request = page.getByRole('listitem', { name: 'Izin ADITYA PRATAMA' });
-  await expect(request).toContainText('tautan WhatsApp');
-  await request.getByRole('button', { name: 'Setujui' }).click();
-  await expect(request).toHaveCount(0); // the list shows pending requests by default
   await page.getByRole('button', { name: 'Semua' }).click();
+  const request = page.getByRole('listitem', { name: 'Izin ADITYA PRATAMA' });
   await expect(request).toContainText('Disetujui');
 
   // The worker applies the izin: the session shows Sakit, and so does the parent's page.

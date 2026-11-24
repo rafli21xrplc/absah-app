@@ -95,3 +95,14 @@ export function clockOffset(dateHeader: string | null, deviceNow: number): numbe
   const server = Date.parse(dateHeader);
   return Number.isNaN(server) ? null : server - deviceNow;
 }
+
+/** How long ago a lesson ended, in words: "27 menit", "1 jam", "1 jam 12 menit". Not over yet (or not a lesson): null. */
+export function overdueText(endsAt: string, nowMinutes: number): string | null {
+  const end = toMinutes(endsAt);
+  const late = nowMinutes - end;
+  if (!Number.isFinite(late) || late < 0) return null;
+  const hours = Math.floor(late / 60);
+  const minutes = late % 60;
+  if (hours === 0) return `${minutes} menit`;
+  return minutes === 0 ? `${hours} jam` : `${hours} jam ${minutes} menit`;
+}

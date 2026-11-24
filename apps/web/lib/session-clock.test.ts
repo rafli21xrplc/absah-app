@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clockOffset, greetingName, greetingPart, groupToday, minutesOfDay, phaseOf, toMinutes, type ClockSession } from './session-clock';
+import { clockOffset, greetingName, greetingPart, groupToday, minutesOfDay, overdueText, phaseOf, toMinutes, type ClockSession } from './session-clock';
 
 const lesson = (id: string, startsAt: string, endsAt: string, status: ClockSession['status'] = 'open') => ({ id, status, period: { startsAt, endsAt } });
 const daily = (id: string, status: ClockSession['status'] = 'open') => ({ id, status, period: null });
@@ -128,5 +128,18 @@ describe('clockOffset', () => {
   it('is null when there is no usable header', () => {
     expect(clockOffset(null, 0)).toBeNull();
     expect(clockOffset('bukan tanggal', 0)).toBeNull();
+  });
+});
+
+describe('overdueText', () => {
+  it('says how long ago the lesson ended', () => {
+    expect(overdueText('08:30', 8 * 60 + 30)).toBe('0 menit');
+    expect(overdueText('08:30', 8 * 60 + 57)).toBe('27 menit');
+    expect(overdueText('07:45', 9 * 60)).toBe('1 jam 15 menit');
+    expect(overdueText('07:45', 8 * 60 + 45)).toBe('1 jam');
+  });
+  it('is null while the lesson is not over, or for a time that is not HH:MM', () => {
+    expect(overdueText('08:30', 8 * 60 + 29)).toBeNull();
+    expect(overdueText('', 600)).toBeNull();
   });
 });

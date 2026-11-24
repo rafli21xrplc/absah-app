@@ -33,3 +33,4 @@ export { GreetingHeader, SessionGroup, SessionHero, SessionItem, type SessionHer
 export { AttendanceFlow, type AttendanceFlowProps, type FlowStudent, type SendResult } from './features/presensi/attendance-flow';
 export { AttendanceRow, type AttendanceRowProps } from './features/presensi/attendance-row';
 export * as presensi from './features/presensi/reducer';
+export { AlertRow, BarList, BoardSection, StatusBoard, type AlertRowProps, type BarItem, type BoardSectionProps, type SectionState, type StatusBoxData } from './features/papan/board';

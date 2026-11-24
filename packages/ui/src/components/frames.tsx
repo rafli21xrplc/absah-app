@@ -65,8 +65,8 @@ export function WorkspaceLabel({ name, detail }: { name: string; detail?: string
 }
 
 /** A page's own main landmark and its column: padding and spacing live here so a page holds no free styling. */
-export function PageMain({ children, width = 'md' }: { children: ReactNode; width?: 'md' | 'lg' }) {
-  return <main className={cx('mx-auto box-border flex w-full flex-col gap-4 px-4 py-6', width === 'lg' ? 'max-w-5xl' : 'max-w-xl')}>{children}</main>;
+export function PageMain({ children, width = 'md' }: { children: ReactNode; width?: 'md' | 'lg' | 'xl' }) {
+  return <main className={cx('mx-auto box-border flex w-full flex-col gap-4 px-4 py-6', width === 'xl' ? 'max-w-6xl' : width === 'lg' ? 'max-w-5xl' : 'max-w-xl')}>{children}</main>;
 }
 
 /** The portal: one simple column, at most 480 px wide on a laptop. */

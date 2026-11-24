@@ -591,9 +591,8 @@ TPPK = school anti-violence team; UKS = school clinic; PKL = industry internship
 DUDI = industry partner; 7 KAIH = seven habits journal; MBG = free school meal program.
 
 ## Dasbor dan rapor karakter (RKP-05, RKP-06, KEG-04)
-- `/dasbor` (admin, kepsek, wakasek; card on the home page): GET /dashboard/principal. Tiles link to the report they summarise (/rekap,
-  /rekap/kepatuhan, /peringatan-dini, /mbg); `atRisk` and `mbg` are null when the school lacks the capability, so those tiles are
-  simply absent. The trend is a list of CSS bars (data.module.css .trend), no chart library; a day without rekap is an empty bar.
+- `/dasbor` (admin, kepsek, wakasek; card on the home page) is the "Hari ini" arrival board (U6a, below). The data is still GET
+  /dashboard/principal (+ the endpoints of each part); `atRisk` and `mbg` are null when the school lacks the capability, so those parts are absent.
 - `/dasbor/yayasan` (RKP-06): GET /dashboard/collections has no school header; the API reads every school in its own tenant. The
   link on /dasbor only shows when that list is not empty. Schools are listed lowest attendance first (lib/dashboard.ts schoolsByAttention).
 - Rapor karakter (KEG-04) is a button on the rombel's rekap page (ExportButtons with classId): POST /exports/character-reports, then
@@ -715,6 +714,21 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
   penolakan, kunci) di runtime kedua tanpa akses ke sesi UI. Kirim saat aplikasi dibuka, kembali online, tab terlihat, atau tiap 15 dtk.
 - E2E `presensi-offline.spec.ts`: satu handler `page.route` mencatat tiap `/sessions/:id/sync` dengan Idempotency-Key-nya; tiga kirim
   pertama setelah sinyal kembali tidak dijawab, yang keempat sampai; kunci sama di semua percobaan dan tiap presensi dijawab sekali.
+
+### Papan "Hari ini" admin (U6a; `app/(staf)/dasbor`)
+- Papan Main = `/dasbor` (keputusan Q3), bukan `/hari-ini` (itu daftar sesi guru). Judul "Hari ini"; tanggal, semester (dari `/reports/semesters`) dan
+  "diperbarui hh.mm" (waktu muat dasbor, jam sekolah).
+- Tiap bagian memanggil datanya sendiri lewat `useSection` (`lib/use-section.ts`) dan punya empat keadaan lewat `BoardSection` (`@absah/ui`):
+  memuat, kosong, galat (Coba lagi), tanpa sinyal. Bagian yang lambat atau rusak tidak menahan yang lain. Reload setelah aksi hanya bagian terkait.
+- Angka dari API apa adanya; klien tidak menghitung rekap. Keterangan di bawah angka hanya yang API tahu: "Hadir" = `presentRate` dan `days` dari
+  dasbor; "Izin" = jumlah izin menunggu. Tidak ada "rata-rata telat n menit", "dipulangkan dari UKS", "orang tua sudah diberi tahu": API tidak mengirimnya.
+- Sesi belum diisi = sesi `open` yang jamnya sudah lewat (`groupToday(...).unfilled`, jam server dari header `Date`); "Lewat" = `overdueText`.
+  Tindakan = "Buka" (ke `/sesi/[id]`), bukan Ingatkan.
+- Disembunyikan karena belum ada endpoint (dicatat di PR U6a, antrean absah-api): **Ingatkan** per sesi dan semua; **Unduh rekap hari ini**
+  (`POST /exports` hanya per semester); aksi "Hubungi orang tua" / "Catat ke BK" pada peringatan dini (diganti "Lihat detail" ke /peringatan-dini).
+- Setujui/Tolak izin: dialog (`alertdialog`) menyebut dampaknya; satu Idempotency-Key per (izin, jawaban), disimpan setelah jawaban hilang dan dibuang
+  setelah API menjawab. Bagian MBG hanya bila `mbg.enabled` dan peran MBG_READERS; "Papan kedatangan" hanya bila `gate.enabled` dan GATE_VIEWERS.
+- Tabel `Table` perlu `caption` yang berbeda dari nama bagian (dua landmark dengan nama sama gagal di axe).
 
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan

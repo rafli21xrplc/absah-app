@@ -1,4 +1,4 @@
-import type { CollectionSchoolSummary, EarlyWarningKind, PrincipalDashboard, Role } from '@absah/contracts';
+import type { CollectionSchoolSummary, EarlyWarningKind, LeaveKind, PrincipalDashboard, Role } from '@absah/contracts';
 import { EARLY_WARNING_LABELS } from './ksw';
 
 /** Mirror absah-api canReadPrincipalDashboard (the API enforces it). */
@@ -34,4 +34,16 @@ export function schoolsByAttention(schools: readonly CollectionSchoolSummary[]):
     if (x === null || y === null) return x === y ? a.name.localeCompare(b.name, 'id') : x === null ? 1 : -1;
     return x - y || a.name.localeCompare(b.name, 'id');
   });
+}
+
+/** The status letter that stands for a warning on the board: repeated lateness is T, every kind of absence is A. */
+export const warningCode = (kinds: readonly EarlyWarningKind[]): 'A' | 'T' => (kinds.includes('repeated_late') && kinds.length === 1 ? 'T' : 'A');
+
+/** The status letter of a leave request: sakit is S, izin is I. */
+export const leaveCode = (kind: LeaveKind): 'S' | 'I' => (kind === 'sakit' ? 'S' : 'I');
+
+/** "Semua hadir dan telat, dari 900 siswa" needs the API's rate and day count: no number is worked out here. */
+export function presentCaption(today: PrincipalDashboard['attendance']['today'], format: (rate: number | null) => string): string | undefined {
+  if (today.days === 0 || today.presentRate === null) return undefined;
+  return `${format(today.presentRate)} hadir dan telat, dari ${today.days} siswa`;
 }

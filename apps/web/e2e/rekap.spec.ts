@@ -50,9 +50,13 @@ test('Rekap: alpa hari ini masuk rekap rombel dan siswa, ekspor e-Rapor dibuat w
 
   // Dasbor kepala sekolah (RKP-05): today's attendance and session fill, the same 75% as the rekap.
   await page.goto('/dasbor');
-  await expect(page.getByRole('heading', { name: 'Dasbor kepala sekolah' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /Kehadiran hari ini/ })).toContainText('75%');
-  await expect(page.getByRole('link', { name: /Pengisian sesi/ })).toContainText(/1 dari \d+ sesi sudah diisi/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Hari ini' })).toBeVisible();
+  // The five boxes in their fixed order; the rate under Hadir is the API's, the same 75% as the rekap.
+  const board = page.getByRole('list', { name: 'Ringkasan kehadiran siswa' });
+  await expect(board.getByRole('listitem')).toHaveCount(5);
+  await expect(board.getByRole('listitem').first()).toContainText('75%');
+  await expect(page.getByRole('region', { name: 'Sesi belum diisi' })).toContainText(/1 dari \d+ sesi sudah diisi/);
+  await expect(page.getByRole('region', { name: 'Kehadiran per rombel' })).toBeVisible();
   await page.goto('/dasbor/yayasan');
   await expect(page.getByRole('heading', { name: 'Dasbor yayasan' })).toBeVisible();
   await expect(page.getByText(/belum memimpin sekolah yang tergabung dalam yayasan/)).toBeVisible();
