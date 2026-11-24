@@ -8,6 +8,7 @@ import { SegmentedControl } from '../../components/segmented-control';
 import { Drawer } from '../../components/drawer';
 import { Input } from '../../components/field';
 import { Table, TableBody, TableHead, TableRow, Td, Th } from '../../components/table';
+import { WeekGrid } from '../jadwal/week-grid';
 import { DataHeader } from './data-page';
 import { ExitDialog } from './exit-dialog';
 
@@ -180,6 +181,46 @@ export const MapelTambah: Story = {
           <Input />
         </Field>
       </Drawer>
+    </PageMain>
+  ),
+};
+
+const WEEK_DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+const PLAN: ([string, string] | null)[][] = [
+  [['Pend. Pancasila', 'Pak Teguh'], ['B. Indonesia', 'Bu Lestari'], ['PJOK', 'Pak Dwi'], ['IPA', 'Pak Joko P.'], ['PAI', 'Pak Hasan']],
+  [['Pend. Pancasila', 'Pak Teguh'], ['B. Indonesia', 'Bu Lestari'], ['PJOK', 'Pak Dwi'], ['IPA', 'Pak Joko P.'], ['PAI', 'Pak Hasan']],
+  [['Matematika', 'Bu Sari D.'], ['B. Inggris', 'Bu Desi R.'], ['PJOK', 'Pak Dwi'], ['Matematika', 'Bu Sari D.'], ['B. Jawa', 'Bu Endang']],
+  [['Matematika', 'Bu Sari D.'], ['B. Inggris', 'Bu Desi R.'], ['Sejarah', 'Bu Ratna W.'], ['Matematika', 'Bu Sari D.'], ['B. Jawa', 'Bu Endang']],
+  [['IPA', 'Pak Joko P.'], ['Informatika', 'Pak Yoga'], ['Sejarah', 'Bu Ratna W.'], null, ['PAI', 'Pak Hasan']],
+  [null, ['Informatika', 'Pak Yoga'], null, ['IPS', 'Bu Yuliana'], null],
+];
+const TIMES = ['07.00–07.45', '07.45–08.30', '08.30–09.15', '09.15–10.00', '10.15–11.00', '11.00–11.45'];
+
+/** Jadwal: one rombel's week. The Drawer edits a lesson (see MapelTambah for the drawer look). */
+export const JadwalMingguan: Story = {
+  render: () => (
+    <PageMain width="xl">
+      <DataHeader title="Jadwal 2026/2027" />
+      <Field label="Rombel" className="max-w-xs">
+        <Select defaultValue="x2">
+          <option value="x2">X-2</option>
+        </Select>
+      </Field>
+      <WeekGrid
+        label="Jadwal mingguan"
+        days={WEEK_DAYS}
+        onPick={() => undefined}
+        rows={PLAN.map((row, r) => ({
+          number: r + 1,
+          cells: row.map((c, d) => ({
+            time: TIMES[r] ?? '',
+            subject: c?.[0],
+            teacher: c?.[1],
+            label: `${WEEK_DAYS[d]} jam ${r + 1}: ${c ? c[0] : 'kosong'}`,
+            selected: r === 2 && d === 0,
+          })),
+        }))}
+      />
     </PageMain>
   ),
 };
