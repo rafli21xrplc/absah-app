@@ -5,6 +5,8 @@ import { DataToolbar } from '../../components/data-toolbar';
 import { Field, Select } from '../../components/field';
 import { PageMain } from '../../components/frames';
 import { SegmentedControl } from '../../components/segmented-control';
+import { Drawer } from '../../components/drawer';
+import { Input } from '../../components/field';
 import { Table, TableBody, TableHead, TableRow, Td, Th } from '../../components/table';
 import { DataHeader } from './data-page';
 import { ExitDialog } from './exit-dialog';
@@ -94,6 +96,90 @@ export const KeluarkanSiswa: Story = {
         confirmLabel="Keluarkan"
         onConfirm={() => undefined}
       />
+    </PageMain>
+  ),
+};
+
+const CLASSES: [string, string, string, number, number][] = [
+  ['X-1', '10 · IPA', 'Bu Ratna Wulandari', 36, 0],
+  ['X-2', '10 · IPA', 'Pak Agus Setiawan', 35, 0],
+  ['X-3', '10 · IPS', 'Bu Sari Dewi', 34, 1],
+  ['XI-1', '11 · IPA', 'Pak Joko Pramono', 36, 0],
+  ['XI-6', '11 · IPS', 'Belum ditentukan', 33, 2],
+  ['XII-2', '12 · Bahasa', 'Bu Yuni Amelia', 30, 0],
+];
+
+/** Rombel: the same pattern as Siswa, with the Kelas filter and counts that line up to the right. */
+export const Rombel: Story = {
+  render: () => (
+    <PageMain width="xl">
+      <DataHeader title="Rombel 2026/2027" subtitle="36 rombel" actions={<Button variant="secondary" size="48">Import data siswa</Button>} />
+      <DataToolbar search={{ label: 'Cari rombel', value: '', onChange: () => undefined, placeholder: 'Nama rombel' }}>
+        <Field label="Kelas" className="min-w-44">
+          <Select defaultValue="">
+            <option value="">Semua kelas</option>
+            <option>10</option>
+          </Select>
+        </Field>
+      </DataToolbar>
+      <Table caption="Daftar rombel" className="min-w-160">
+        <TableHead>
+          <TableRow>
+            <Th>Rombel</Th>
+            <Th>Kelas</Th>
+            <Th>Wali kelas</Th>
+            <Th className="text-right">Siswa</Th>
+            <Th className="text-right">Calon keluar</Th>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {CLASSES.map(([name, grade, homeroom, students, missing]) => (
+            <TableRow key={name}>
+              <Th scope="row">
+                <a href="#siswa" className="text-papan">{name}</a>
+              </Th>
+              <Td>{grade}</Td>
+              <Td className={homeroom.startsWith('Belum') ? 'text-tinta-muted' : undefined}>{homeroom}</Td>
+              <Td className="text-right tabular-nums">{students}</Td>
+              <Td className="text-right tabular-nums">{missing > 0 ? <span className="text-body-strong text-telat">{missing}</span> : 0}</Td>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </PageMain>
+  ),
+};
+
+/** Mapel: list and add only. The drawer opens over the list; a refused name is said in words under the field. */
+export const MapelTambah: Story = {
+  render: () => (
+    <PageMain width="xl">
+      <DataHeader title="Mata pelajaran" subtitle="4 mapel" />
+      <DataToolbar search={{ label: 'Cari mapel', value: '', onChange: () => undefined, placeholder: 'Nama atau kode mapel' }} actions={<Button>Tambah mapel</Button>} />
+      <Table caption="Daftar mata pelajaran" className="min-w-96">
+        <TableHead>
+          <TableRow>
+            <Th>Nama mapel</Th>
+            <Th>Kode</Th>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {[['Matematika', 'MTK'], ['Bahasa Indonesia', 'BIN'], ['Fisika', 'FIS'], ['Sejarah', '–']].map(([n, c]) => (
+            <TableRow key={n}>
+              <Th scope="row">{n}</Th>
+              <Td>{c}</Td>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <Drawer open onOpenChange={() => undefined} title="Tambah mata pelajaran" onSubmit={(e) => e.preventDefault()} actions={<Button type="submit">Simpan</Button>}>
+        <Field label="Nama mapel" error="Nama mapel minimal 2 huruf.">
+          <Input defaultValue="M" />
+        </Field>
+        <Field label="Kode" optional hint="Singkatan untuk jadwal, misalnya MTK.">
+          <Input />
+        </Field>
+      </Drawer>
     </PageMain>
   ),
 };
