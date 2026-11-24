@@ -1,12 +1,12 @@
 'use client';
 
 import { TppkTrackResponse, type TppkReportStatus } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Card, Field, Input, PageMain, messages } from '@absah/ui';
 import { useState, type FormEvent } from 'react';
 import { api, ApiError } from '@/lib/api';
 import { STATUS_LABELS } from '@/lib/tppk';
-import forms from '../../../forms.module.css';
-import styles from '../lapor.module.css';
+
+const t = messages.report;
 
 /** Status of a report by its tracking code: nothing else is shown, and nothing is remembered. */
 export default function LacakPage() {
@@ -24,35 +24,29 @@ export default function LacakPage() {
       const res = await api(`/tppk/reports/track/${encodeURIComponent(code.trim())}`, TppkTrackResponse, { anonymous: true });
       setStatus(res.status);
     } catch (err) {
-      setError(err instanceof ApiError && err.status === 429 ? 'Terlalu banyak percobaan. Coba lagi beberapa menit lagi.' : err instanceof ApiError ? err.message : 'Tidak bisa terhubung. Periksa internet lalu coba lagi.');
+      setError(err instanceof ApiError && err.status === 429 ? t.trackTooMany : err instanceof ApiError ? err.message : t.trackOffline);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <main className={styles.page}>
-      <h1 className={styles.title}>Lacak laporan</h1>
-      <form className={forms.form} onSubmit={(e) => void submit(e)}>
-        <label className={forms.field}>
-          <span className={forms.label}>Kode lacak</span>
-          <input className={forms.input} value={code} onChange={(e) => setCode(e.target.value)} maxLength={20} autoComplete="off" autoCapitalize="characters" placeholder="XXXXX-XXXXX" />
-        </label>
-        {error && (
-          <p className={forms.error} role="alert">
-            {error}
-          </p>
-        )}
-        <Button type="submit" disabled={busy || code.trim().length < 10}>
-          {busy ? 'Memeriksa…' : 'Lihat status'}
+    <PageMain>
+      <h1 className="m-0 text-h1">{t.trackTitle}</h1>
+      <form className="flex flex-col gap-4" onSubmit={(e) => void submit(e)}>
+        <Field label={t.codeLabel} error={error ?? undefined}>
+          <Input value={code} onChange={(e) => setCode(e.target.value)} maxLength={20} autoComplete="off" autoCapitalize="characters" placeholder="XXXXX-XXXXX" />
+        </Field>
+        <Button type="submit" size="52" loading={busy} disabled={code.trim().length < 10}>
+          {t.seeStatus}
         </Button>
       </form>
       {status && (
-        <section role="status" aria-label="Status laporan">
-          <h2>{STATUS_LABELS[status].label}</h2>
-          <p className={styles.lead}>{STATUS_LABELS[status].hint}</p>
-        </section>
+        <Card as="section" role="status" aria-label={t.statusLabel} className="flex flex-col gap-1">
+          <h2 className="m-0 text-h2">{STATUS_LABELS[status].label}</h2>
+          <p className="m-0 text-body text-tinta-muted">{STATUS_LABELS[status].hint}</p>
+        </Card>
       )}
-    </main>
+    </PageMain>
   );
 }
