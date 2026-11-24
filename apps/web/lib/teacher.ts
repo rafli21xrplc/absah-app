@@ -48,3 +48,14 @@ export function teacherLeaveProblem(input: { startsOn: string; endsOn: string; r
   if (!input.reason.trim()) return 'Tulis alasannya.';
   return null;
 }
+
+/** "Jam ke-1 (07.00–07.40)" for a lesson, "Sesi harian" for a daily session. */
+export function sessionTimeLabel(period: { number: number; startsAt: string; endsAt: string } | null): string {
+  return period ? `Jam ke-${period.number} (${startLabel(period.startsAt)}–${startLabel(period.endsAt)})` : 'Sesi harian';
+}
+
+/** Why a candidate is a good pick, in the order the list is sorted by. */
+export function candidateNotes(c: { checkedIn: boolean; sameSubject: boolean; substitutionsThisMonth: number }): string {
+  const notes = [c.checkedIn ? 'Sudah absen' : 'Belum absen', ...(c.sameSubject ? ['Mapel sama'] : []), c.substitutionsThisMonth === 0 ? 'Belum mengganti bulan ini' : `${c.substitutionsThisMonth}× mengganti bulan ini`];
+  return notes.join(' · ');
+}

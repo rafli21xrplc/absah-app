@@ -449,6 +449,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   TEACHER_LEAVE_DECIDING (wakasek, kepsek, admin) see the pending queue minus their own and approve or reject with an
   optional note. Cards on the home page by role + capability.
 
+## Guru pengganti (apps/web/app/(staf)/pengganti; GRU-03)
+- /pengganti (SUBSTITUTION_READING = wakasek, piket, kepsek, admin): GET /substitutions?date= lists sessions whose teacher is
+  on approved izin, "needed" or already covered; the count of uncovered sessions is shown on top. Only sessions the
+  school already generated for that day appear, which the page says.
+- SUBSTITUTION_ASSIGNING (wakasek, piket, admin) pick from GET /substitutions/candidates (ranked by the API: checked
+  in, same subject, fewest this month; the page only prints why via candidateNotes) and POST /substitutions. On a 409 the
+  reason is shown and the candidate list reloads, since someone else may have just taken that teacher.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
