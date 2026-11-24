@@ -529,6 +529,12 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   says to contact the school; `before` says whether the child may sit now; `arrived` says the child is checked in.
 - The room and seat show as soon as the school arranges them ("Ruang belum diatur sekolah" until then).
 
+## e2e for tagihan siswa and ujian (apps/web/e2e/tagihan-siswa.spec.ts, ujian.spec.ts)
+- Both import the 10-student SMP fixture, turn the capability on with PUT /school/capabilities and drive the staff pages as
+  the admin: fee type -> issue to a rombel twice (the second says they already have it) -> cancel one with a reason -> recap;
+  and exam today -> rooms -> seat VII A -> manual check-in. They do not pay or scan: paying needs the gateway worker and a
+  parent login, scanning needs a card phone, both covered by the API tests and the pure helpers. CI judges these specs.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
