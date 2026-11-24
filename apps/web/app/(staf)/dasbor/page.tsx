@@ -1,6 +1,7 @@
 'use client';
 
 import { CollectionDashboardList, PrincipalDashboard } from '@absah/contracts';
+import { useReveal } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
@@ -18,6 +19,8 @@ export default function DasborPage() {
   const [data, setData] = useState<PrincipalDashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [foundation, setFoundation] = useState(false);
+  // Blocks fade in and the trend bars grow once the numbers arrive (wide screens only, never with reduced motion).
+  const reveal = useReveal<HTMLElement>(data);
 
   useEffect(() => {
     if (!schoolId || !allowed) return;
@@ -44,7 +47,7 @@ export default function DasborPage() {
 
   const today = data?.attendance.today;
   return (
-    <main className={styles.main}>
+    <main className={styles.main} ref={reveal}>
       <Link className={styles.back} href="/">
         ← Beranda
       </Link>
@@ -59,25 +62,25 @@ export default function DasborPage() {
       {data && today && (
         <>
           <div className={styles.counts}>
-            <Link className={styles.count} href="/rekap">
+            <Link className={styles.count} data-reveal href="/rekap">
               <span>Kehadiran hari ini</span>
               <strong>{percent(today.presentRate)}</strong>
               <small>{today.days === 0 ? 'Belum ada presensi' : `${today.counts.H + today.counts.T} dari ${today.days} siswa`}</small>
             </Link>
-            <Link className={styles.count} href="/rekap/kepatuhan">
+            <Link className={styles.count} data-reveal href="/rekap/kepatuhan">
               <span>Pengisian sesi</span>
               <strong>{percent(data.sessions.fillRate)}</strong>
               <small>{sessionsLine(data.sessions)}</small>
             </Link>
             {data.atRisk && (
-              <Link className={styles.count} href="/peringatan-dini">
+              <Link className={styles.count} data-reveal href="/peringatan-dini">
                 <span>Siswa berisiko (7 hari)</span>
                 <strong>{data.atRisk.students}</strong>
                 <small>peringatan dini</small>
               </Link>
             )}
             {data.mbg && (
-              <Link className={styles.count} href="/mbg">
+              <Link className={styles.count} data-reveal href="/mbg">
                 <span>MBG hari ini</span>
                 <strong>{data.mbg.status === 'not_school_day' ? '–' : data.mbg.present}</strong>
                 <small>{mbgLine(data.mbg)}</small>
@@ -85,7 +88,7 @@ export default function DasborPage() {
             )}
           </div>
 
-          <section className={styles.section} aria-labelledby="tren">
+          <section className={styles.section} aria-labelledby="tren" data-reveal>
             <h2 id="tren">Kehadiran {data.attendance.trend.length} hari sekolah terakhir</h2>
             {data.attendance.trend.length === 0 ? (
               <p className={styles.empty}>Belum ada rekap kehadiran.</p>
@@ -95,7 +98,7 @@ export default function DasborPage() {
                   <li key={p.date}>
                     <span>{shortDate(p.date)}</span>
                     <span className={styles.bar} role="img" aria-label={`Kehadiran ${shortDate(p.date)}: ${percent(p.presentRate)}`}>
-                      <span style={{ width: `${barWidth(p.presentRate)}%` }} />
+                      <span data-grow style={{ width: `${barWidth(p.presentRate)}%` }} />
                     </span>
                     <span className={styles.num}>{percent(p.presentRate)}</span>
                   </li>
@@ -105,7 +108,7 @@ export default function DasborPage() {
           </section>
 
           {data.atRisk && (
-            <section className={styles.section} aria-labelledby="berisiko">
+            <section className={styles.section} aria-labelledby="berisiko" data-reveal>
               <h2 id="berisiko">Siswa yang perlu perhatian</h2>
               {data.atRisk.items.length === 0 ? (
                 <p className={styles.empty}>Tidak ada peringatan dini dalam 7 hari terakhir.</p>
