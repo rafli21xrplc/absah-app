@@ -15,6 +15,7 @@ import { HABIT_SUMMARY_READERS } from '@/lib/habits';
 import { JOURNAL_VIEWERS } from '@/lib/journal';
 import { VISITOR_VIEWERS } from '@/lib/visitors';
 import { BK_READERS, EARLY_WARNING_READERS, FOLLOWUP_READERS, POINT_RECORDERS } from '@/lib/ksw';
+import { TEACHER_CHECKIN, TEACHER_LEAVE_DECIDING } from '@/lib/teacher';
 import { UKS_STAFF } from '@/lib/uks';
 import { MEMORIZATION_WRITERS } from '@/lib/memorization';
 import { MBG_READERS } from '@/lib/mbg';
@@ -194,6 +195,20 @@ export default function StafHome() {
           <IfCap name="student.counseling">
             <Link className={styles.card} href="/bk">
               Catatan BK
+            </Link>
+          </IfCap>
+        )}
+        {hasRole(...TEACHER_CHECKIN) && (
+          <IfCap name="teacher.attendance">
+            <Link className={styles.card} href="/absen-guru">
+              Absen guru
+            </Link>
+          </IfCap>
+        )}
+        {(hasRole(...TEACHER_CHECKIN) || hasRole(...TEACHER_LEAVE_DECIDING)) && (
+          <IfCap name="teacher.attendance">
+            <Link className={styles.card} href="/izin-guru">
+              Izin guru
             </Link>
           </IfCap>
         )}
