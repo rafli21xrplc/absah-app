@@ -6,8 +6,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { api } from '@/lib/api';
-import { signOut } from '@/lib/auth';
-import { offlineStore } from '@/lib/offline-queue';
 import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
@@ -31,6 +29,7 @@ import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../shell.module.css';
 import { ChangelogNotice } from './changelog-notice';
+import { SignOutButton } from './sign-out-button';
 import { MbgCard } from './mbg/card';
 import { TppkCards } from './tppk/card';
 
@@ -302,18 +301,7 @@ export default function StafHome() {
             Ganti sekolah
           </Button>
         )}
-        <Button
-          variant="secondary"
-          onClick={() =>
-            void signOut().then(() => {
-              void offlineStore().clearCached(); // rosters kept for offline use do not stay on the phone
-              selectSchool(null);
-              router.replace('/masuk');
-            })
-          }
-        >
-          Keluar
-        </Button>
+        <SignOutButton />
       </div>
     </main>
   );

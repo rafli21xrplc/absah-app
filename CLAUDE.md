@@ -538,9 +538,9 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 ## Sesi offline (PRS-08; lib/offline-queue.ts, lib/sync-sessions.ts, (staf)/offline-sync.tsx)
 - Pins api e11b771 (later bumped: see apps/web/package.json; POST /sessions/{id}/sync, GET /gate/board, /workspace/exports). The staff layout mounts <OfflineSync>:
   it sends the queue on load, on `online`, when the tab is visible and every 15 s while something waits, and shows what
-  happened per session (terkirim / koreksi diajukan because the session was locked meanwhile / tidak ada perubahan /
-  tidak terkirim + the API's reason). Nothing is dropped silently: only an API answer (even a refusal) removes an item;
-  no answer (TypeError, 408/429/502/503/504) keeps it, 401 keeps it for the same user.
+  happened per session (terkirim / koreksi diajukan because the session was locked meanwhile / tidak ada perubahan).
+  Nothing is dropped: only a SUCCESS removes an item. No answer (TypeError, 408/429/502/503/504) keeps it and counts the try;
+  a refusal for good keeps it with the reason (`rejected`) until "Coba lagi"; 401 keeps it for the same user (see U5 below).
 - Store (IndexedDB `absah-staff-offline`: `queue`, `cache`; memoryStore in tests and as fallback): the queue is keyed
   `${userId}:${sessionId}` (filling again replaces the entry) and each item keeps its own Idempotency-Key, so a resend after
   a lost reply gets the same answer. capturedAt is the moment of "Kirim". The cache holds copies of /me/context, the Hari ini
@@ -693,6 +693,28 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - `Sheet` memfokuskan dirinya sendiri saat terbuka, bukan kolom pertama (di HP kolom terfokus membuka keyboard). Eyebrow `Sheet` ikut nama dialog
   untuk pembaca layar dan digambar sekali. `AttendanceFlow` memegang area gulir daftar sendiri (header, filter, footer ada dalam alur, tidak menimpa baris).
 - E2E mengisi sesi lewat `fillSession` / `markStudents` / `pickStatus` / `sendReview` di `apps/web/e2e/helpers.ts`; jangan menulis ulang urutan kliknya.
+
+### Presensi tanpa sinyal (U5)
+- Tidak ada arsitektur baru: antrean IndexedDB (`lib/offline-queue.ts`), `syncPending` (`lib/sync-sessions.ts`) dan `<OfflineSync>` yang ada.
+  Item antrean kini punya `attempts`, `nextAttemptAt` dan `rejected` (field opsional, versi IndexedDB tetap 1).
+- Jeda antar percobaan otomatis tumbuh per item: 15 dtk, 30 dtk, 1 mnt, 2 mnt, paling lama 5 mnt (`backoffMs`). "Kirim sekarang" dan
+  event `online` melewati jeda (`force`). Kunci idempoten per item tidak pernah berubah, jadi kirim ulang aman. Hanya SUKSES yang
+  menghapus item.
+- Penolakan permanen dari server (mis. batas ubah lewat) tidak menghapus item: ia tinggal, dengan kalimat API-nya ("Presensi X-2 belum
+  terkirim. ... Hubungi wali kelas."), sebagai Banner galat dengan "Coba lagi" (`retry`), dan tidak dikirim lagi sebelum tombol itu.
+  Satu penolakan tidak menahan sesi berikutnya; tidak ada jawaban menghentikan satu putaran.
+- Layar isi presensi: `offline = !navigator.onLine || data dari salinan`. Offline: banner kuning "Tidak ada sinyal. Presensi disimpan di
+  HP ...", tombol utama "Simpan presensi di HP", tombol lembar "Simpan di HP", lalu layar "Tersimpan di HP" dengan lencana "Menunggu · n"
+  (`waitingCount`). Saat n menjadi 0 layar itu berubah menjadi "terkirim". Tetap lewat lembar ringkasan.
+- Beranda guru: sesi yang masih di antrean keluar dari kartu utama dan masuk kelompok "Menunggu dikirim" (`SessionItem` varian `waiting`).
+- Keluar akun dengan antrean menampilkan dialog jumlah presensi yang belum terkirim (`SignOutButton`). Antrean tidak dihapus saat keluar;
+  ia terkirim saat pengguna yang sama masuk lagi (antrean per user).
+- `<OfflineSync>` mengukur tingginya sendiri ke `--offline-notice` (di `<html>`); layar setinggi HP (`h-dvh`) mengurangkannya. Tanpa itu
+  footer layar isi presensi terdorong keluar layar saat banner tampil.
+- Tidak memakai Background Sync: ia hanya Chromium, dan menjalankannya di service worker berarti menulis ulang aturan di atas (jeda,
+  penolakan, kunci) di runtime kedua tanpa akses ke sesi UI. Kirim saat aplikasi dibuka, kembali online, tab terlihat, atau tiap 15 dtk.
+- E2E `presensi-offline.spec.ts`: satu handler `page.route` mencatat tiap `/sessions/:id/sync` dengan Idempotency-Key-nya; tiga kirim
+  pertama setelah sinyal kembali tidak dijawab, yang keempat sampai; kunci sama di semua percobaan dan tiap presensi dijawab sekali.
 
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan

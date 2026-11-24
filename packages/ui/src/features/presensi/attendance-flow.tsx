@@ -1,6 +1,6 @@
 'use client';
 
-import { CircleCheck } from 'lucide-react';
+import { CircleCheck, Smartphone } from 'lucide-react';
 import { useEffect, useMemo, useReducer, useRef, useState, type ElementType, type ReactNode } from 'react';
 import { messages } from '../../../messages/id';
 import { cx } from '../../cx';
@@ -73,18 +73,22 @@ export interface AttendanceFlowProps {
   next?: { label: string; href: string } | null;
   /** A banner under the header, e.g. "Tanpa sinyal. Daftar siswa dari salinan di HP." */
   banner?: ReactNode;
+  /** No signal: the main button says "Simpan presensi di HP" and the send button of the sheet "Simpan di HP". */
+  offline?: boolean;
+  /** How many presensi of this teacher wait on the phone: the "Menunggu · n" badge. It reaching 0 turns "tersimpan" into "terkirim". */
+  waitingCount?: number;
   /** The session is locked: rows are plain, there is no sending; `readOnlyNote` explains and offers the way out. */
   readOnly?: boolean;
   readOnlyNote?: ReactNode;
   /** For stories and tests: start with a sheet open, a filter on, or on the "terkirim" screen. */
-  initialView?: { filter?: 'all' | 'unfilled' | 'absent'; sheetFor?: string; review?: boolean; sent?: boolean };
+  initialView?: { filter?: 'all' | 'unfilled' | 'absent'; sheetFor?: string; review?: boolean; sent?: boolean; saved?: boolean };
   /** Correction mode: the same screen, but the main button asks for a correction with a reason. */
   correction?: { onSubmit: (changes: { id: string; status: Status }[], reason: string) => Promise<SendResult>; onCancel: () => void };
 }
 
 /** Fills one session on a phone: Semua hadir, tap the ones who are not there, check, send. The rules are in reducer.ts. */
 export function AttendanceFlow(props: AttendanceFlowProps) {
-  const { title, subtitle, dateLabel, shortTitle, students, backHref, linkAs, withTopic = false, initialTopic = '', notifyParents = true, showHelpFirst = false, onHelpSeen, onSubmit, next, banner, readOnly = false, readOnlyNote, correction, initialView } = props;
+  const { title, subtitle, dateLabel, shortTitle, students, backHref, linkAs, withTopic = false, initialTopic = '', notifyParents = true, showHelpFirst = false, onHelpSeen, onSubmit, next, banner, offline = false, waitingCount = 1, readOnly = false, readOnlyNote, correction, initialView } = props;
   const Link = linkAs ?? 'a';
   const roster = useMemo(() => students.map((s) => ({ id: s.id, mark: s.mark, fixed: s.fixed })), [students]);
   const byId = useMemo(() => new Map(students.map((s) => [s.id, s])), [students]);
@@ -92,7 +96,7 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
   const [topic, setTopic] = useState(initialTopic);
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState(false);
-  const [phase, setPhase] = useState<'editing' | 'sent'>(initialView?.sent ? 'sent' : 'editing');
+  const [phase, setPhase] = useState<'editing' | 'sent' | 'saved'>(initialView?.sent ? 'sent' : initialView?.saved ? 'saved' : 'editing');
   const [result, setResult] = useState<SendResult | null>(null);
 
   // A different session (or a fresh answer from the server) replaces the roster; nothing of the last one stays.
@@ -123,7 +127,10 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
       dispatch({ type: 'closeReview' });
       setPhase('sent');
     }
-    if (r.kind === 'queued') dispatch({ type: 'closeReview' });
+    if (r.kind === 'queued') {
+      dispatch({ type: 'closeReview' });
+      setPhase('saved');
+    }
   }
 
   async function sendCorrection() {
@@ -139,17 +146,20 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
     if (r.kind === 'sent') dispatch({ type: 'closeReview' });
   }
 
-  if (phase === 'sent') {
+  if (phase === 'sent' || phase === 'saved') {
+    // Saved on the phone is "tersimpan" until the last waiting one went out; then it is simply sent.
+    const saved = phase === 'saved' && waitingCount > 0;
     return (
       <main className="mx-auto box-border flex min-h-dvh w-full max-w-xl flex-col items-center justify-center gap-4 px-6 py-8 text-center">
-        <span aria-hidden className="inline-flex size-16 items-center justify-center rounded-lg bg-papan text-on-papan">
-          <CircleCheck strokeWidth={2.25} className="size-8" />
+        <span aria-hidden className={cx('inline-flex size-16 items-center justify-center rounded-lg', saved ? 'bg-stabilo text-on-stabilo' : 'bg-papan text-on-papan')}>
+          {saved ? <Smartphone strokeWidth={2.25} className="size-8" /> : <CircleCheck strokeWidth={2.25} className="size-8" />}
         </span>
-        <h1 className="m-0 text-h1">{fill(t.sentTitle, { name: shortTitle })}</h1>
+        <h1 className="m-0 text-h1">{fill(saved ? t.savedTitle : t.sentTitle, { name: shortTitle })}</h1>
+        {saved && <span className="rounded-full bg-stabilo px-3 py-1 text-small font-bold text-on-stabilo">{fill(t.waitingBadge, { n: waitingCount })}</span>}
         <p className="m-0 text-body text-tinta-muted">
           {STATUSES.map((s) => `${statusTokens(s).kata} ${c[s]}`).join(' · ')}.
           <br />
-          {t.sentUntil}
+          {saved ? `${t.savedBody} ${t.savedUntil}` : t.sentUntil}
         </p>
         <Link href={next?.href ?? backHref} className={cx(buttonStyles({ variant: 'primary', size: '52' }), 'w-full no-underline')}>
           {next ? fill(t.next, { label: next.label }) : t.backToday}
@@ -172,7 +182,7 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
     }
     return primaryAction(state) === 'review' ? (
       <Button size="52" className="w-full" onClick={() => dispatch({ type: 'openReview' })}>
-        {t.review}
+        {offline ? t.saveOnPhone : t.review}
       </Button>
     ) : (
       <Button variant="stabilo" size="52" className="w-full" onClick={() => dispatch({ type: 'setFilter', filter: 'unfilled' })}>
@@ -183,7 +193,7 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
 
   return (
     <ToastProvider duration={7000} viewportClassName="pointer-events-none fixed inset-x-0 bottom-28 z-50 m-0 flex list-none flex-col gap-2 p-4 sm:left-auto sm:right-4 sm:w-96">
-      <main className="mx-auto box-border flex h-dvh w-full max-w-xl flex-col">
+      <main className="mx-auto box-border flex h-[calc(100dvh-var(--offline-notice,0px))] w-full max-w-xl flex-col">
         <header className="flex shrink-0 items-center gap-3 border-b border-garis bg-kapur-raised px-3 py-3">
           <Link href={backHref} aria-label={t.back} className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-tinta no-underline">
             <span aria-hidden className="text-h2">‹</span>
@@ -292,11 +302,6 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
                 </span>
               ))}
             </div>
-            {result?.kind === 'queued' && (
-              <Banner kind="offline" title={t.queuedTitle}>
-                {t.queuedBody}
-              </Banner>
-            )}
             {mainButton}
             {correction && (
               <Button variant="secondary" size="48" className="w-full" disabled={busy} onClick={correction.onCancel}>
@@ -358,14 +363,14 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
             <Input value={topic} maxLength={200} placeholder={t.topicPlaceholder} onChange={(e) => setTopic(e.target.value)} />
           </Field>
         )}
-        <p className="m-0 text-small text-tinta-muted">{notifyParents && c.A > 0 ? t.impactWa : t.impact}</p>
+        <p className="m-0 text-small text-tinta-muted">{offline ? t.impactOffline : notifyParents && c.A > 0 ? t.impactWa : t.impact}</p>
         {result?.kind === 'failed' && (
           <Banner kind="error" title={t.sendFailed}>
             {result.message ?? t.sendFailedBody}
           </Banner>
         )}
         <Button size="52" className="w-full" loading={busy} onClick={() => void send()}>
-          {t.send}
+          {offline ? t.saveOnPhoneSheet : t.send}
         </Button>
       </Sheet>
 

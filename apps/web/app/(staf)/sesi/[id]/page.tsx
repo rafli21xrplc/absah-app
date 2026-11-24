@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { SOURCE_LABELS, STATUS_LABELS, type ExceptionStatus } from '@/lib/attendance';
-import { isTransient, offlineStore, queuedId, queueSession, savedLabel, sessionCacheKey } from '@/lib/offline-queue';
+import { isTransient, offlineStore, QUEUE_CHANGED_EVENT, queuedId, queueSession, savedLabel, sessionCacheKey } from '@/lib/offline-queue';
 import { groupToday, minutesOfDay } from '@/lib/session-clock';
 import { SESSIONS_SYNCED_EVENT } from '@/lib/sync-sessions';
 import { useWorkspace } from '@/lib/workspace';
@@ -27,6 +27,22 @@ function helpSeen(userId: string): boolean {
   }
 }
 
+/** The browser's own idea of "online": it only says "no" when there is surely no network; a dead connection still shows as online. */
+function useOnline(): boolean {
+  const [online, setOnline] = useState(true);
+  useEffect(() => {
+    const update = () => setOnline(navigator.onLine);
+    update();
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    return () => {
+      window.removeEventListener('online', update);
+      window.removeEventListener('offline', update);
+    };
+  }, []);
+  return online;
+}
+
 /** The exceptions that were given and wait in the phone's queue, or null. */
 type Queued = Awaited<ReturnType<ReturnType<typeof offlineStore>['queue']>>[number];
 
@@ -44,9 +60,27 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
   const [attempt, setAttempt] = useState(0);
   /** Set while the roster comes from the phone's copy (no signal). */
   const [copyFrom, setCopyFrom] = useState<string | null>(null);
+  /** Presensi of this teacher that wait on the phone (the "Menunggu · n" badge). */
+  const [waitingCount, setWaitingCount] = useState(0);
+  const online = useOnline();
   const [next, setNext] = useState<{ label: string; href: string } | null>(null);
   /** One key per payload: sending the same answers again is the same action, different answers are a new one. */
   const sent = useRef<{ signature: string; key: string } | null>(null);
+
+  const countWaiting = useCallback(
+    () =>
+      offlineStore()
+        .queue(userId)
+        .then((q) => setWaitingCount(q.filter((i) => !i.rejected).length)),
+    [userId],
+  );
+
+  useEffect(() => {
+    void countWaiting();
+    const changed = () => void countWaiting();
+    window.addEventListener(QUEUE_CHANGED_EVENT, changed);
+    return () => window.removeEventListener(QUEUE_CHANGED_EVENT, changed);
+  }, [countWaiting]);
 
   /** Reads the session: the API, else (no signal) the phone's copy; and what already waits in the queue. */
   const read = useCallback(async () => {
@@ -147,6 +181,7 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
         capturedAt: new Date().toISOString(),
         idempotencyKey: newIdempotencyKey(),
       });
+      await countWaiting();
       void read().then(apply);
       return { kind: 'queued' };
     }
@@ -187,14 +222,16 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
 
   const title = detail.subject ? `${detail.owner.name} · ${detail.subject.name}` : detail.owner.name;
   const subtitle = detail.period ? fill(t.period, { n: detail.period.number, start: detail.period.startsAt, end: detail.period.endsAt }) : t.dailyTitle;
+  const offline = !online || copyFrom !== null;
   const banners = (
     <>
-      {copyFrom && (
-        <Banner kind="offline" title={t.copyBannerTitle} className="rounded-none border-x-0">
-          {fill(t.copyBanner, { time: copyFrom })}
+      {offline && (
+        <Banner kind="offline" title={t.queuedTitle} className="rounded-none border-x-0">
+          {t.queuedBody}
+          {copyFrom && ` ${fill(t.copyBanner, { time: copyFrom })}`}
         </Banner>
       )}
-      {queued && !copyFrom && (
+      {queued && !offline && (
         <Banner kind="offline" title={t.waitingTitle} className="rounded-none border-x-0">
           {t.waiting}
         </Banner>
@@ -230,6 +267,8 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
       }}
       next={next}
       banner={banners}
+      offline={offline}
+      waitingCount={waitingCount}
       readOnly={readOnly}
       readOnlyNote={
         <>

@@ -1,7 +1,7 @@
 import type { SyncSessionResult } from '@absah/contracts';
 import { describe, expect, it } from 'vitest';
 import { ApiError } from './api';
-import { isTransient, memoryStore, queuedId, savedLabel, type QueuedSession } from './offline-queue';
+import { afterNoAnswer, backoffMs, forRetry, isDue, isTransient, memoryStore, queuedId, savedLabel, type QueuedSession } from './offline-queue';
 import { describeResult, syncPending } from './sync-sessions';
 
 const USER = '0196a000-0000-7000-8000-000000000001';
@@ -48,19 +48,47 @@ describe('syncPending (PRS-08)', () => {
     };
     expect(await syncPending(store, USER, flaky)).toEqual([]);
     expect((await store.queue(USER)).length).toBe(2);
-    expect((await syncPending(store, USER, flaky)).length).toBe(2);
+    expect((await syncPending(store, USER, flaky, { force: true })).length).toBe(2);
     expect(keys).toEqual(['key-1', 'key-1', 'key-2']);
   });
 
-  it('drops a session the API refuses and says why; keeps one that hit a gateway error', async () => {
+  it('keeps a session the API refuses, with the reason in plain words; keeps one that hit a gateway error', async () => {
+    const store = memoryStore();
+    await store.enqueue(item(1, { title: 'X-2' }));
+    await store.enqueue(item(2));
+    const out = await syncPending(store, USER, (i) => Promise.reject(i.sessionId === 's1' ? apiError(403, 'Batas ubah sudah lewat.') : apiError(503)));
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ kind: 'rejected', sessionId: 's1' });
+    expect(out[0]?.text).toBe('Presensi X-2 belum terkirim. Batas ubah sudah lewat. Hubungi wali kelas.');
+    const left = await store.queue(USER);
+    expect(left.map((i) => i.sessionId)).toEqual(['s1', 's2']);
+    expect(left[0]?.rejected?.message).toBe(out[0]?.text);
+    expect(left[1]?.attempts).toBe(1);
+  });
+
+  it('does not send a refused session again by itself, but "Coba lagi" does, with the same key', async () => {
+    const store = memoryStore();
+    await store.enqueue(item(1, { title: 'X-2' }));
+    await syncPending(store, USER, () => Promise.reject(apiError(403, 'Batas ubah sudah lewat.')));
+    const sent: string[] = [];
+    const ok = (i: QueuedSession) => {
+      sent.push(i.idempotencyKey);
+      return Promise.resolve(result('submitted'));
+    };
+    expect(await syncPending(store, USER, ok, { force: true })).toEqual([]);
+    expect(sent).toEqual([]);
+    const out = await syncPending(store, USER, ok, { retry: true });
+    expect(out.map((o) => o.kind)).toEqual(['submitted']);
+    expect(sent).toEqual(['key-1']);
+    expect(await store.queue(USER)).toEqual([]);
+  });
+
+  it('a refusal does not block the next session', async () => {
     const store = memoryStore();
     await store.enqueue(item(1));
     await store.enqueue(item(2));
-    const out = await syncPending(store, USER, (i) => Promise.reject(i.sessionId === 's1' ? apiError(404, 'Sesi tidak ditemukan.') : apiError(503)));
-    expect(out).toHaveLength(1);
-    expect(out[0]).toMatchObject({ kind: 'rejected', sessionId: 's1' });
-    expect(out[0]?.text).toContain('Sesi tidak ditemukan.');
-    expect((await store.queue(USER)).map((i) => i.sessionId)).toEqual(['s2']);
+    const out = await syncPending(store, USER, (i) => (i.sessionId === 's1' ? Promise.reject(apiError(404, 'Sesi tidak ditemukan.')) : Promise.resolve(result('submitted'))));
+    expect(out.map((o) => o.kind)).toEqual(['rejected', 'submitted']);
   });
 
   it('keeps everything when signed out (401) and never sends another user’s sessions', async () => {
@@ -84,6 +112,78 @@ describe('syncPending (PRS-08)', () => {
     const queued = await store.queue(USER);
     expect(queued).toHaveLength(1);
     expect(queued[0]?.idempotencyKey).toBe('key-new');
+  });
+});
+
+describe('waiting between tries (U5)', () => {
+  const T0 = new Date('2026-11-23T01:00:00.000Z');
+  const later = (ms: number) => new Date(T0.getTime() + ms);
+
+  it('the wait grows 15 s, 30 s, 1 min, 2 min and stops at 5 min', () => {
+    expect([1, 2, 3, 4, 5, 6, 12].map(backoffMs)).toEqual([15_000, 30_000, 60_000, 120_000, 240_000, 300_000, 300_000]);
+  });
+
+  it('a send without an answer counts the try and is not due again until its wait is over', async () => {
+    const store = memoryStore();
+    await store.enqueue(item(1));
+    const down = () => Promise.reject(new TypeError('Failed to fetch'));
+    await syncPending(store, USER, down, { now: T0 });
+    const [first] = await store.queue(USER);
+    expect(first?.attempts).toBe(1);
+    expect(first?.nextAttemptAt).toBe(later(15_000).toISOString());
+    let calls = 0;
+    const count = () => {
+      calls += 1;
+      return down();
+    };
+    await syncPending(store, USER, count, { now: later(14_000) });
+    expect(calls).toBe(0);
+    await syncPending(store, USER, count, { now: later(15_000) });
+    expect(calls).toBe(1);
+    expect((await store.queue(USER))[0]?.attempts).toBe(2);
+  });
+
+  it('"Kirim sekarang" (force) does not wait', async () => {
+    const store = memoryStore();
+    await store.enqueue(item(1));
+    let calls = 0;
+    const down = () => {
+      calls += 1;
+      return Promise.reject(new TypeError('Failed to fetch'));
+    };
+    await syncPending(store, USER, down, { now: T0 });
+    await syncPending(store, USER, down, { now: later(1_000), force: true });
+    expect(calls).toBe(2);
+  });
+
+  it('three tries without an answer, then one send: the same key every time and the item gone only at the end', async () => {
+    const store = memoryStore();
+    await store.enqueue(item(1));
+    const keys: string[] = [];
+    let calls = 0;
+    const flaky = (i: QueuedSession) => {
+      keys.push(i.idempotencyKey);
+      calls += 1;
+      return calls <= 3 ? Promise.reject(new TypeError('Failed to fetch')) : Promise.resolve(result('submitted'));
+    };
+    for (let n = 0; n < 3; n += 1) {
+      await syncPending(store, USER, flaky, { force: true });
+      expect((await store.queue(USER))[0]?.attempts).toBe(n + 1);
+    }
+    const out = await syncPending(store, USER, flaky, { force: true });
+    expect(out.map((o) => o.kind)).toEqual(['submitted']);
+    expect(keys).toEqual(['key-1', 'key-1', 'key-1', 'key-1']);
+    expect(await store.queue(USER)).toEqual([]);
+  });
+
+  it('isDue / forRetry', () => {
+    expect(isDue(item(1), T0)).toBe(true);
+    expect(isDue(afterNoAnswer(item(1), T0), T0)).toBe(false);
+    expect(isDue(item(1, { rejected: { message: 'x', at: T0.toISOString() } }), later(1e9))).toBe(false);
+    const again = forRetry(afterNoAnswer(item(1, { rejected: { message: 'x', at: T0.toISOString() } }), T0));
+    expect(again.rejected).toBeUndefined();
+    expect(again.nextAttemptAt).toBeUndefined();
+    expect(again.idempotencyKey).toBe('key-1');
   });
 });
 

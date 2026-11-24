@@ -40,6 +40,16 @@ async function pick(user: ReturnType<typeof userEvent.setup>, name: string, curr
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 }
 
+async function toSend(over: Partial<AttendanceFlowProps> = {}) {
+  const ctx = setup(over);
+  await ctx.user.click(screen.getByRole('button', { name: /Semua hadir/ }));
+  await pick(ctx.user, 'Bayu Firmansyah', 'Hadir', 'Telat');
+  await pick(ctx.user, 'Rizky Maulana', 'Hadir', 'Izin');
+  await pick(ctx.user, 'Putri Ayu Lestari', 'Hadir', 'Alpa');
+  await ctx.user.click(screen.getByRole('button', { name: /^(Periksa dan kirim|Simpan presensi di HP)$/ }));
+  return ctx;
+}
+
 describe('step 2: opened, everyone "Belum diisi"', () => {
   it('shows 25 students all "Belum diisi", the progress, the filters and the footer', async () => {
     const { container } = setup();
@@ -261,16 +271,6 @@ describe('step 5: check before sending', () => {
 });
 
 describe('step 6: sending', () => {
-  async function toSend(over: Partial<AttendanceFlowProps> = {}) {
-    const ctx = setup(over);
-    await ctx.user.click(screen.getByRole('button', { name: /Semua hadir/ }));
-    await pick(ctx.user, 'Bayu Firmansyah', 'Hadir', 'Telat');
-    await pick(ctx.user, 'Rizky Maulana', 'Hadir', 'Izin');
-    await pick(ctx.user, 'Putri Ayu Lestari', 'Hadir', 'Alpa');
-    await ctx.user.click(screen.getByRole('button', { name: 'Periksa dan kirim' }));
-    return ctx;
-  }
-
   it('sends only the students who are not Hadir', async () => {
     const { user, onSubmit } = await toSend();
     await user.click(await screen.findByRole('button', { name: 'Kirim presensi' }));
@@ -324,14 +324,45 @@ describe('step 6: sending', () => {
     expect((await screen.findByRole('alert')).textContent).toContain('Sesi sudah dikunci.');
   });
 
-  it('with no signal it is kept on the phone: a banner says so and the answers stay', async () => {
+  it('with no signal it is kept on the phone: the "Tersimpan di HP" screen shows "Menunggu · n" and the answers stay', async () => {
     const onSubmit = vi.fn<AttendanceFlowProps['onSubmit']>().mockResolvedValue({ kind: 'queued' });
-    const { user } = await toSend({ onSubmit });
+    const { user, container } = await toSend({ onSubmit, waitingCount: 2 });
     await user.click(await screen.findByRole('button', { name: 'Kirim presensi' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    expect(screen.getByText(/Presensi disimpan di HP dan dikirim otomatis saat sinyal kembali/)).toBeTruthy();
-    expect(screen.getByText(/^Tidak ada sinyal\./)).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Presensi X-2 tersimpan di HP' })).toBeTruthy();
+    expect(screen.getByText('Menunggu · 2')).toBeTruthy();
+    expect(screen.getByText(/Dikirim otomatis saat sinyal kembali/)).toBeTruthy();
+    await expectNoAxeViolations(container);
+    await user.click(screen.getByRole('button', { name: 'Ubah presensi ini' }));
     expect(row('Putri Ayu Lestari', 'Alpa')).toBeTruthy();
+  });
+
+  it('when the last waiting one went out, the saved screen becomes the sent screen', async () => {
+    const onSubmit = vi.fn<AttendanceFlowProps['onSubmit']>().mockResolvedValue({ kind: 'queued' });
+    const { user, rerender } = await toSend({ onSubmit, waitingCount: 1 });
+    await user.click(await screen.findByRole('button', { name: 'Kirim presensi' }));
+    await screen.findByRole('heading', { name: 'Presensi X-2 tersimpan di HP' });
+    rerender(<AttendanceFlow title="X-2 · Matematika" subtitle="Jam ke-3 · 08.30–09.15" dateLabel="Senin, 25 Januari" shortTitle="X-2" students={roster()} backHref="/hari-ini" onSubmit={onSubmit} waitingCount={0} />);
+    expect(await screen.findByRole('heading', { name: 'Presensi X-2 terkirim' })).toBeTruthy();
+    expect(screen.queryByText(/^Menunggu/)).toBeNull();
+  });
+});
+
+describe('U5: without signal, before sending', () => {
+  it('the main button says "Simpan presensi di HP", the sheet says what will happen and its button "Simpan di HP"', async () => {
+    const { user } = await toSend({ offline: true });
+    expect(screen.queryByRole('button', { name: 'Kirim presensi' })).toBeNull();
+    const sheet = screen.getByRole('dialog', { name: 'Periksa sebelum kirim' });
+    expect(within(sheet).getByRole('button', { name: 'Simpan di HP' })).toBeTruthy();
+    expect(sheet.textContent).toContain('Presensi disimpan di HP ini dan dikirim otomatis saat sinyal kembali.');
+    expect(sheet.textContent).not.toContain('WhatsApp');
+    await user.click(within(sheet).getByRole('button', { name: 'Kembali dan periksa lagi' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByRole('button', { name: 'Simpan presensi di HP' })).toBeTruthy();
+  });
+
+  it('with signal the words stay "Periksa dan kirim" and "Kirim presensi"', async () => {
+    await toSend();
+    expect(screen.getByRole('button', { name: 'Kirim presensi' })).toBeTruthy();
   });
 });
 

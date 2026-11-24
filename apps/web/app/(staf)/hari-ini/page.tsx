@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
 import { ALL_SESSIONS_VIEWERS } from '@/lib/attendance';
-import { isTransient, offlineStore, savedLabel, sessionCacheKey, todayCacheKey } from '@/lib/offline-queue';
+import { isTransient, offlineStore, QUEUE_CHANGED_EVENT, savedLabel, sessionCacheKey, todayCacheKey } from '@/lib/offline-queue';
 import { clockOffset, greetingName, greetingPart, groupToday, minutesOfDay } from '@/lib/session-clock';
 import { SESSIONS_SYNCED_EVENT } from '@/lib/sync-sessions';
 import { useWorkspace } from '@/lib/workspace';
@@ -56,6 +56,16 @@ export default function HariIniPage() {
   /** Server time minus the phone's clock, from the Date header of the last answer. */
   const [offset, setOffset] = useState(0);
   const [tick, setTick] = useState(() => Date.now());
+  /** Sessions this teacher filled without signal that are still on the phone: they say "Menunggu dikirim" until they are at the school. */
+  const [waitingIds, setWaitingIds] = useState<ReadonlySet<string>>(new Set());
+  const userId = me.user.id;
+
+  useEffect(() => {
+    const read = () => void offlineStore().queue(userId).then((q) => setWaitingIds(new Set(q.map((i) => i.sessionId))));
+    read();
+    window.addEventListener(QUEUE_CHANGED_EVENT, read);
+    return () => window.removeEventListener(QUEUE_CHANGED_EVENT, read);
+  }, [userId]);
 
   // A lesson starts and ends on the minute, so look at the clock again every 30 seconds.
   useEffect(() => {
@@ -104,7 +114,8 @@ export default function HariIniPage() {
   }, [schoolId, scope, timezone, attempt]);
 
   const nowMinutes = minutesOfDay(new Date(tick + offset), timezone);
-  const groups = useMemo(() => (data ? groupToday(data.sessions, nowMinutes) : null), [data, nowMinutes]);
+  const waiting = useMemo(() => data?.sessions.filter((s) => waitingIds.has(s.id)) ?? [], [data, waitingIds]);
+  const groups = useMemo(() => (data ? groupToday(data.sessions.filter((s) => !waitingIds.has(s.id)), nowMinutes) : null), [data, nowMinutes, waitingIds]);
 
   const showHero = scope === 'mine';
   const hero = showHero ? groups?.current[0] : undefined;
@@ -144,6 +155,13 @@ export default function HariIniPage() {
       {!data && !error && <SkeletonRows count={3} />}
       {empty && (
         <EmptyState title={scope === 'mine' ? t.empty : t.emptyAll}>{scope === 'mine' ? t.emptyBody : t.emptyAllBody}</EmptyState>
+      )}
+      {waiting.length > 0 && (
+        <SessionGroup title={t.waitingGroup}>
+          {waiting.map((s) => (
+            <SessionItem key={s.id} variant="waiting" time={timeOf(s)} title={titleOf(s)} meta={metaOf(s, showTeacher)} href={link(s)} linkAs={Link} />
+          ))}
+        </SessionGroup>
       )}
       {hero && <SessionHero time={timeOf(hero)} title={titleOf(hero)} meta={metaOf(hero, false)} href={link(hero)} actionLabel={`${t.fill} ${titleOf(hero)}`} linkAs={Link} />}
       {inProgress.length > 0 && (
