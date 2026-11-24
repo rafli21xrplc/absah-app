@@ -742,6 +742,14 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
   orang. Admin tidak ditawari menonaktifkan dirinya sendiri (API menolak). Tautan undangan hanya tampil sekali (dari respons POST), maka disalin dari drawer.
 - Jumlah total tidak ditulis bila API tidak mengirimnya (daftar siswa memakai cursor tanpa total): subtitle memakai jumlah rombel dari `/classes`.
 
+### Pola wizard (U8; contoh: `app/(staf)/setup`)
+- Satu pertanyaan per langkah. `Stepper` (nomor + kata + `aria-current="step"`; di HP hanya label langkah aktif) di atas, `Field`/`ChoiceGroup` di tengah,
+  `WizardNav` (Kembali kiri, aksi kanan) di bawah. Kemajuan tersimpan di server per langkah (`PUT /school/setup/steps/:step`); halaman hanya membuka langkah
+  `todo` pertama.
+- `ChoiceGroup` = fieldset + radio berbentuk kartu. Nama radio hanya labelnya; penjelasan lewat `aria-describedby`. Radio memakai `relative z-10` supaya klik
+  tidak tertahan overlay label (tes Playwright `check()` menggantung 90 detik tanpanya).
+- Ringkasan "Yang aktif untuk ..." (`PresetSummary`, `data-testid="preset-summary"`) dihitung dari `presetCapabilities` yang sama dengan server, tampil sebelum menyimpan.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

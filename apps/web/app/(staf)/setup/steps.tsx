@@ -9,15 +9,16 @@ import {
   type SchoolSetupResponse,
   type StaffRole,
 } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, ChoiceGroup, Field, Input, PresetSummary, Select, WizardNav, messages } from '@absah/ui';
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
 import { CAPABILITY_LABELS, CAPABILITY_VALUE_LABELS } from '@/lib/capability-labels';
 import { LEVEL_LABELS, LEVEL_OPTIONS } from '@/lib/levels';
 import { ROLE_LABELS } from '@/lib/roles';
-import forms from '../../forms.module.css';
-import styles from './setup.module.css';
 import { toE164 } from '@/lib/phone';
+
+const t = messages.setup;
+const fill = (text: string, values: Record<string, string>) => text.replace(/\{(\w+)\}/g, (_, k: string) => values[k] ?? '');
 
 export type Caps = Record<string, unknown>;
 
@@ -49,10 +50,10 @@ function useSubmit() {
   const message =
     error instanceof ApiError
       ? error.code === 'VALIDATION_FAILED' && Array.isArray(error.body.details)
-        ? 'Periksa lagi isian yang ditandai.'
+        ? t.checkFields
         : error.message
       : error
-        ? 'Tidak bisa terhubung. Periksa internet lalu coba lagi.'
+        ? t.notConnected
         : null;
   return { busy, error, message, run };
 }
@@ -69,30 +70,21 @@ function Shell(props: {
   extra?: ReactNode;
 }) {
   return (
-    <form className={forms.form} onSubmit={props.onSubmit}>
-      <h1 className={styles.title}>{props.title}</h1>
-      {props.hint && <p className={forms.hint}>{props.hint}</p>}
+    <form className="flex flex-col gap-5" onSubmit={props.onSubmit}>
+      <h1 className="m-0 text-h1">{props.title}</h1>
+      {props.hint && <p className="m-0 text-body text-tinta-muted">{props.hint}</p>}
       {props.children}
       {props.message && (
-        <p className={forms.error} role="alert">
+        <p role="alert" className="m-0 text-body text-alpa">
           {props.message}
         </p>
       )}
-      <div className={styles.nav}>
-        {props.onBack ? (
-          <Button variant="secondary" onClick={props.onBack}>
-            Kembali
-          </Button>
-        ) : (
-          <span />
-        )}
-        <span style={{ display: 'flex', gap: 8 }}>
-          {props.extra}
-          <Button type="submit" disabled={props.busy}>
-            {props.submitLabel ?? 'Simpan dan lanjut'}
-          </Button>
-        </span>
-      </div>
+      <WizardNav onBack={props.onBack} backLabel={t.back}>
+        {props.extra}
+        <Button type="submit" loading={props.busy}>
+          {props.submitLabel ?? t.next}
+        </Button>
+      </WizardNav>
     </form>
   );
 }
@@ -127,31 +119,23 @@ export function ProfileStep({ setup, schoolId, onCaps, onDone, onBack }: StepPro
       await onDone('done');
     });
   return (
-    <Shell title="Profil sekolah" busy={busy} message={message} onBack={onBack} onSubmit={submit}>
-      <label className={forms.field}>
-        <span className={forms.label}>Nama sekolah</span>
-        <input className={forms.input} name="name" defaultValue={p.name} required minLength={3} maxLength={120} />
-        {fieldError(error, 'name') && <span className={forms.error}>{fieldError(error, 'name')}</span>}
-      </label>
-      <label className={forms.field}>
-        <span className={forms.label}>NPSN</span>
-        <input className={forms.input} name="npsn" defaultValue={p.npsn ?? ''} inputMode="numeric" pattern="\d{8}" />
-        <span className={forms.hint}>8 angka. Madrasah boleh mengisi NSM saja.</span>
-        {fieldError(error, 'npsn') && <span className={forms.error}>{fieldError(error, 'npsn')}</span>}
-      </label>
-      <label className={forms.field}>
-        <span className={forms.label}>NSM (madrasah)</span>
-        <input className={forms.input} name="nsm" defaultValue={p.nsm ?? ''} inputMode="numeric" pattern="\d{12}" />
-        {fieldError(error, 'nsm') && <span className={forms.error}>{fieldError(error, 'nsm')}</span>}
-      </label>
-      <label className={forms.field}>
-        <span className={forms.label}>Zona waktu</span>
-        <select className={forms.input} name="timezone" defaultValue={p.timezone}>
-          <option value="Asia/Jakarta">WIB (Jakarta)</option>
-          <option value="Asia/Makassar">WITA (Makassar)</option>
-          <option value="Asia/Jayapura">WIT (Jayapura)</option>
-        </select>
-      </label>
+    <Shell title={t.profileTitle} busy={busy} message={message} onBack={onBack} onSubmit={submit}>
+      <Field label={t.schoolName} error={fieldError(error, 'name') ?? undefined}>
+        <Input name="name" defaultValue={p.name} required minLength={3} maxLength={120} />
+      </Field>
+      <Field label={t.npsn} hint={t.npsnHint} error={fieldError(error, 'npsn') ?? undefined}>
+        <Input name="npsn" defaultValue={p.npsn ?? ''} inputMode="numeric" pattern="\d{8}" />
+      </Field>
+      <Field label={t.nsm} error={fieldError(error, 'nsm') ?? undefined}>
+        <Input name="nsm" defaultValue={p.nsm ?? ''} inputMode="numeric" pattern="\d{12}" />
+      </Field>
+      <Field label={t.timezone}>
+        <Select name="timezone" defaultValue={p.timezone}>
+          <option value="Asia/Jakarta">{t.wib}</option>
+          <option value="Asia/Makassar">{t.wita}</option>
+          <option value="Asia/Jayapura">{t.wit}</option>
+        </Select>
+      </Field>
     </Shell>
   );
 }
@@ -184,56 +168,35 @@ export function LevelStep({ setup, schoolId, onCaps, onDone, onBack }: StepProps
       await onDone('done');
     });
   return (
-    <Shell title="Jenjang sekolah" busy={busy} message={message} onBack={onBack} onSubmit={submit}>
-      <fieldset className={styles.choices}>
-        <legend className={forms.label}>Jenjang</legend>
-        {LEVEL_OPTIONS.map((o) => (
-          <label key={o.value} className={styles.choice}>
-            <input type="radio" name="level" value={o.value} checked={level === o.value} onChange={() => setLevel(o.value)} />
-            {o.label}
-          </label>
-        ))}
-      </fieldset>
-      <fieldset className={styles.choices}>
-        <legend className={forms.label}>Madrasah (MI, MTs, MA, MAK)?</legend>
-        {[
-          [true, 'Ya, madrasah'],
-          [false, 'Bukan'],
-        ].map(([value, label]) => (
-          <label key={String(value)} className={styles.choice}>
-            <input type="radio" name="madrasah" checked={madrasah === value} onChange={() => setMadrasah(value as boolean)} />
-            {label}
-          </label>
-        ))}
-      </fieldset>
-      <div className={styles.summary} aria-live="polite" data-testid="preset-summary">
-        <strong>
-          Yang aktif untuk {LEVEL_LABELS[level]}
-          {madrasah ? ' (madrasah)' : ''}:
-        </strong>
-        <ul>
-          {presetSummary(level, madrasah).map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-      </div>
+    <Shell title={t.levelTitle} busy={busy} message={message} onBack={onBack} onSubmit={submit}>
+      <ChoiceGroup legend={t.level} name="level" options={LEVEL_OPTIONS} value={level} onValueChange={(v) => setLevel(v as Level)} />
+      <ChoiceGroup
+        legend={t.madrasahQuestion}
+        name="madrasah"
+        options={[
+          { value: 'ya', label: t.madrasahYes },
+          { value: 'bukan', label: t.madrasahNo },
+        ]}
+        value={madrasah ? 'ya' : 'bukan'}
+        onValueChange={(v) => setMadrasah(v === 'ya')}
+      />
+      <PresetSummary testId="preset-summary" title={fill(t.presetTitle, { level: LEVEL_LABELS[level], madrasah: madrasah ? t.madrasahSuffix : '' })} items={presetSummary(level, madrasah)} />
     </Shell>
   );
 }
 
 function YesNo({ name, legend, defaultValue }: { name: string; legend: string; defaultValue: boolean }) {
   return (
-    <fieldset className={styles.choices}>
-      <legend className={forms.label}>{legend}</legend>
-      <label className={styles.choice}>
-        <input type="radio" name={name} value="ya" defaultChecked={defaultValue} required />
-        Ya
-      </label>
-      <label className={styles.choice}>
-        <input type="radio" name={name} value="tidak" defaultChecked={!defaultValue} />
-        Tidak
-      </label>
-    </fieldset>
+    <ChoiceGroup
+      legend={legend}
+      name={name}
+      required
+      defaultValue={defaultValue ? 'ya' : 'tidak'}
+      options={[
+        { value: 'ya', label: t.yes },
+        { value: 'tidak', label: t.no },
+      ]}
+    />
   );
 }
 
@@ -247,14 +210,14 @@ export function MbgStep({ schoolId, caps, onCaps, onDone, onBack }: StepProps) {
     });
   return (
     <Shell
-      title="Penerima Makan Bergizi Gratis?"
-      hint="Bila ya, Absah menghitung jumlah siswa hadir untuk laporan MBG. Jam batas dan nomor PIC bisa diisi nanti."
+      title={t.mbgTitle}
+      hint={t.mbgHint}
       busy={busy}
       message={message}
       onBack={onBack}
       onSubmit={submit}
     >
-      <YesNo name="mbg" legend="Sekolah menerima MBG" defaultValue={caps['mbg.enabled'] === true} />
+      <YesNo name="mbg" legend={t.mbgLegend} defaultValue={caps['mbg.enabled'] === true} />
     </Shell>
   );
 }
@@ -264,22 +227,10 @@ export function ImportStep({ caps, onDone, onBack }: StepProps) {
   const { busy, message, run } = useSubmit();
   const source = caps['data.source'] === 'emis' ? 'EMIS' : 'Dapodik';
   return (
-    <Shell
-      title="Data siswa"
-      hint={`Data siswa, rombel, dan guru diambil dari ${source}.`}
-      busy={busy}
-      message={message}
-      onBack={onBack}
-      submitLabel="Lewati dulu"
-      onSubmit={(e) => void run(e, () => onDone('skipped'))}
-    >
-      <div className={styles.summary}>
-        <strong>Import dari {source}</strong>
-        <p className={forms.hint}>
-          {source === 'Dapodik'
-            ? 'Lanjutkan setup dulu. Setelah selesai, buka menu Import Dapodik di beranda: unggah berkas ekspor, periksa pratinjau, lalu terapkan.'
-            : 'Import dari EMIS tersedia di pembaruan berikutnya. Anda bisa melanjutkan setup sekarang.'}
-        </p>
+    <Shell title={t.importTitle} hint={fill(t.importHint, { source })} busy={busy} message={message} onBack={onBack} submitLabel={t.skipForNow} onSubmit={(e) => void run(e, () => onDone('skipped'))}>
+      <div className="flex flex-col gap-2 rounded-lg border border-garis bg-kapur-raised p-4">
+        <strong className="text-body-strong">{fill(t.importFrom, { source })}</strong>
+        <p className="m-0 text-body text-tinta-muted">{source === 'Dapodik' ? t.importDapodik : t.importEmis}</p>
       </div>
     </Shell>
   );
@@ -295,14 +246,14 @@ export function GateStep({ schoolId, caps, onCaps, onDone, onBack }: StepProps) 
     });
   return (
     <Shell
-      title="Presensi gerbang"
-      hint="Siswa memindai kartu QR di kios gerbang saat datang dan pulang."
+      title={t.gateTitle}
+      hint={t.gateHint}
       busy={busy}
       message={message}
       onBack={onBack}
       onSubmit={submit}
     >
-      <YesNo name="gate" legend="Pakai presensi gerbang" defaultValue={caps['gate.enabled'] === true} />
+      <YesNo name="gate" legend={t.gateLegend} defaultValue={caps['gate.enabled'] === true} />
     </Shell>
   );
 }
@@ -334,93 +285,72 @@ export function InviteStep({ schoolId, onDone, onBack }: StepProps) {
   };
 
   return (
-    <div className={forms.form}>
-      <form className={forms.form} onSubmit={submit}>
-        <h1 className={styles.title}>Undang staf</h1>
-        <p className={forms.hint}>Kirim tautan undangan ke operator, guru, dan staf lain. Bisa juga dilakukan nanti.</p>
-        <label className={forms.field}>
-          <span className={forms.label}>Nama</span>
-          <input className={forms.input} name="name" required minLength={2} />
-        </label>
-        <fieldset className={styles.choices}>
-          <legend className={forms.label}>Kirim lewat</legend>
-          <label className={styles.choice}>
-            <input type="radio" name="channel" checked={channel === 'email'} onChange={() => setChannel('email')} />
-            Email
-          </label>
-          <label className={styles.choice}>
-            <input type="radio" name="channel" checked={channel === 'whatsapp'} onChange={() => setChannel('whatsapp')} />
-            WhatsApp
-          </label>
-        </fieldset>
-        <label className={forms.field}>
-          <span className={forms.label}>{channel === 'email' ? 'Email' : 'Nomor WhatsApp'}</span>
-          <input
-            className={forms.input}
-            name="contact"
-            type={channel === 'email' ? 'email' : 'tel'}
-            inputMode={channel === 'email' ? 'email' : 'tel'}
-            placeholder={channel === 'email' ? 'nama@sekolah.sch.id' : '0812…'}
-            required
-          />
-          {(fieldError(error, 'email') ?? fieldError(error, 'phoneNumber')) && (
-            <span className={forms.error}>{fieldError(error, 'email') ?? fieldError(error, 'phoneNumber')}</span>
-          )}
-        </label>
-        <label className={forms.field}>
-          <span className={forms.label}>Peran</span>
-          <select className={forms.input} name="role" defaultValue="guru">
+    <div className="flex flex-col gap-5">
+      <form className="flex flex-col gap-5" onSubmit={submit}>
+        <h1 className="m-0 text-h1">{t.inviteTitle}</h1>
+        <p className="m-0 text-body text-tinta-muted">{t.inviteHint}</p>
+        <Field label={t.name}>
+          <Input name="name" required minLength={2} />
+        </Field>
+        <ChoiceGroup
+          legend={t.sendVia}
+          name="channel"
+          options={[
+            { value: 'email', label: t.email },
+            { value: 'whatsapp', label: t.whatsapp },
+          ]}
+          value={channel}
+          onValueChange={(v) => setChannel(v as 'email' | 'whatsapp')}
+        />
+        <Field label={channel === 'email' ? t.email : t.whatsappNumber} error={(fieldError(error, 'email') ?? fieldError(error, 'phoneNumber')) ?? undefined}>
+          <Input name="contact" type={channel === 'email' ? 'email' : 'tel'} inputMode={channel === 'email' ? 'email' : 'tel'} placeholder={channel === 'email' ? 'nama@sekolah.sch.id' : '0812…'} required />
+        </Field>
+        <Field label={t.role}>
+          <Select name="role" defaultValue="guru">
             {INVITE_ROLES.map((r) => (
               <option key={r} value={r}>
                 {ROLE_LABELS[r]}
               </option>
             ))}
-          </select>
-        </label>
+          </Select>
+        </Field>
         {message && (
-          <p className={forms.error} role="alert">
+          <p role="alert" className="m-0 text-body text-alpa">
             {message}
           </p>
         )}
-        <Button type="submit" variant="secondary" disabled={busy}>
-          Undang
+        <Button type="submit" variant="secondary" loading={busy}>
+          {t.invite}
         </Button>
       </form>
 
       {invited.length > 0 && (
-        <ul className={styles.invited} aria-label="Sudah diundang">
+        <ul aria-label={t.invited} className="m-0 flex list-none flex-col gap-2 p-0">
           {invited.map((i) => (
-            <li key={i.link}>
-              <strong>
+            <li key={i.link} className="flex flex-col gap-1 rounded-lg border border-garis bg-kapur-raised p-3">
+              <strong className="text-body-strong">
                 {i.name} · {ROLE_LABELS[i.role]}
               </strong>
-              <span className={styles.link}>{i.link}</span>
-              <Button variant="secondary" onClick={() => void navigator.clipboard?.writeText(i.link)}>
-                Salin tautan
+              <span className="break-all text-small text-tinta-muted">{i.link}</span>
+              <Button variant="secondary" className="self-start" onClick={() => void navigator.clipboard?.writeText(i.link)}>
+                {t.copyLink}
               </Button>
             </li>
           ))}
         </ul>
       )}
 
-      <div className={styles.nav}>
-        {onBack ? (
-          <Button variant="secondary" onClick={onBack}>
-            Kembali
-          </Button>
-        ) : (
-          <span />
-        )}
+      <WizardNav onBack={onBack} backLabel={t.back}>
         <Button
-          disabled={finishing}
+          loading={finishing}
           onClick={() => {
             setFinishing(true);
             void onDone(invited.length > 0 ? 'done' : 'skipped').finally(() => setFinishing(false));
           }}
         >
-          Selesai
+          {t.finish}
         </Button>
-      </div>
+      </WizardNav>
     </div>
   );
 }
