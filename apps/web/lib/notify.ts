@@ -27,6 +27,7 @@ export const TEMPLATE_LABELS: Record<TemplateCode, string> = {
   tppk_team_changed: 'Tim TPPK diubah',
   pkl_mentor_assigned: 'Akses pembimbing industri',
   pkl_checkin_missing: 'Pengingat check-in PKL',
+  student_discipline_threshold: 'Catatan kesiswaan perlu dibicarakan',
 };
 
 /** Plain words for the common failure codes; the code itself stays visible for support. */

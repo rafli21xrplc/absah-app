@@ -399,6 +399,20 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   school A lists only Aditya. A held late message is NOT asserted here (it depends on the real clock): api
   test/notify-preferences.test.ts covers it.
 
+## Poin kesiswaan (apps/web/app/(staf)/poin, KSW-02)
+- Pins api commit 11bb2af (new role guru_bk, capabilities student.points, student.counseling, student.early_warning,
+  template student_discipline_threshold: the Record<> label maps in lib/capability-labels.ts, lib/notify.ts and
+  lib/roles.ts must name them or typecheck fails).
+- Menu "Poin kesiswaan" for POINT_RECORDERS (admin, wakasek, wali kelas, guru; lib/ksw.ts mirrors the API policies)
+  when student.points. Pick the student (shared <StudentPicker>, GET /point-entries/students?q= because teachers
+  cannot read the registry), the rule (GET /point-rules, grouped by kind; the API copies the points, nothing is
+  typed), a date (today up to 30 days back), a note and optional photo/PDF. Evidence: checkEvidence (type, 5 MB) then
+  POST /point-entries/evidence, PUT to the presigned URL with putPhoto, then POST /point-entries with the id.
+  A pelanggaran asks window.confirm first. One idempotency key per entry until it went through.
+- /poin/[enrollmentId] (admin, kepsek, wakasek, wali kelas of the class; others get a message, the API 404/403):
+  net totals, entries newest first, evidence link on request (an <a> after the link is fetched, a popup would be
+  blocked), "Batalkan" with a reason for admin and wakasek (a reversal never edits history).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
