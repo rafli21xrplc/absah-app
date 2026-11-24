@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Absah · Isi presensi X-2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F7F5EF}
+a{color:#1E5B4B}a:hover{color:#143F34}
+button:focus-visible,input:focus-visible{outline:3px solid #F2C14E;outline-offset:2px}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #F7F5EF; color: #1B2421; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 15px; line-height: 22px; display: flex; flex-direction: column">
+
+  <sc-if value="{{editing}}" hint-placeholder-val="{{true}}">
+    <header style="flex: none; padding: 8px 8px 8px 4px; background: #FFFFFF; border-bottom: 1px solid #E2DED3; display: flex; align-items: center; gap: 2px">
+      <button type="button" aria-label="Kembali ke Hari ini" style="flex: none; width: 44px; height: 44px; border: 0; border-radius: 10px; background: transparent; color: #1B2421; cursor: pointer; display: inline-flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></button>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+        <h1 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700">X-2 · Matematika</h1>
+        <span style="font-size: 13px; line-height: 18px; color: #5B6661">Jam ke-3 · 08.30–09.15 · Ruang 12</span>
+      </div>
+      <button type="button" onClick="{{openHelp}}" aria-label="Cara mengisi presensi" style="flex: none; min-width: 44px; height: 44px; padding: 0 12px; border: 1px solid #E2DED3; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Bantuan</button>
+    </header>
+
+    <div style="flex: none; padding: 12px 16px 10px; background: #FFFFFF; border-bottom: 1px solid #E2DED3; display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+        <span style="font-weight: 700">{{progressText}}</span>
+        <span style="font-size: 13px; line-height: 18px; color: #5B6661">Senin, 25 Januari</span>
+      </div>
+      <div style="height: 8px; border-radius: 9999px; background: #E2DED3; overflow: hidden" role="progressbar" aria-label="Siswa yang sudah diisi">
+        <div style="{{barStyle}}"></div>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <button type="button" onClick="{{setAll}}" style="{{chipAll}}">{{chipAllText}}</button>
+        <button type="button" onClick="{{setQ}}" style="{{chipQ}}">{{chipQText}}</button>
+        <button type="button" onClick="{{setAbs}}" style="{{chipAbs}}">{{chipAbsText}}</button>
+      </div>
+    </div>
+
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 8px">
+      <sc-if value="{{showHint}}" hint-placeholder-val="{{true}}">
+        <section aria-label="Cara mengisi presensi" style="padding: 14px; border-radius: 10px; background: #E3EFEA; display: flex; flex-direction: column; gap: 10px">
+          <div style="font-weight: 700">Mengisi presensi, 2 langkah</div>
+          <div style="display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; width: 24px; height: 24px; border-radius: 9999px; background: #1E5B4B; color: #FFFFFF; font-size: 13px; line-height: 24px; font-weight: 700; text-align: center">1</span><span style="font-size: 14px; line-height: 20px">Ketuk <b>Semua hadir</b>. Semua siswa yang belum diisi menjadi Hadir.</span></div>
+          <div style="display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; width: 24px; height: 24px; border-radius: 9999px; background: #1E5B4B; color: #FFFFFF; font-size: 13px; line-height: 24px; font-weight: 700; text-align: center">2</span><span style="font-size: 14px; line-height: 20px">Ketuk <b>nama siswa yang tidak hadir</b>, lalu pilih alasannya: Telat, Izin, Sakit, atau Alpa.</span></div>
+          <button type="button" onClick="{{closeHelp}}" style="align-self: flex-start; min-height: 44px; padding: 0 16px; border: 1px solid #1E5B4B; border-radius: 10px; background: transparent; color: #1E5B4B; font: inherit; font-weight: 700; cursor: pointer">Mengerti</button>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{showAllBtn}}" hint-placeholder-val="{{true}}">
+        <button type="button" onClick="{{markRest}}" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; min-height: 64px; padding: 10px 14px; border: 0; border-radius: 10px; background: #1E5B4B; color: #FFFFFF; font: inherit; text-align: left; cursor: pointer">
+          <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.18)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+          <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; line-height: 24px; font-weight: 700">{{allBtnTitle}}</span><span style="font-size: 13px; line-height: 18px; opacity: 0.9">{{allBtnSub}}</span></span>
+        </button>
+      </sc-if>
+
+      <sc-for list="{{rows}}" as="s" hint-placeholder-count="6">
+        <button type="button" onClick="{{s.open}}" aria-label="{{s.aria}}" style="{{s.rowStyle}}">
+          <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 9999px; background: #F7F5EF; border: 1px solid #E2DED3; color: #5B6661; font-size: 13px; font-weight: 700">{{s.ini}}</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+            <span style="font-weight: 600">{{s.nama}}</span>
+            <span style="font-size: 13px; line-height: 18px; color: #5B6661">{{s.sub}}</span>
+          </span>
+          <span style="{{s.pillStyle}}"><span style="{{s.badgeStyle}}">{{s.badge}}</span>{{s.word}}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg></span>
+        </button>
+      </sc-for>
+
+      <sc-if value="{{emptyList}}" hint-placeholder-val="{{false}}">
+        <div style="padding: 28px 12px; text-align: center; color: #5B6661">{{emptyText}}</div>
+      </sc-if>
+    </div>
+
+    <footer style="flex: none; padding: 10px 16px 20px; background: #FFFFFF; border-top: 1px solid #E2DED3; display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; justify-content: space-between; font-size: 13px; line-height: 18px; font-weight: 600; color: #5B6661; font-variant-numeric: tabular-nums">
+        <span>Hadir {{c.H}}</span><span>Telat {{c.T}}</span><span>Izin {{c.I}}</span><span>Sakit {{c.S}}</span><span>Alpa {{c.A}}</span>
+      </div>
+      <button type="button" onClick="{{mainAction}}" style="{{mainStyle}}">{{mainText}}</button>
+    </footer>
+
+    <sc-if value="{{toastOn}}" hint-placeholder-val="{{false}}">
+      <div role="status" style="position: absolute; left: 16px; right: 16px; bottom: 132px; display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 16px; border-radius: 10px; background: #1B2421; color: #FFFFFF; box-shadow: 0 6px 20px rgba(27,36,33,0.28)">
+        <span style="flex: 1; font-size: 14px; line-height: 20px">{{toastText}}</span>
+        <button type="button" onClick="{{undo}}" style="min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: #F2C14E; font: inherit; font-weight: 700; cursor: pointer">Urungkan</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{sheetOn}}" hint-placeholder-val="{{false}}">
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end">
+        <div onClick="{{closeSheet}}" style="position: absolute; inset: 0; background: rgba(27,36,33,0.5)"></div>
+        <section role="dialog" aria-label="{{sheetTitle}}" style="position: relative; padding: 8px 16px 20px; border-radius: 16px 16px 0 0; background: #FFFFFF; display: flex; flex-direction: column; gap: 8px">
+          <span style="align-self: center; width: 40px; height: 4px; border-radius: 9999px; background: #E2DED3; margin-bottom: 4px"></span>
+          <div style="padding: 0 2px 4px">
+            <div style="font-size: 13px; line-height: 18px; color: #5B6661">Pilih kehadiran untuk</div>
+            <div style="font-size: 20px; line-height: 26px; font-weight: 700">{{sheetName}}</div>
+          </div>
+          <sc-for list="{{opts}}" as="o" hint-placeholder-count="5">
+            <button type="button" onClick="{{o.pick}}" aria-label="{{o.aria}}" style="{{o.style}}">
+              <span style="{{o.badgeStyle}}">{{o.key}}</span>
+              <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; line-height: 24px; font-weight: 700">{{o.word}}</span><span style="font-size: 13px; line-height: 18px; color: #5B6661">{{o.desc}}</span></span>
+              <span style="{{o.tickStyle}}">Dipilih</span>
+            </button>
+          </sc-for>
+          <button type="button" onClick="{{closeSheet}}" style="min-height: 48px; border: 0; border-radius: 10px; background: transparent; color: #5B6661; font: inherit; font-weight: 600; cursor: pointer">Batal</button>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{confirmOn}}" hint-placeholder-val="{{false}}">
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end">
+        <div onClick="{{closeConfirm}}" style="position: absolute; inset: 0; background: rgba(27,36,33,0.5)"></div>
+        <section role="dialog" aria-label="Periksa sebelum kirim" style="position: relative; max-height: 90%; overflow-y: auto; padding: 8px 16px 20px; border-radius: 16px 16px 0 0; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px">
+          <span style="align-self: center; width: 40px; height: 4px; border-radius: 9999px; background: #E2DED3; margin-bottom: 4px"></span>
+          <h2 style="margin: 0; font-size: 20px; line-height: 26px; font-weight: 700">Periksa sebelum kirim</h2>
+          <div style="display: flex; gap: 6px">
+            <div style="flex: 1; padding: 8px 4px; border-radius: 10px; background: #E3EFEA; color: #1E5B4B; text-align: center"><div style="font-size: 22px; line-height: 26px; font-weight: 700">{{c.H}}</div><div style="font-size: 12px; line-height: 16px; font-weight: 600">Hadir</div></div>
+            <div style="flex: 1; padding: 8px 4px; border-radius: 10px; background: #FBEFD9; color: #9A5B00; text-align: center"><div style="font-size: 22px; line-height: 26px; font-weight: 700">{{c.T}}</div><div style="font-size: 12px; line-height: 16px; font-weight: 600">Telat</div></div>
+            <div style="flex: 1; padding: 8px 4px; border-radius: 10px; background: #E6EDFB; color: #2F5FC4; text-align: center"><div style="font-size: 22px; line-height: 26px; font-weight: 700">{{c.I}}</div><div style="font-size: 12px; line-height: 16px; font-weight: 600">Izin</div></div>
+            <div style="flex: 1; padding: 8px 4px; border-radius: 10px; background: #EFE8FA; color: #7A4CC2; text-align: center"><div style="font-size: 22px; line-height: 26px; font-weight: 700">{{c.S}}</div><div style="font-size: 12px; line-height: 16px; font-weight: 600">Sakit</div></div>
+            <div style="flex: 1; padding: 8px 4px; border-radius: 10px; background: #FBE7E7; color: #B53434; text-align: center"><div style="font-size: 22px; line-height: 26px; font-weight: 700">{{c.A}}</div><div style="font-size: 12px; line-height: 16px; font-weight: 600">Alpa</div></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="font-size: 13px; font-weight: 700; color: #5B6661">Yang tidak hadir ({{absentCount}})</div>
+            <sc-for list="{{absentRows}}" as="a" hint-placeholder-count="2">
+              <div style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 4px 10px; border: 1px solid #E2DED3; border-radius: 10px">
+                <span style="flex: 1; font-weight: 600">{{a.nama}}</span>
+                <span style="{{a.pillStyle}}"><span style="{{a.badgeStyle}}">{{a.badge}}</span>{{a.word}}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{noAbsent}}" hint-placeholder-val="{{false}}">
+              <div style="padding: 10px 12px; border-radius: 10px; background: #F7F5EF; color: #5B6661; font-size: 14px">Semua siswa hadir.</div>
+            </sc-if>
+          </div>
+          <label style="display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; font-weight: 600">Topik hari ini <span style="font-weight: 500; color: #5B6661">(jurnal mengajar, boleh dikosongkan)</span></span>
+            <input type="text" placeholder="mis. Persamaan kuadrat: rumus abc" style="min-height: 48px; padding: 0 12px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit">
+          </label>
+          <p style="margin: 0; font-size: 13px; line-height: 18px; color: #5B6661">Setelah dikirim, orang tua siswa yang Alpa diberi tahu lewat WhatsApp. Presensi masih bisa diubah sampai pukul 23.59 hari ini.</p>
+          <button type="button" onClick="{{send}}" style="min-height: 52px; border: 0; border-radius: 10px; background: #1E5B4B; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer">Kirim presensi</button>
+          <button type="button" onClick="{{closeConfirm}}" style="min-height: 48px; border: 0; border-radius: 10px; background: transparent; color: #1E5B4B; font: inherit; font-weight: 700; cursor: pointer">Kembali dan periksa lagi</button>
+        </section>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <sc-if value="{{sent}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center">
+      <span style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 16px; background: #1E5B4B; color: #FFFFFF"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+      <h1 style="margin: 0; font-size: 24px; line-height: 30px; font-weight: 700">Presensi X-2 terkirim</h1>
+      <p style="margin: 0; color: #5B6661">Hadir {{c.H}} · Telat {{c.T}} · Izin {{c.I}} · Sakit {{c.S}} · Alpa {{c.A}}.<br>Masih bisa diubah sampai pukul 23.59 hari ini.</p>
+      <button type="button" style="width: 100%; min-height: 52px; border: 0; border-radius: 10px; background: #1E5B4B; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer">Lanjut ke X-3 · Fisika, 09.15</button>
+      <button type="button" onClick="{{reopen}}" style="width: 100%; min-height: 48px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; font-weight: 600; cursor: pointer">Ubah presensi ini</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.names = ['Adinda Saraswati', 'Ahmad Fauzan', 'Anisa Rahmawati', 'Bagas Wicaksono', 'Bayu Firmansyah', 'Citra Maharani', 'Daffa Alfarizi', 'Eka Prasetyo', 'Farah Nabila', 'Gilang Ramadhan', 'Hana Safitri', 'Ilham Kurniawan', 'Intan Permata', 'Joko Susilo', 'Kevin Santoso', 'Laila Fitriani', 'Muhammad Iqbal', 'Nabila Zahra', 'Oktaviani Dewi', 'Putri Ayu Lestari', 'Rafi Hidayat', 'Rizky Maulana', 'Sekar Ayuningtyas', 'Tegar Pamungkas', 'Yusuf Habibie'];
+    var st = {};
+    for (var i = 0; i < this.names.length; i++) { st[i] = '?'; }
+    st[21] = 'I';
+    this.state = { st: st, prev: null, filter: 'all', sheetId: -1, confirm: false, sent: false, hint: true, toast: '' };
+  }
+  renderVals() {
+    var self = this;
+    var S = this.state;
+    var order = ['H', 'T', 'I', 'S', 'A'];
+    var info = {
+      H: { word: 'Hadir', desc: 'Ada di kelas', fg: '#1E5B4B', bg: '#E3EFEA' },
+      T: { word: 'Telat', desc: 'Datang setelah pelajaran dimulai', fg: '#9A5B00', bg: '#FBEFD9' },
+      I: { word: 'Izin', desc: 'Tidak hadir, ada surat atau kabar dari orang tua', fg: '#2F5FC4', bg: '#E6EDFB' },
+      S: { word: 'Sakit', desc: 'Tidak hadir karena sakit', fg: '#7A4CC2', bg: '#EFE8FA' },
+      A: { word: 'Alpa', desc: 'Tidak hadir tanpa kabar', fg: '#B53434', bg: '#FBE7E7' }
+    };
+    function pill(v) {
+      if (v === '?') return { word: 'Belum diisi', badge: '?', badgeStyle: 'flex: none; width: 22px; height: 22px; border-radius: 6px; background: #E2DED3; color: #5B6661; font-size: 12px; line-height: 22px; font-weight: 700; text-align: center', pillStyle: 'flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px 0 8px; box-sizing: border-box; border: 1.5px dashed #848C84; border-radius: 10px; background: #FFFFFF; color: #5B6661; font-size: 14px; font-weight: 700' };
+      var i = info[v];
+      return { word: i.word, badge: v, badgeStyle: 'flex: none; width: 22px; height: 22px; border-radius: 6px; background: ' + i.fg + '; color: #FFFFFF; font-size: 12px; line-height: 22px; font-weight: 700; text-align: center', pillStyle: 'flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px 0 8px; box-sizing: border-box; border: 1px solid ' + i.bg + '; border-radius: 10px; background: ' + i.bg + '; color: ' + i.fg + '; font-size: 14px; font-weight: 700' };
+    }
+    function put(id, v) { var c = Object.assign({}, S.st); c[id] = v; return c; }
+    function toast(text) { self.setState({ toast: text }); setTimeout(function () { self.setState({ toast: '' }); }, 7000); }
+
+    var c = { H: 0, T: 0, I: 0, S: 0, A: 0, Q: 0 };
+    var all = this.names.map(function (n, i) {
+      var v = S.st[i];
+      if (v === '?') c.Q++; else c[v]++;
+      var p = pill(v);
+      var parts = n.split(' ');
+      return {
+        id: i, v: v, nama: n, ini: (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase(),
+        sub: i === 21 ? 'Izin disetujui · acara keluarga' : 'No. absen ' + (i + 1),
+        word: p.word, badge: p.badge, badgeStyle: p.badgeStyle, pillStyle: p.pillStyle,
+        aria: n + ': ' + p.word + '. Ketuk untuk mengubah.',
+        rowStyle: 'display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; min-height: 64px; padding: 8px 10px 8px 12px; background: #FFFFFF; border: 1px solid #E2DED3; border-radius: 10px; font: inherit; color: inherit; text-align: left; cursor: pointer',
+        open: function () { self.setState({ sheetId: i }); }
+      };
+    });
+    var filled = 25 - c.Q;
+    var absent = c.T + c.I + c.S + c.A;
+    var rows = all.filter(function (r) {
+      if (S.filter === 'q') return r.v === '?';
+      if (S.filter === 'abs') return r.v !== '?' && r.v !== 'H';
+      return true;
+    });
+    var done = c.Q === 0;
+
+    function chip(on) { return 'flex: 1; min-height: 44px; padding: 0 6px; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; ' + (on ? 'border: 1px solid #1E5B4B; background: #1E5B4B; color: #FFFFFF' : 'border: 1px solid #E2DED3; background: #FFFFFF; color: #1B2421'); }
+
+    var sheetOn = S.sheetId >= 0;
+    var cur = sheetOn ? S.st[S.sheetId] : '?';
+    var opts = order.map(function (k) {
+      var i = info[k]; var sel = cur === k;
+      return {
+        key: k, word: i.word, desc: i.desc, aria: i.word + ': ' + i.desc,
+        style: 'display: flex; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; min-height: 60px; padding: 8px 14px 8px 12px; border-radius: 10px; font: inherit; color: #1B2421; text-align: left; cursor: pointer; ' + (sel ? 'border: 2px solid ' + i.fg + '; background: ' + i.bg : 'border: 1px solid #E2DED3; background: #FFFFFF'),
+        badgeStyle: 'flex: none; width: 34px; height: 34px; border-radius: 8px; background: ' + i.fg + '; color: #FFFFFF; font-size: 16px; line-height: 34px; font-weight: 700; text-align: center',
+        tickStyle: sel ? 'font-size: 12px; font-weight: 700; color: ' + i.fg : 'display: none',
+        pick: function () { self.setState({ st: put(S.sheetId, k), sheetId: -1, toast: '', prev: null }); }
+      };
+    });
+
+    var absentRows = all.filter(function (r) { return r.v !== '?' && r.v !== 'H'; });
+
+    var mainText, mainStyle, mainAction;
+    if (done) {
+      mainText = 'Periksa dan kirim';
+      mainStyle = 'min-height: 52px; border: 0; border-radius: 10px; background: #1E5B4B; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer';
+      mainAction = function () { self.setState({ confirm: true }); };
+    } else {
+      mainText = 'Lihat ' + c.Q + ' siswa yang belum diisi';
+      mainStyle = 'min-height: 52px; border: 0; border-radius: 10px; background: #F2C14E; color: #2B2208; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer';
+      mainAction = function () { self.setState({ filter: 'q' }); };
+    }
+    var firstTime = filled <= 1;
+    return {
+      editing: !S.sent, sent: S.sent, c: c,
+      progressText: done ? 'Semua 25 siswa sudah diisi' : filled + ' dari 25 siswa sudah diisi',
+      barStyle: 'height: 8px; border-radius: 9999px; background: #1E5B4B; width: ' + Math.round(filled / 25 * 100) + '%',
+      chipAll: chip(S.filter === 'all'), chipAllText: 'Semua ' + 25,
+      chipQ: chip(S.filter === 'q'), chipQText: 'Belum ' + c.Q,
+      chipAbs: chip(S.filter === 'abs'), chipAbsText: 'Tidak hadir ' + absent,
+      setAll: function () { self.setState({ filter: 'all' }); },
+      setQ: function () { self.setState({ filter: 'q' }); },
+      setAbs: function () { self.setState({ filter: 'abs' }); },
+      showHint: S.hint, openHelp: function () { self.setState({ hint: true }); }, closeHelp: function () { self.setState({ hint: false }); },
+      showAllBtn: c.Q > 0 && S.filter !== 'abs',
+      allBtnTitle: firstTime ? 'Semua hadir' : 'Sisanya hadir',
+      allBtnSub: 'Tandai ' + c.Q + ' siswa yang belum diisi sebagai Hadir',
+      markRest: function () {
+        var cp = Object.assign({}, S.st); var n = 0;
+        for (var k in cp) { if (cp[k] === '?') { cp[k] = 'H'; n++; } }
+        self.setState({ st: cp, prev: S.st, filter: 'all', hint: false });
+        toast(n + ' siswa ditandai Hadir. Sekarang ketuk nama yang tidak hadir.');
+      },
+      undo: function () { if (S.prev) self.setState({ st: S.prev, prev: null, toast: '' }); },
+      toastOn: !!S.toast, toastText: S.toast,
+      rows: rows, emptyList: rows.length === 0,
+      emptyText: S.filter === 'q' ? 'Semua siswa sudah diisi.' : 'Belum ada siswa yang tidak hadir.',
+      mainText: mainText, mainStyle: mainStyle, mainAction: mainAction,
+      sheetOn: sheetOn, sheetTitle: 'Pilih kehadiran', sheetName: sheetOn ? this.names[S.sheetId] : '',
+      opts: opts, closeSheet: function () { self.setState({ sheetId: -1 }); },
+      confirmOn: S.confirm, closeConfirm: function () { self.setState({ confirm: false }); },
+      absentRows: absentRows, absentCount: absent, noAbsent: absent === 0,
+      send: function () { self.setState({ sent: true, confirm: false }); },
+      reopen: function () { self.setState({ sent: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

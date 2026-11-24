@@ -606,3 +606,49 @@ DUDI = industry partner; 7 KAIH = seven habits journal; MBG = free school meal p
   the form is open) and `/dudi/penilaian/[id]` (one 0-100 field per aspect, only while the window is `open`). lib/pkl-assessment.ts holds
   the validation (`aspectsRequest`, `scoresRequest`) and the lines (`assessmentNote`). e2e: golden-smk.spec.ts (placement ends in 10 days).
 
+
+## UI Absah: aturan tetap
+
+Sumber kebenaran visual: `design/boards/*.dc.html` dan `design/ds/absah/tokens.json`. Rencana: docs/ui/SLICING_PLAN.md.
+Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhenti dan tanya.
+
+### Token dan gaya
+- Jangan menulis warna hex, ukuran huruf, atau radius di komponen. Pakai token dari `packages/ui`.
+- Huruf: Plus Jakarta Sans lewat `next/font`. Isi teks HP minimal 15 px, web staf 14 px.
+- Jarak kelipatan 4. Radius 6, 10, atau 16 saja.
+- Satu tombol utama (hijau papan) per layar. Stabilo (kuning) hanya untuk "ada yang belum beres".
+
+### Aksesibilitas
+- Sasaran sentuh minimal 44 px (baris siswa 64, aksi utama 52), jarak antarsasaran 8.
+- Makna tidak boleh hanya lewat warna. Status presensi = huruf + kata + warna, urutan tetap:
+  Hadir, Telat, Izin, Sakit, Alpa. Status kosong = "Belum diisi" dengan garis putus-putus.
+- Kontras teks minimal 4,5 : 1, komponen UI minimal 3 : 1.
+- Fokus terlihat: cincin hijau papan 2 px dengan jeda kapur 2 px (token focus). Stabilo tidak boleh dipakai untuk fokus, kontrasnya terhadap kapur di bawah 3 : 1. Setiap kontrol punya nama aksesibel yang utuh,
+  contoh: "Gilang Ramadhan: Hadir. Ketuk untuk mengubah."
+- Tidak ada gestur yang menjadi satu-satunya jalan. Tidak ada pengatur waktu yang memaksa.
+- Hormati `prefers-reduced-motion`. Tata letak harus tetap rapi dengan huruf diperbesar 130 persen.
+
+### Perilaku
+- Tidak ada isian diam-diam. Aksi massal (mis. "Semua hadir") adalah tombol yang terlihat
+  dan menyediakan Urungkan.
+- Setiap daftar dan formulir punya empat keadaan: kosong, memuat, galat, tanpa sinyal.
+- Aksi yang tampak seperti hapus tidak menghapus. "Keluarkan siswa" mengubah status dan
+  menyimpan riwayat.
+- Kirim presensi selalu lewat ringkasan, dan memakai Idempotency-Key.
+
+### Bahasa layar
+- Bahasa Indonesia sehari-hari. Ikuti tabel Hindari/Pakai di papan Sistem-UI.
+- Tidak ada istilah teknis di layar guru, orang tua, dan siswa (sinkronisasi, validasi, API, kode galat).
+- Semua teks layar disimpan di `packages/ui/messages/id.ts`, bukan tersebar di JSX.
+
+### Kode
+- Komponen UI bersama hanya di `packages/ui`. Halaman tidak berisi gaya bebas.
+- Tidak ada percabangan `if (jenjang)`. Pakai `useCapability` atau `<IfCap>` (`lib/capabilities.tsx`); server memakai `requireCap`.
+- Tipe dan skema data berasal dari `@absah/contracts` (git dependency dari absah-api). Jangan menulis tipe API manual.
+- Halaman staf memanggil `api()` dari klien (lihat bagian Session and workspace); jangan mengubah pola ini tanpa keputusan (docs/ui/SLICING_PLAN.md, pertanyaan 2). Halaman baru di luar `(staf)` memakai Server Component bila tidak butuh sesi.
+- Setiap komponen baru: satu story, satu tes aksesibilitas, dan keempat keadaan di atas.
+- Jangan menambah dependensi tanpa menulis alasannya di deskripsi PR.
+
+### Selesai berarti
+`pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
+dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

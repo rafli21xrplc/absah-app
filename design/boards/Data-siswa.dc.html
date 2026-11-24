@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Absah · Data siswa</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F7F5EF}
+a{color:#1E5B4B}a:hover{color:#143F34}
+</style>
+</helmet>
+<div style="position: relative; min-height: 980px; background: #F7F5EF; color: #1B2421; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 15px; line-height: 22px; display: flex; flex-wrap: wrap; align-items: stretch">
+<aside style="flex: 1 1 240px; max-width: 100%; box-sizing: border-box; padding: 24px 16px; background: #FFFFFF; border-right: 1px solid #E2DED3; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#1E5B4B"></rect><path d="M17 34 L28 45 L47 22" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="47" cy="14" r="6" fill="#F2C14E"></circle></svg>
+      <span style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em">Absah</span>
+    </div>
+    <button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 56px; padding: 8px 12px; border: 1px solid #E2DED3; border-radius: 10px; background: #F7F5EF; color: #1B2421; font: inherit; text-align: left; cursor: pointer">
+      <span style="display: flex; flex-direction: column"><span style="font-weight: 600">SMA Absah Uji 1</span><span style="font-size: 13px; line-height: 18px; color: #5B6661">SMA · 2026/2027 genap</span></span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6661" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg>
+    </button>
+    <nav aria-label="Menu utama" style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg>Hari ini</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>Presensi kelas</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14"></path><path d="M9 21v-8h6v8"></path></svg>Gerbang</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>Izin</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg>Kegiatan</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v18M4 3v6a3 3 0 0 0 6 0V3M17 21V3c-2.5 1.5-4 4-4 7v3h4"></path></svg>Makan Bergizi Gratis</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 12px 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #5B6661">Data sekolah</span>
+<a href="#" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; background: #E3EFEA; color: #1E5B4B; font-weight: 600; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Siswa</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path></svg>Rombel</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"></path><path d="M4 21V5"></path></svg>Mata pelajaran</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18M8 2v4M16 2v4"></path></svg>Jadwal</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"></circle><path d="M2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7.5M22 21a7 7 0 0 0-5-6.7"></path></svg>Guru dan staf</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Tahun ajaran</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 12px 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #5B6661">Laporan</span>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Rekap dan ekspor</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path></svg>Kesiswaan</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 10px; color: #1B2421; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"></path></svg>Pengaturan</a>
+</div>
+</nav></aside>
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px; display: flex; flex-direction: column; gap: 20px">
+    <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 13px; font-weight: 600; color: #5B6661">Data sekolah</span>
+        <h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.01em">Siswa</h1>
+        <p style="margin: 0; color: #5B6661">900 siswa aktif di 36 rombel · terakhir sinkron dengan Dapodik 20 Jan 2027</p>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <button type="button" style="min-height: 44px; padding: 0 16px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; font-weight: 600; cursor: pointer">Import dari Dapodik</button>
+        <button type="button" style="min-height: 44px; padding: 0 16px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; font-weight: 600; cursor: pointer">Ekspor Excel</button>
+        <button type="button" onClick="{{openAdd}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 10px; background: #1E5B4B; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Tambah siswa</button>
+      </div>
+    </header>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+      <label style="flex: 1 1 280px; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6661" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Cari siswa</span>
+        <input type="search" value="{{query}}" onChange="{{onQuery}}" placeholder="Cari nama atau NISN" style="flex: 1; min-width: 0; border: 0; outline-offset: 4px; background: transparent; color: #1B2421; font: inherit">
+      </label>
+      <label style="display: flex; align-items: center; gap: 8px">
+        <span style="font-size: 13px; font-weight: 600; color: #5B6661">Rombel</span>
+        <select value="{{rombelFilter}}" onChange="{{onRombelFilter}}" style="min-height: 44px; padding: 0 10px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit">
+          <sc-for list="{{rombelOptionsAll}}" as="o" hint-placeholder-count="5"><option value="{{o.value}}">{{o.label}}</option></sc-for>
+        </select>
+      </label>
+      <div role="group" aria-label="Status" style="display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: #E2DED3">
+        <sc-for list="{{statusTabs}}" as="t" hint-placeholder-count="3">
+          <button type="button" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <section aria-label="Daftar siswa" style="background: #FFFFFF; border: 1px solid #E2DED3; border-radius: 16px; overflow: hidden">
+      <div style="overflow-x: auto">
+        <div role="table" aria-label="Siswa" style="min-width: 980px; font-size: 14px">
+          <div role="row" style="display: grid; grid-template-columns: minmax(200px, 2fr) 80px 56px minmax(180px, 1.6fr) 130px 110px 210px; align-items: center; background: #F7F5EF; color: #5B6661; font-size: 13px; font-weight: 600">
+            <span role="columnheader" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0; padding-left: 16px">Nama</span>
+            <span role="columnheader" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0">Rombel</span>
+            <span role="columnheader" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0">L/P</span>
+            <span role="columnheader" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0">Orang tua / wali</span>
+            <span role="columnheader" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0">Kartu digital</span>
+            <span role="columnheader" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0">Status</span>
+            <span role="columnheader" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0; padding-right: 16px; text-align: right">Tindakan</span>
+          </div>
+          <sc-for list="{{rows}}" as="s" hint-placeholder-count="10">
+            <div role="row" style="display: grid; grid-template-columns: minmax(200px, 2fr) 80px 56px minmax(180px, 1.6fr) 130px 110px 210px; align-items: center">
+              <span role="cell" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0; padding-left: 16px"><span style="display: block; font-weight: 600">{{s.nama}}</span><span style="font-size: 13px; color: #5B6661; font-variant-numeric: tabular-nums">NISN {{s.nisn}}</span></span>
+              <span role="cell" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0; font-weight: 600">{{s.rombel}}</span>
+              <span role="cell" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0">{{s.jk}}</span>
+              <span role="cell" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0"><span style="display: block">{{s.wali}}</span><span style="font-size: 13px; color: #5B6661; font-variant-numeric: tabular-nums">{{s.hp}}</span></span>
+              <span role="cell" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0">{{s.kartu}}</span>
+              <span role="cell" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0"><span style="{{s.statusStyle}}">{{s.status}}</span></span>
+              <span role="cell" style="padding: 10px 12px; border-bottom: 1px solid #E2DED3; min-width: 0; padding-right: 16px; text-align: right; white-space: nowrap"><button type="button" onClick="{{s.edit}}" style="min-height: 36px; padding: 0 12px; border: 0; border-radius: 10px; background: #E3EFEA; color: #1E5B4B; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Ubah</button><button type="button" onClick="{{s.remove}}" aria-label="{{s.removeLabel}}" style="min-height: 36px; padding: 0 12px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; margin-left: 4px">Keluarkan</button></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+        <p style="margin: 0; padding: 32px 16px; text-align: center; color: #5B6661">Tidak ada siswa yang cocok dengan pencarian ini.</p>
+      </sc-if>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; font-size: 13px; color: #5B6661">
+        <span>Menampilkan {{shown}} siswa contoh · total 900 siswa aktif</span>
+        <span style="display: flex; gap: 4px">
+          <button type="button" style="min-width: 36px; min-height: 36px; border: 1px solid #E2DED3; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; cursor: pointer" aria-label="Halaman sebelumnya">‹</button>
+          <button type="button" aria-current="page" style="min-width: 36px; min-height: 36px; border: 0; border-radius: 10px; background: #1E5B4B; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">1</button>
+          <button type="button" style="min-width: 36px; min-height: 36px; border: 1px solid #E2DED3; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; cursor: pointer">2</button>
+          <button type="button" style="min-width: 36px; min-height: 36px; border: 1px solid #E2DED3; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; cursor: pointer">3</button>
+          <button type="button" style="min-width: 36px; min-height: 36px; border: 1px solid #E2DED3; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; cursor: pointer" aria-label="Halaman berikutnya">›</button>
+        </span>
+      </div>
+    </section>
+  </main>
+
+  <sc-if value="{{drawerOpen}}" hint-placeholder-val="{{true}}">
+    <div style="position: absolute; inset: 0; background: rgba(27, 36, 33, 0.28); display: flex; justify-content: flex-end">
+      <form role="dialog" aria-modal="true" aria-labelledby="form-judul" onSubmit="{{save}}" style="width: 460px; max-width: 100%; box-sizing: border-box; background: #FFFFFF; border-left: 1px solid #E2DED3; display: flex; flex-direction: column">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px; border-bottom: 1px solid #E2DED3">
+          <h2 id="form-judul" style="margin: 0; font-size: 20px; line-height: 28px; font-weight: 600">{{formTitle}}</h2>
+          <button type="button" onClick="{{closeDrawer}}" aria-label="Tutup" style="width: 40px; height: 40px; border: 0; border-radius: 10px; background: transparent; color: #1B2421; cursor: pointer; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #5B6661">Identitas</span>
+          <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600">Nama lengkap</span><input type="text" required="required" value="{{form.nama}}" onChange="{{onNama}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #848C84; border-radius: 10px; font: inherit; color: #1B2421"></label>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+            <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600">NISN</span><input type="text" inputmode="numeric" value="{{form.nisn}}" onChange="{{onNisn}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #848C84; border-radius: 10px; font: inherit; color: #1B2421; min-width: 0"></label>
+            <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600">Tanggal lahir</span><input type="date" value="{{form.lahir}}" onChange="{{onLahir}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #848C84; border-radius: 10px; font: inherit; color: #1B2421; min-width: 0"></label>
+          </div>
+          <fieldset style="margin: 0; padding: 0; border: 0; display: flex; gap: 16px; align-items: center">
+            <legend style="padding: 0 0 6px; font-size: 13px; font-weight: 600">Jenis kelamin</legend>
+            <label style="display: flex; align-items: center; gap: 8px; min-height: 40px"><input type="radio" name="jk" checked="{{form.isL}}" onChange="{{setL}}" style="width: 18px; height: 18px; margin: 0; accent-color: #1E5B4B">Laki-laki</label>
+            <label style="display: flex; align-items: center; gap: 8px; min-height: 40px"><input type="radio" name="jk" checked="{{form.isP}}" onChange="{{setP}}" style="width: 18px; height: 18px; margin: 0; accent-color: #1E5B4B">Perempuan</label>
+          </fieldset>
+
+          <span style="padding-top: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #5B6661">Kelas</span>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+            <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600">Rombel</span>
+              <select value="{{form.rombel}}" onChange="{{onRombel}}" style="min-height: 44px; padding: 0 10px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; font: inherit; color: #1B2421">
+                <sc-for list="{{rombelOptions}}" as="o" hint-placeholder-count="5"><option value="{{o.value}}">{{o.label}}</option></sc-for>
+              </select></label>
+            <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600">Status</span>
+              <select value="{{form.status}}" onChange="{{onStatus}}" style="min-height: 44px; padding: 0 10px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; font: inherit; color: #1B2421">
+                <option value="Aktif">Aktif</option><option value="Pindah">Pindah</option><option value="Keluar">Keluar</option>
+              </select></label>
+          </div>
+
+          <span style="padding-top: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #5B6661">Orang tua / wali</span>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+            <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600">Nama</span><input type="text" value="{{form.wali}}" onChange="{{onWali}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #848C84; border-radius: 10px; font: inherit; color: #1B2421; min-width: 0"></label>
+            <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600">Nomor WhatsApp</span><input type="tel" value="{{form.hp}}" onChange="{{onHp}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #848C84; border-radius: 10px; font: inherit; color: #1B2421; min-width: 0"></label>
+          </div>
+          <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 4px">
+            <legend style="padding: 0 0 6px; font-size: 13px; font-weight: 600">Kartu digital dipegang</legend>
+            <label style="display: flex; align-items: center; gap: 8px; min-height: 40px"><input type="radio" name="kartu" checked="{{form.kartuSiswa}}" onChange="{{setKartuSiswa}}" style="width: 18px; height: 18px; margin: 0; accent-color: #1E5B4B">HP siswa</label>
+            <label style="display: flex; align-items: center; gap: 8px; min-height: 40px"><input type="radio" name="kartu" checked="{{form.kartuOrtu}}" onChange="{{setKartuOrtu}}" style="width: 18px; height: 18px; margin: 0; accent-color: #1E5B4B">HP orang tua</label>
+          </fieldset>
+          <p style="margin: 0; padding: 12px 14px; border-radius: 10px; background: #F7F5EF; font-size: 13px; line-height: 18px; color: #5B6661">Data dari Dapodik diperbarui saat import berikutnya bila berbeda. Setiap perubahan tercatat di audit log.</p>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid #E2DED3">
+          <button type="button" onClick="{{closeDrawer}}" style="min-height: 44px; padding: 0 16px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; font-weight: 600; cursor: pointer">Batal</button>
+          <button type="submit" style="min-height: 44px; padding: 0 20px; border: 0; border-radius: 10px; background: #1E5B4B; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{confirmOpen}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; background: rgba(27, 36, 33, 0.28); display: flex; align-items: center; justify-content: center; padding: 24px">
+      <div role="alertdialog" aria-modal="true" aria-labelledby="konfirmasi-judul" style="width: 480px; max-width: 100%; box-sizing: border-box; padding: 24px; background: #FFFFFF; border-radius: 16px; display: flex; flex-direction: column; gap: 16px">
+        <h2 id="konfirmasi-judul" style="margin: 0; font-size: 20px; line-height: 28px; font-weight: 600">Keluarkan {{confirmName}} dari siswa aktif?</h2>
+        <p style="margin: 0; color: #5B6661">Data tidak dihapus. Riwayat presensi dan rekapnya tetap tersimpan, dan siswa tidak lagi dihitung di tagihan mulai besok.</p>
+        <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600">Alasan</span>
+          <select style="min-height: 44px; padding: 0 10px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; font: inherit; color: #1B2421"><option>Pindah sekolah</option><option>Lulus</option><option>Mengundurkan diri</option><option>Salah input</option></select></label>
+        <div style="display: flex; justify-content: flex-end; gap: 8px">
+          <button type="button" onClick="{{cancelConfirm}}" style="min-height: 44px; padding: 0 16px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; font-weight: 600; cursor: pointer">Batal</button>
+          <button type="button" onClick="{{doRemove}}" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 10px; background: #B53434; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Keluarkan</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var seed = [
+      ['Gilang Ramadhan', '0081234501', 'X-2', 'L', 'Hartono', '0812-3301-4410', 'siswa', 'Aktif', '2010-03-14'],
+      ['Putri Ayu Lestari', '0081234502', 'X-2', 'P', 'Sri Wahyuni', '0813-2290-1177', 'siswa', 'Aktif', '2010-07-02'],
+      ['Bayu Firmansyah', '0081234503', 'X-2', 'L', 'Dedi Firmansyah', '0857-4410-2231', 'siswa', 'Aktif', '2010-01-21'],
+      ['Nadia Putri', '0071234511', 'XI-2', 'P', 'Ratna Sari', '0812-7781-3302', 'siswa', 'Aktif', '2009-05-30'],
+      ['Fajar Nugroho', '0071234512', 'XI-6', 'L', 'Bambang Nugroho', '0821-6612-0098', 'orang tua', 'Aktif', '2009-11-08'],
+      ['Salsa Amelia', '0081234520', 'X-3', 'P', 'Yuni Amelia', '0812-9900-1234', 'siswa', 'Aktif', '2010-09-17'],
+      ['Bima Saputra', '0061234530', 'XII-2', 'L', 'Rudi Saputra', '0813-5544-8721', 'siswa', 'Aktif', '2008-02-25'],
+      ['Aulia Rahman', '0061234531', 'XII-5', 'P', 'Abdul Rahman', '0852-1100-7765', 'siswa', 'Aktif', '2008-12-03'],
+      ['Raka Pratama', '0081234540', 'X-9', 'L', 'Agus Pratama', '0811-2233-4455', 'orang tua', 'Aktif', '2010-06-12'],
+      ['Dewi Kartika', '0071234550', 'XI-8', 'P', 'Kartini', '0857-8899-0011', 'siswa', 'Pindah', '2009-04-19']
+    ];
+    var students = seed.map(function (r, i) {
+      return { id: i + 1, nama: r[0], nisn: r[1], rombel: r[2], jk: r[3], wali: r[4], hp: r[5], kartu: r[6], status: r[7], lahir: r[8] };
+    });
+    this.nextId = 100;
+    this.state = {
+      students: students,
+      query: '',
+      rombelFilter: '',
+      statusFilter: 'Aktif',
+      drawer: { mode: 'edit', id: 1 },
+      form: Object.assign({}, students[0]),
+      confirmId: null
+    };
+  }
+  setField(name) {
+    var self = this;
+    return function (e) {
+      var f = Object.assign({}, self.state.form);
+      f[name] = e && e.target ? e.target.value : e;
+      self.setState({ form: f });
+    };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var rombels = [];
+    ['X', 'XI', 'XII'].forEach(function (g) { for (var i = 1; i <= 12; i++) rombels.push(g + '-' + i); });
+    var q = st.query.trim().toLowerCase();
+    var statusLooks = {
+      Aktif: 'display: inline-block; padding: 2px 10px; border-radius: 9999px; background: #E3EFEA; color: #1E5B4B; font-size: 13px; font-weight: 600',
+      Pindah: 'display: inline-block; padding: 2px 10px; border-radius: 9999px; background: #E6EDFB; color: #2F5FC4; font-size: 13px; font-weight: 600',
+      Keluar: 'display: inline-block; padding: 2px 10px; border-radius: 9999px; background: #F7F5EF; border: 1px solid #E2DED3; color: #5B6661; font-size: 13px; font-weight: 600'
+    };
+    var rows = st.students.filter(function (s) {
+      if (st.statusFilter && s.status !== st.statusFilter) return false;
+      if (st.rombelFilter && s.rombel !== st.rombelFilter) return false;
+      if (q && s.nama.toLowerCase().indexOf(q) < 0 && s.nisn.indexOf(q) < 0) return false;
+      return true;
+    }).map(function (s) {
+      return {
+        nama: s.nama, nisn: s.nisn, rombel: s.rombel, jk: s.jk, wali: s.wali, hp: s.hp,
+        kartu: s.kartu === 'siswa' ? 'HP siswa' : 'HP orang tua',
+        status: s.status, statusStyle: statusLooks[s.status],
+        removeLabel: 'Keluarkan ' + s.nama,
+        edit: function () { self.setState({ drawer: { mode: 'edit', id: s.id }, form: Object.assign({}, s) }); },
+        remove: function () { self.setState({ confirmId: s.id }); }
+      };
+    });
+    var tabs = ['Aktif', 'Pindah', 'Keluar'].map(function (t) {
+      var on = st.statusFilter === t;
+      return {
+        label: t, pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ statusFilter: t }); },
+        style: 'min-height: 36px; padding: 0 14px; border: 0; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; ' + (on ? 'background: #FFFFFF; color: #1B2421' : 'background: transparent; color: #5B6661')
+      };
+    });
+    var f = st.form || {};
+    var confirmS = st.students.filter(function (s) { return s.id === st.confirmId; })[0];
+    return {
+      query: st.query,
+      onQuery: function (e) { self.setState({ query: e.target.value }); },
+      rombelFilter: st.rombelFilter,
+      onRombelFilter: function (e) { self.setState({ rombelFilter: e.target.value }); },
+      rombelOptionsAll: [{ value: '', label: 'Semua rombel' }].concat(rombels.map(function (r) { return { value: r, label: r }; })),
+      rombelOptions: rombels.map(function (r) { return { value: r, label: r }; }),
+      statusTabs: tabs,
+      rows: rows,
+      shown: rows.length,
+      empty: rows.length === 0,
+      drawerOpen: !!st.drawer,
+      formTitle: st.drawer && st.drawer.mode === 'add' ? 'Tambah siswa' : 'Ubah data siswa',
+      form: {
+        nama: f.nama || '', nisn: f.nisn || '', lahir: f.lahir || '', rombel: f.rombel || 'X-1', status: f.status || 'Aktif',
+        wali: f.wali || '', hp: f.hp || '', isL: f.jk === 'L', isP: f.jk === 'P',
+        kartuSiswa: f.kartu !== 'orang tua', kartuOrtu: f.kartu === 'orang tua'
+      },
+      onNama: this.setField('nama'), onNisn: this.setField('nisn'), onLahir: this.setField('lahir'),
+      onRombel: this.setField('rombel'), onStatus: this.setField('status'), onWali: this.setField('wali'), onHp: this.setField('hp'),
+      setL: function () { self.setField('jk')('L'); }, setP: function () { self.setField('jk')('P'); },
+      setKartuSiswa: function () { self.setField('kartu')('siswa'); }, setKartuOrtu: function () { self.setField('kartu')('orang tua'); },
+      openAdd: function () {
+        self.setState({ drawer: { mode: 'add' }, form: { nama: '', nisn: '', lahir: '', rombel: 'X-1', status: 'Aktif', jk: 'L', wali: '', hp: '', kartu: 'siswa' } });
+      },
+      closeDrawer: function () { self.setState({ drawer: null }); },
+      save: function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var form = Object.assign({}, self.state.form);
+        if (!form.nama) return;
+        var list = self.state.students.slice();
+        if (self.state.drawer.mode === 'add') {
+          form.id = self.nextId++;
+          list.unshift(form);
+        } else {
+          list = list.map(function (s) { return s.id === self.state.drawer.id ? Object.assign({}, s, form) : s; });
+        }
+        self.setState({ students: list, drawer: null });
+      },
+      confirmOpen: !!confirmS,
+      confirmName: confirmS ? confirmS.nama : '',
+      cancelConfirm: function () { self.setState({ confirmId: null }); },
+      doRemove: function () {
+        var list = self.state.students.map(function (s) { return s.id === self.state.confirmId ? Object.assign({}, s, { status: 'Keluar' }) : s; });
+        self.setState({ students: list, confirmId: null });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
