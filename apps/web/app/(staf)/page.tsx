@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import { signOut } from '@/lib/auth';
 import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
+import { SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
 import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../shell.module.css';
@@ -17,6 +18,7 @@ export default function StafHome() {
   const router = useRouter();
   const { me, schoolId, isAdmin, hasRole, selectSchool } = useWorkspace();
   const dataSource = useCapability('data.source');
+  const mode = useCapability('attendance.mode');
   const school = me.schools.find((s) => s.id === schoolId);
 
   // A new school's admin lands in the setup wizard until it is finished.
@@ -70,6 +72,11 @@ export default function StafHome() {
               Rombel
             </Link>
           </>
+        )}
+        {hasRole(...SCHEDULE_PAGE_READERS) && (
+          <Link className={styles.card} href="/jadwal">
+            {mode === 'daily' ? 'Wali kelas dan jadwal' : 'Jadwal pelajaran'}
+          </Link>
         )}
         {hasRole(...STUDENT_MANAGERS) && dataSource === 'dapodik' && (
           <Link className={styles.card} href="/import">
