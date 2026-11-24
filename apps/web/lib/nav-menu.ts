@@ -15,6 +15,7 @@ import {
   FileText,
   GraduationCap,
   Handshake,
+  LayoutGrid,
   HeartPulse,
   LayoutDashboard,
   ListChecks,
@@ -31,6 +32,7 @@ import {
   Star,
   Stethoscope,
   UserCheck,
+  UserRound,
   UserRoundCog,
   Users,
   UsersRound,
@@ -236,4 +238,36 @@ export function currentItemKey(groups: readonly VisibleGroup[], pathname: string
     }
   }
   return best?.key ?? null;
+}
+
+/** The people who teach and run no part of the school: on a phone they get the bottom bar instead of the menu sheet. */
+export function usesTeacherBar(ctx: MenuContext): boolean {
+  return ctx.hasRole('guru', 'wali_kelas') && !ctx.hasRole('admin', 'operator', 'kepsek', 'wakasek');
+}
+
+export interface BarItem {
+  key: string;
+  label: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+/**
+ * The teacher's four bottom tabs. The design draws Hari ini, Jadwal, Riwayat, Akun, but a teacher cannot read the schedule page
+ * and no history page exists, and a link to nothing is not allowed. So: Izin (a thing a teacher does daily), Menu (the home page,
+ * which still holds every card a teacher can open) and Akun (this phone's settings). When Jadwal and Riwayat exist, swap them in here.
+ */
+export const TEACHER_BAR: readonly [BarItem, BarItem, BarItem, BarItem] = [
+  { key: 'hari-ini', label: 'Hari ini', href: '/hari-ini', icon: CalendarCheck },
+  { key: 'izin', label: 'Izin', href: '/izin', icon: FileText },
+  { key: 'menu', label: 'Menu', href: '/', icon: LayoutGrid },
+  { key: 'akun', label: 'Akun', href: '/pengaturan', icon: UserRound },
+];
+
+/** The tab for this path. Home ("/") only matches itself; the others also match the pages under them. */
+export function currentBarKey(pathname: string): string | null {
+  for (const item of TEACHER_BAR) {
+    if (item.href === '/' ? pathname === '/' : pathname === item.href || pathname.startsWith(`${item.href}/`)) return item.key;
+  }
+  return null;
 }

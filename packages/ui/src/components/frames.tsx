@@ -1,6 +1,7 @@
 import type { ElementType, ReactNode } from 'react';
 import { messages } from '../../messages/id';
 import { Button } from './button';
+import { cx } from '../cx';
 import { buttonStyles } from './button-styles';
 import { EmptyState } from './empty-state';
 import { ErrorState } from './error-state';
@@ -11,6 +12,8 @@ export interface AppShellProps {
   sidebar: ReactNode;
   /** A bar above the page on screens under 1024 px (menu button, school name). */
   topBar?: ReactNode;
+  /** The teacher's bottom bar, phone only (under 1024 px); the page gets room under it. */
+  bottomBar?: ReactNode;
   children: ReactNode;
   skipLabel?: string;
 }
@@ -19,18 +22,21 @@ export interface AppShellProps {
  * The staff page frame: skip link, 240 px side column on a laptop, a top bar on a phone, then the page.
  * The page keeps its own <main>; the frame is not a landmark so there is only one.
  */
-export function AppShell({ sidebar, topBar, children, skipLabel = messages.appShell.skip }: AppShellProps) {
+export function AppShell({ sidebar, topBar, bottomBar, children, skipLabel = messages.appShell.skip }: AppShellProps) {
   return (
     <div className="min-h-dvh bg-kapur text-tinta lg:flex">
-      <a href="#isi" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-kapur-raised focus:px-4 focus:py-3 focus:font-bold">
-        {skipLabel}
-      </a>
+      <nav aria-label={messages.appShell.shortcuts}>
+        <a href="#isi" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-kapur-raised focus:px-4 focus:py-3 focus:font-bold">
+          {skipLabel}
+        </a>
+      </nav>
       <aside className="hidden w-60 shrink-0 flex-col gap-5 overflow-y-auto border-r border-garis bg-kapur-raised p-4 lg:sticky lg:top-0 lg:flex lg:h-dvh">{sidebar}</aside>
       <div className="flex min-w-0 flex-1 flex-col">
         {topBar && <div className="sticky top-0 z-30 border-b border-garis bg-kapur-raised lg:hidden">{topBar}</div>}
-        <div id="isi" tabIndex={-1} className="min-w-0 flex-1 outline-none">
+        <div id="isi" tabIndex={-1} className={cx('min-w-0 flex-1 outline-none', bottomBar ? 'pb-14 lg:pb-0' : '')}>
           {children}
         </div>
+        {bottomBar && <div className="fixed inset-x-0 bottom-0 z-30 lg:hidden">{bottomBar}</div>}
       </div>
     </div>
   );
@@ -56,6 +62,11 @@ export function WorkspaceLabel({ name, detail }: { name: string; detail?: string
       {detail && <span className="truncate text-small text-tinta-muted">{detail}</span>}
     </div>
   );
+}
+
+/** A page's own main landmark and its column: padding and spacing live here so a page holds no free styling. */
+export function PageMain({ children, width = 'md' }: { children: ReactNode; width?: 'md' | 'lg' }) {
+  return <main className={cx('mx-auto box-border flex w-full flex-col gap-4 px-4 py-6', width === 'lg' ? 'max-w-5xl' : 'max-w-xl')}>{children}</main>;
 }
 
 /** The portal: one simple column, at most 480 px wide on a laptop. */

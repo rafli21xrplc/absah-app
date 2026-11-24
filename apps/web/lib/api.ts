@@ -29,6 +29,8 @@ export interface ApiOptions {
   signal?: AbortSignal;
   /** Send no cookies at all (anonymous TPPK report): the request carries nothing about who sent it. */
   anonymous?: boolean;
+  /** Sees the raw response before the body is read: for headers such as Date (the server clock). */
+  onResponse?: (res: Response) => void;
 }
 
 /** Calls /api/v1 and validates the response with its contract from absah-api. */
@@ -47,6 +49,7 @@ export async function api<S extends z.ZodType>(path: string, schema: S, options:
     credentials: options.linkToken || options.tracerToken || options.anonymous ? 'omit' : 'same-origin',
     signal: options.signal,
   });
+  options.onResponse?.(res);
   const json: unknown = await res.json().catch(() => null);
   if (!res.ok) {
     const parsed = ErrorBody.safeParse(json);

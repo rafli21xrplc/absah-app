@@ -1,8 +1,9 @@
 /* Storybook uses the same pipeline as the apps (see globals.css in each app): theme, utilities, tokens, base. */
+@layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 @import './tokens.css';
-@import './base.css';
+@import './base.css' layer(base);
 
 @source '.';
 

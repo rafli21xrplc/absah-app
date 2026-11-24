@@ -12,7 +12,8 @@ body {
 
 /* The Tailwind preflight is not loaded (see globals.css in each app), so the two resets that matter are here: form controls
    use the page font, and links use the board colour instead of the default browser blue (unreadable on the dark theme).
-   Components and CSS modules that set their own colour or font still win. */
+   This file is imported into the `base` cascade layer (globals.css), below Tailwind's utilities, so a class such as
+   `text-on-papan` on a link wins over `a { color }`. CSS modules, which are not in a layer, win over both. */
 button,
 input,
 select,

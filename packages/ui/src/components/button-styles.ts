@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 
 /** The class names of a button. Pure (no React), so a server component or a plain link can use it too. */
 export const buttonStyles = cva(
-  'inline-flex select-none items-center justify-center gap-2 rounded-md px-5 text-body-strong font-bold transition-colors duration-150',
+  'box-border inline-flex select-none items-center justify-center gap-2 rounded-md px-5 text-body-strong font-bold transition-colors duration-150',
   {
     variants: {
       variant: { primary: '', stabilo: '', secondary: '', ghost: '', danger: '' },

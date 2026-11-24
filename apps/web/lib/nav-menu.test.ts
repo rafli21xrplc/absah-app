@@ -3,7 +3,7 @@ import type { Role } from '@absah/contracts';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { currentItemKey, menuContext, STAFF_MENU, visibleMenu } from './nav-menu';
+import { currentBarKey, currentItemKey, menuContext, STAFF_MENU, TEACHER_BAR, usesTeacherBar, visibleMenu } from './nav-menu';
 
 const labels = (roles: Role[], caps = presetCapabilities('smp', false)) =>
   visibleMenu(menuContext(roles, caps)).flatMap((g) => g.items.map((i) => i.label));
@@ -143,5 +143,43 @@ describe('currentItemKey', () => {
   it('nothing is current on the home page or an unknown path', () => {
     expect(currentItemKey(groups, '/')).toBeNull();
     expect(currentItemKey(groups, '/entah')).toBeNull();
+  });
+});
+
+describe('teacher bottom bar', () => {
+  const uses = (roles: Role[]) => usesTeacherBar(menuContext(roles, {}));
+
+  it('is for people who only teach: guru and wali kelas', () => {
+    expect(uses(['guru'])).toBe(true);
+    expect(uses(['guru', 'wali_kelas'])).toBe(true);
+    expect(uses(['wali_kelas', 'piket'])).toBe(true);
+  });
+
+  it('is not for anyone who manages the school, even if they also teach', () => {
+    for (const role of ['admin', 'operator', 'kepsek', 'wakasek'] as Role[]) expect(uses(['guru', role]), role).toBe(false);
+  });
+
+  it('is not for people who do not teach', () => {
+    expect(uses(['piket'])).toBe(false);
+    expect(uses([])).toBe(false);
+  });
+
+  it('has four tabs, each with its own link and a page behind it (no link to nothing)', () => {
+    expect(TEACHER_BAR).toHaveLength(4);
+    expect(new Set(TEACHER_BAR.map((i) => i.href)).size).toBe(4);
+    for (const i of TEACHER_BAR) {
+      const dir = i.href === '/' ? '' : i.href;
+      expect(existsSync(join(__dirname, '../app/(staf)', dir, 'page.tsx')), i.href).toBe(true);
+    }
+  });
+
+  it('starts with Hari ini', () => expect(TEACHER_BAR[0].href).toBe('/hari-ini'));
+
+  it('marks the tab of the page, and home only for home', () => {
+    expect(currentBarKey('/hari-ini')).toBe('hari-ini');
+    expect(currentBarKey('/izin/baru')).toBe('izin');
+    expect(currentBarKey('/')).toBe('menu');
+    expect(currentBarKey('/kegiatan')).toBeNull();
+    expect(currentBarKey('/izin-guru')).toBeNull();
   });
 });

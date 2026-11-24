@@ -21,8 +21,9 @@ test('Presensi harian SD: Hari ini, "Semua hadir kecuali…", resubmit', async (
   generateSessions(schoolId);
 
   await page.goto('/hari-ini');
+  // A daily session is open all day, so it is the one in progress: the big "Isi presensi" card.
   const card = page.getByRole('link', { name: /VII A/ });
-  await expect(card).toContainText('Belum diisi');
+  await expect(card).toHaveText('Isi presensi');
   await card.click();
 
   await expect(page.getByRole('heading', { name: 'VII A' })).toBeVisible();
@@ -37,7 +38,8 @@ test('Presensi harian SD: Hari ini, "Semua hadir kecuali…", resubmit', async (
   await expect(page.getByText('Presensi tersimpan.')).toBeVisible();
 
   await page.getByRole('link', { name: '← Hari ini' }).click();
-  await expect(page.getByRole('link', { name: /VII A/ })).toContainText('Sudah diisi');
+  // Sent: it moves to "Sudah selesai" with what was sent, as a row (no button).
+  await expect(page.getByRole('link', { name: /VII A/ })).toContainText('Terkirim');
   await expect(page.getByRole('link', { name: /VII A/ })).toContainText('1 tidak hadir');
 
   await page.goto('/koreksi');

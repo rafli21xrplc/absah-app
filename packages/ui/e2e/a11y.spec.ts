@@ -29,6 +29,11 @@ test('every story passes axe', async ({ page, request }) => {
     for (const v of result.violations) {
       failures.push(`${story.title} / ${story.name}: ${v.id} (${v.nodes.length}) ${v.nodes[0]?.html.slice(0, 120) ?? ''}`);
     }
+    // axe files "text the same colour as its background" (a 1:1 ratio) under `incomplete`, not `violations`, so a link whose
+    // text vanished into its button passed this spec once. A contrast that axe could not decide is a failure here too.
+    for (const i of result.incomplete.filter((x) => x.id === 'color-contrast')) {
+      failures.push(`${story.title} / ${story.name}: color-contrast undecided (${i.nodes.length}) ${i.nodes[0]?.html.slice(0, 120) ?? ''}`);
+    }
   }
   expect(failures, failures.join('\n')).toEqual([]);
 });
