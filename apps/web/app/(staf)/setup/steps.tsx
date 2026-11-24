@@ -17,6 +17,7 @@ import { LEVEL_LABELS, LEVEL_OPTIONS } from '@/lib/levels';
 import { ROLE_LABELS } from '@/lib/roles';
 import forms from '../../forms.module.css';
 import styles from './setup.module.css';
+import { toE164 } from '@/lib/phone';
 
 export type Caps = Record<string, unknown>;
 
@@ -304,15 +305,6 @@ export function GateStep({ schoolId, caps, onCaps, onDone, onBack }: StepProps) 
       <YesNo name="gate" legend="Pakai presensi gerbang" defaultValue={caps['gate.enabled'] === true} />
     </Shell>
   );
-}
-
-/** Accepts 0812..., 62812... or +62812... and returns +62812... */
-export function toE164(input: string): string {
-  const digits = input.replace(/[^\d+]/g, '');
-  if (digits.startsWith('+')) return digits;
-  if (digits.startsWith('62')) return `+${digits}`;
-  if (digits.startsWith('0')) return `+62${digits.slice(1)}`;
-  return digits;
 }
 
 const INVITE_ROLES = STAFF_ROLES.filter((r) => r !== 'pembimbing_industri');

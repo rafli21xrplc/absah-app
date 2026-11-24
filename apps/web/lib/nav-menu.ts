@@ -54,6 +54,7 @@ import { MEMORIZATION_WRITERS } from './memorization';
 import { NOTIFY_VIEWERS } from './notify';
 import { RECAP_READERS } from './report';
 import { SCHEDULE_PAGE_READERS } from './schedule-access';
+import { STAFF_READERS } from './staff-access';
 import { STUDENT_MANAGERS, STUDENT_READERS } from './student-access';
 import { STUDENT_BILLING_READING } from './student-billing';
 import { SUBSTITUTION_READING, TEACHER_CHECKIN, TEACHER_LEAVE_DECIDING, TEACHER_REPORT_READING } from './teacher';
@@ -124,6 +125,7 @@ export const STAFF_MENU: readonly MenuGroup[] = [
       { key: 'siswa', label: 'Siswa', href: '/siswa', icon: Users, visible: (c) => c.hasRole(...STUDENT_READERS) },
       { key: 'rombel', label: 'Rombel', href: '/rombel', icon: UsersRound, visible: (c) => c.hasRole(...STUDENT_READERS) },
       { key: 'mapel', label: 'Mata pelajaran', href: '/mapel', icon: BookOpen, visible: (c) => c.hasRole(...SCHEDULE_PAGE_READERS) && perPeriod(c) },
+      { key: 'staf', label: 'Guru dan staf', href: '/staf', icon: UserRoundCog, visible: (c) => c.hasRole(...STAFF_READERS) },
       { key: 'jadwal', label: (c) => (c.cap('attendance.mode') === 'daily' ? 'Wali kelas dan jadwal' : 'Jadwal pelajaran'), href: '/jadwal', icon: CalendarDays, visible: (c) => c.hasRole(...SCHEDULE_PAGE_READERS) },
       {
         key: 'impor',
