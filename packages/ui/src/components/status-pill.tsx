@@ -10,7 +10,7 @@ const LOOK: Record<StatusCode, { pill: string; chip: string }> = {
   S: { pill: 'border-sakit-soft bg-sakit-soft text-sakit', chip: 'bg-sakit text-on-papan' },
   A: { pill: 'border-alpa-soft bg-alpa-soft text-alpa', chip: 'bg-alpa text-on-papan' },
   // Dashed border: the one cue that tells "not filled" from the rest without colour.
-  '?': { pill: 'border-[1.5px] border-dashed border-garis-kuat bg-kapur-raised text-tinta-muted', chip: 'bg-garis text-tinta-muted' },
+  '?': { pill: 'border-[1.5px] border-dashed border-garis-kuat bg-kapur-raised text-tinta-muted', chip: 'bg-garis text-tinta' },
 };
 
 export interface StatusPillProps {

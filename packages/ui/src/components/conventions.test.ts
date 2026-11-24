@@ -23,6 +23,16 @@ describe('components use tokens only', () => {
     expect(code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []).toEqual([]);
   });
 
+  // tinta-muted on garis is 4.44:1 in the light theme (WCAG AA needs 4.5). Use `tinta` on the grey `garis` fill.
+  it.each(sources)('$file does not put tinta-muted text on a bg-garis fill', ({ code }) => {
+    // Disabled controls are exempt from the contrast rule (WCAG 1.4.3): the `disabled:` variants and the blocked Button
+    // (cursor-not-allowed). A blocked button also shows its reason as separate text on the page background.
+    const bad = [...code.matchAll(/'[^']*'|"[^"]*"|`[^`]*`/g)]
+      .map((m) => m[0].replace(/\bdisabled:\S+/g, ''))
+      .filter((s) => !s.includes('cursor-not-allowed') && /\bbg-garis\b(?!-)/.test(s) && /\btext-tinta-muted\b/.test(s));
+    expect(bad).toEqual([]);
+  });
+
   it.each(sources)('$file only uses text sizes that exist in tokens.json', ({ code }) => {
     const used = [...code.matchAll(/\btext-(display|h\d|body-strong|body|small|angka|caption|xs|sm|base|lg|xl)\b/g)].map((m) => m[1]);
     expect(used.filter((u) => !TEXT_TOKENS.includes(u ?? ''))).toEqual([]);

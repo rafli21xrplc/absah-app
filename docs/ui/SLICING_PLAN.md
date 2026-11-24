@@ -128,6 +128,22 @@ diminta; dikerjakan di PR terpisah setelah token, hanya untuk web staf di layar 
 
 Pertanyaan ini perlu jawaban pemilik produk sebelum fase yang disebut dimulai. Tidak ada yang menghalangi U1.
 
+**Diputuskan 2026-11-24 oleh Claude** atas arahan pemilik ("untuk keperluan keputusan, jawab dengan perspektif terbaik Anda").
+Ini keputusan kerja, bukan persetujuan produk; masing-masing bisa dibalik dengan satu PR kecil sebelum fase terkait selesai.
+
+| # | Keputusan | Alasan |
+| --- | --- | --- |
+| 2 | Tetap `api()` di klien. Tidak ada Server Component atau Server Action. | Fondasi auth baru tidak ada dan tidak dibutuhkan desain. Pola sekarang sudah lolos e2e. |
+| 3 | Papan "Hari ini" admin menjadi bagian atas `/dasbor` (admin, kepsek, wakasek). `/hari-ini` tetap daftar sesi. | Tidak memindahkan rute yang dipakai e2e, prefetch offline, dan peran lain. |
+| 4 | `/lapor/lacak` dipertahankan. | Pelapor anonim hanya punya kode; tanpa itu tidak bisa melihat status. U7c melarang daftar laporan, bukan pencarian dengan kode. Tidak ada isi laporan di URL. |
+| 5 | Ikuti desain: semua siswa mulai "Belum diisi", tombol "Semua hadir" terlihat, ada Urungkan. Kirim tetap hanya pengecualian. | Aturan tetap CLAUDE.md: tidak ada isian diam-diam. API tidak berubah (yang tidak dikirim tetap hadir); hanya keadaan awal layar dan tombol Kirim (nonaktif dengan alasan selama masih ada "Belum diisi"). `presensi*.spec.ts` dan golden e2e diubah di U4b. |
+| 6 | Halaman U6 memakai endpoint yang ada. Fitur tanpa endpoint (tambah dan ubah identitas siswa, rombel baru, kenaikan kelas, arsip mapel, terbitkan jadwal, status akun, Ingatkan) disembunyikan, bukan tombol mati, dan dicatat di PR. | Tidak membuat kontrak API yang belum dirancang. Daftar jadi antrean PR absah-api. |
+| 7 | Alasan keluar hanya yang didukung API: "Pindah sekolah" (moved) dan "Keluar" (left). | Enrollment tidak menyimpan alasan; menyimpan teks bebas butuh keputusan privasi dan perubahan skema. |
+| 9 | Layar Pulang tetap di halaman kios yang ada. | Kios satu halaman static export dengan IndexedDB v2; menambah rute tidak memberi manfaat. |
+| 10 | Tidak diselidiki. | Alur CRUD U6 memakai desain Absah. |
+| tombol utama ditekan, tema gelap (3,46:1) | Warna tidak diubah. Tombol tetap memakai `papan` yang digelapkan. Diteruskan ke pemilik desain. | Prompt melarang mengubah warna agar cocok; kontras tombol tetap di atas 3:1 pada keadaan lain. |
+
+
 1. **Styling (sebelum U1).** Tetap CSS modules dengan token variabel CSS (disarankan, tanpa mengubah 14 berkas CSS dan kios), atau pindah ke Tailwind v4 seperti bawaan prompt? Pindah berarti menulis ulang gaya seluruh aplikasi.
 2. **Data (sebelum U4a).** Tetap `api()` di klien (disarankan), atau memperkenalkan Server Component dengan cookie diteruskan ke API? Prompt U4 sampai U8 menyebut "halaman server" dan "Server Action"; di repo ini keduanya perlu fondasi auth baru.
 3. **Papan Main (sebelum U6a).** Papan "Hari ini" admin ditaruh di mana: ganti isi `/hari-ini` untuk admin dan kepsek (daftar sesi guru pindah ke `/guru`), atau jadikan halaman tersendiri di `/dasbor`?
