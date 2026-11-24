@@ -49,6 +49,28 @@ describe('pages use tokens that exist', () => {
   });
 });
 
+// Motion (CLAUDE.md "Gerak"): lengths and curves come from the tokens, never as numbers in a component, and no animation library is
+// pulled in by the pages. `animate-spin` is the Spinner component; `animate-pulse` (Skeleton) is the one loading shimmer allowed.
+describe('motion comes from tokens', () => {
+  it('no millisecond numbers in class names', () => {
+    const bad = files.flatMap(({ file, code }) => [...code.matchAll(/\b(?:duration|delay)-(?:\[\d+m?s\]|\d+)\b/g)].map((m) => `${file}: ${m[0]}`));
+    expect(bad).toEqual([]);
+  });
+
+  it('no spinning or bouncing built by hand', () => {
+    const bad = files.flatMap(({ file, code }) => [...code.matchAll(/\banimate-(?:spin|bounce|ping)\b/g)].map((m) => `${file}: ${m[0]}`));
+    expect(bad).toEqual([]);
+  });
+
+  it('base.css keyframes move transform, opacity and the two SVG strokes only', () => {
+    const css = readFileSync(join(__dirname, 'base.css'), 'utf8');
+    const frames = [...css.matchAll(/@keyframes\s+absah-[\w-]+\s*\{([\s\S]*?\n\})/g)].map((m) => m[1] ?? '');
+    expect(frames.length).toBeGreaterThanOrEqual(7);
+    const props = new Set(frames.flatMap((f) => [...f.matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1] ?? '')));
+    expect([...props].filter((p) => !['transform', 'opacity', 'stroke-dashoffset'].includes(p))).toEqual([]);
+  });
+});
+
 // Pages already moved to messages/id.ts. Text typed straight into JSX is how copy ends up spread over hundreds of files, so these
 // stay clean; the other pages join this list when they are restyled (docs/ui/SLICING_PLAN.md, U9a).
 const MOVED = [

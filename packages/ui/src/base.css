@@ -51,3 +51,142 @@ a {
 [data-motion='pending'] [data-grow] {
   opacity: 0;
 }
+
+/* Gerak (papan Motion-UI). Lama dan kurva datang dari tokens.css; hanya transform dan opacity yang bergerak. Dua pengecualian
+   yang digambar papan sendiri: goresan centang dan cincin hitung mundur (SVG). Setiap kelas punya padanan reduced-motion di
+   bawah: keadaan akhir tanpa perjalanan. Komponen memakai kelas ini, tidak menulis angka ms sendiri. */
+@keyframes absah-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes absah-banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes absah-shake-a {
+  0% {
+    transform: none;
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: none;
+  }
+}
+/* Same frames under another name: switching the class between the two restarts the shake, so it can repeat (useShake). */
+@keyframes absah-shake-b {
+  0% {
+    transform: none;
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes absah-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes absah-draw {
+  from {
+    stroke-dashoffset: 44;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes absah-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.motion-card-in {
+  animation: absah-fade-up var(--motion-masuk) var(--ease-masuk) both;
+}
+.motion-banner-in {
+  animation: absah-banner-in var(--motion-biasa) var(--ease-masuk) both;
+}
+.motion-row-in {
+  animation: absah-fade-up var(--motion-masuk) var(--ease-masuk) both;
+  animation-delay: calc(var(--row, 0) * 60ms);
+}
+.motion-shake-a {
+  animation: absah-shake-a var(--motion-masuk) ease-in-out;
+}
+.motion-shake-b {
+  animation: absah-shake-b var(--motion-masuk) ease-in-out;
+}
+.motion-spin {
+  animation: absah-spin 0.7s linear infinite;
+}
+.motion-draw {
+  stroke-dasharray: 44;
+  animation: absah-draw var(--motion-rayakan) var(--ease-masuk) 150ms both;
+}
+.motion-pop {
+  animation: absah-pop var(--motion-biasa) var(--ease-masuk) both;
+}
+/* The ring shrinks along the number: the component sets the offset each second, the line glides between the two. */
+.motion-ring {
+  transition: stroke-dashoffset 1s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-card-in,
+  .motion-banner-in,
+  .motion-row-in,
+  .motion-shake-a,
+  .motion-shake-b,
+  .motion-spin,
+  .motion-draw,
+  .motion-pop {
+    animation: none !important;
+  }
+  .motion-ring {
+    transition: none !important;
+  }
+}

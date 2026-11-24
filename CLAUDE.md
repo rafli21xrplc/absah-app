@@ -767,6 +767,15 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - Tidak dipakai: Lighthouse di CI (skor kinerja bergeser antar-mesin CI, sehingga memblokir PR tanpa sebab); regresi visual dengan screenshot (huruf dan anti-alias
   beda antara macOS dan Linux CI, baseline tidak bisa dipakai bersama). Gantinya: anggaran ukuran (deterministik), axe (U9a), dan screenshot di `docs/ui/` sebagai bukti PR.
 
+### Gerak (UA1)
+
+- Durasi dan kurva hanya dari token gerak (`motion-cepat` 120 ms, `motion-biasa` 200 ms, `motion-masuk` 320 ms, `motion-rayakan` 600 ms; `ease-masuk`, `ease-keluar`). Sumbernya `design/ds/absah/tokens.json`; di komponen pakai `duration-(--motion-biasa)`, bukan angka ms. Keyframes dan kelas `motion-*` ada di `packages/ui/src/base.css`. Dijaga oleh `repo-conventions.test.ts`.
+- Hanya animasikan `transform` dan `opacity` (dua pengecualian yang digambar papan: goresan centang dan cincin hitung mundur). Tidak ada pustaka animasi baru; cukup CSS. `useReveal` (GSAP, layar lebar staf) adalah peninggalan yang tidak diperluas.
+- Setiap gerak ada di papan `Motion-UI` beserta alasannya. Gerak baru: tambahkan ke papan lebih dulu, tanya sebelum membuat. Peta 12 gerak ke komponen ada di Storybook (Gerak/Komponen, "Peta 12 gerak").
+- Setiap gerak punya perilaku `prefers-reduced-motion` (keadaan akhir tanpa perjalanan). Gerak berulang lebih dari 5 detik wajib punya tombol "Jeda animasi".
+- Layar TPPK, keluar otomatis, dan galat berat hanya muncul dan memudar: tidak bergetar, tidak berkedip, tidak merah.
+- Komponen: `Spinner`, `CheckDraw`, `CountdownRing` (angka dan cincin dari satu jam; pembaca layar hanya diberi tahu saat mulai, 10 detik terakhir, dan selesai), `StepList` (status diatur halaman dari kemajuan sungguhan, tidak pewaktu palsu), hook `useShake(hitungan)` dan `useReducedMotion()`. `Button loading` memakai `Spinner` dan tetap berwarna; yang abu-abu hanya tombol nonaktif.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

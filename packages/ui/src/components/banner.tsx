@@ -29,7 +29,7 @@ export function Banner({ kind = 'info', title, children, action, className }: Ba
   const k = KIND[kind];
   const Icon = k.icon;
   return (
-    <div role={k.role} className={cx('flex items-start gap-3 rounded-md border px-4 py-3 text-body text-tinta', k.box, className)}>
+    <div role={k.role} className={cx('motion-banner-in flex items-start gap-3 rounded-md border px-4 py-3 text-body text-tinta', k.box, className)}>
       <Icon aria-hidden strokeWidth={1.75} className={cx('mt-px size-5 shrink-0', k.title)} />
       <p className="m-0 min-w-0 flex-1">
         <b className={cx('font-bold', k.title)}>{title ?? messages.banner[kind]}.</b> {children}

@@ -14,7 +14,7 @@ const boardsDir = join(here, 'boards');
 const outDir = join(here, 'reference');
 const tmpDir = join(here, '.render-tmp');
 
-export const STATIC_BOARDS = ['Alur-presensi', 'Sistem-UI', 'Riset-UI', 'Kios-pulang', 'Lapor-tppk', 'Ortu-portal-sd', 'Siswa-pkl'];
+export const STATIC_BOARDS = ['Alur-presensi', 'Sistem-UI', 'Riset-UI', 'Kios-pulang', 'Lapor-tppk', 'Ortu-portal-sd', 'Siswa-pkl', 'Auth-alur', 'Motion-UI'];
 
 const canvas = JSON.parse(readFileSync(join(boardsDir, 'canvas.json'), 'utf8'));
 

@@ -1,6 +1,6 @@
 // Generates packages/ui/src/tokens.ts and packages/ui/src/tokens.css from design/ds/absah/tokens.json.
 //   pnpm tokens:build
-// tokens.json is the only source of colour, type, spacing and radius. Nothing here invents a value; the only
+// tokens.json is the only source of colour, type, spacing, radius and motion. Nothing here invents a value; the only
 // additions are plumbing: the next/font hook in --font-sans and the Tailwind namespace resets.
 // The output is deterministic (input order, LF, trailing newline), so two runs give identical files.
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -30,7 +30,13 @@ function check(tokens) {
     }
   }
   for (const key of Object.keys(tokens)) {
-    if (!['name', 'version', 'color', 'type', 'spacing', 'radius'].includes(key)) throw new Error(`tokens.json: unknown section "${key}"`);
+    if (!['name', 'version', 'color', 'type', 'spacing', 'radius', 'motion'].includes(key)) throw new Error(`tokens.json: unknown section "${key}"`);
+  }
+  for (const t of tokens.motion?.duration ?? []) {
+    if (!/^\d+ms$/.test(t.value)) throw new Error(`tokens.json: ${t.name} must be a whole number of ms`);
+  }
+  for (const t of tokens.motion?.easing ?? []) {
+    if (!/^cubic-bezier\([\d., ]+\)$/.test(t.value)) throw new Error(`tokens.json: ${t.name} must be a cubic-bezier(...)`);
   }
   const styleKeys = new Set(['name', 'fontSize', 'lineHeight', 'fontWeight', 'letterSpacing', 'fontVariantNumeric']);
   for (const g of tokens.type.groups) {
@@ -63,6 +69,11 @@ export function buildTs(tokens) {
   out.push('export const radius = {');
   for (const t of tokens.radius.tokens) out.push(`  ${q(t.name)}: ${q(t.value)},`);
   out.push('} as const;', '');
+  if (tokens.motion) {
+    out.push('export const motion = {');
+    for (const t of [...tokens.motion.duration, ...tokens.motion.easing]) out.push(`  ${q(t.name)}: ${q(t.value)},`);
+    out.push('} as const;', '', 'export type MotionName = keyof typeof motion;', '');
+  }
   return out.join('\n');
 }
 
@@ -74,6 +85,7 @@ export function buildCss(tokens) {
   // Raw colours: one variable per token and theme. Dark follows the OS (prefers-color-scheme).
   out.push(':root {');
   for (const t of tokens.color.tokens) out.push(`  --${t.name}: ${t.value.light};`);
+  for (const t of [...(tokens.motion?.duration ?? []), ...(tokens.motion?.easing ?? [])]) out.push(`  --${t.name}: ${t.value};`);
   out.push('}', '', '@media (prefers-color-scheme: dark) {', '  :root {');
   for (const t of tokens.color.tokens) out.push(`    --${t.name}: ${t.value.dark};`);
   out.push('  }', '}', '');

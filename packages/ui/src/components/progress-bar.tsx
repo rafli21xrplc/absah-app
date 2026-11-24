@@ -42,7 +42,7 @@ export function ProgressBar({ value, max, unit, text: sentence, label, textPosit
         aria-valuetext={text}
         className="h-2 overflow-hidden rounded-full bg-garis"
       >
-        <div className="h-full rounded-full bg-papan transition-[width] duration-300 ease-out" style={{ width: `${(clamped / safeMax) * 100}%` }} />
+        <div className="h-full rounded-full bg-papan transition-[width] duration-(--motion-biasa) ease-(--ease-masuk)" style={{ width: `${(clamped / safeMax) * 100}%` }} />
       </div>
       {!above && words}
     </div>
