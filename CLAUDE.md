@@ -60,6 +60,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - Specs cannot import @absah/* source (Playwright does not transpile node_modules): check through the API.
 - CI job e2e checks out absah-api at the commit pinned in apps/web/package.json.
 
+## Student data pages (apps/web/app/(staf)/siswa, rombel, import)
+- Role gates mirror the API (lib/student-access.ts): readers admin/operator/kepsek/wakasek,
+  managers admin/operator; useWorkspace().hasRole(...). The API remains the authority.
+- Import: POST /imports/dapodik -> fetch PUT to upload.url with upload.headers exactly -> POST
+  /parse -> poll GET /imports/{id} -> preview -> POST /commit with one Idempotency-Key per click
+  (reused on retry). 409 details.reason = stale_preview -> offer "Muat ulang pratinjau" (POST /parse).
+- E2E runs absah-api http + worker (concurrently); fixtures come from absah-api packages/db/fixtures.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
