@@ -1,0 +1,45 @@
+/* Hand-written base layer. Colours come from tokens.css (generated from design/ds/absah/tokens.json). */
+body {
+  margin: 0;
+  background: var(--kapur);
+  color: var(--tinta);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The Tailwind preflight is not loaded (see globals.css in each app), so the two resets that matter are here: form controls
+   use the page font, and links use the board colour instead of the default browser blue (unreadable on the dark theme).
+   Components and CSS modules that set their own colour or font still win. */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+a {
+  color: var(--papan);
+}
+
+/* Focus ring (token focus): 2 px green board ring with a 2 px chalk gap. The transparent outline keeps a ring in
+   forced-colors mode, where box-shadow is dropped. */
+:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--kapur), 0 0 0 4px var(--focus);
+}
+
+/* Motion is never required to use the app (CLAUDE.md). Library animations check the same media query too. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

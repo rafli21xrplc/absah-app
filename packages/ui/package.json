@@ -5,9 +5,14 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./tokens.css": "./src/tokens.css"
+    "./tokens.css": "./src/tokens.css",
+    "./base.css": "./src/base.css",
+    "./legacy.css": "./src/legacy.css",
+    "./tokens": "./src/tokens.ts",
+    "./fonts/*": "./fonts/*"
   },
   "scripts": {
+    "tokens:build": "node scripts/build-tokens.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run"

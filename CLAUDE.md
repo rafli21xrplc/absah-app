@@ -613,6 +613,15 @@ Sumber kebenaran visual: `design/boards/*.dc.html` dan `design/ds/absah/tokens.j
 Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhenti dan tanya.
 
 ### Token dan gaya
+- Styling: Tailwind CSS v4 (diputuskan 2026-11-24). Sumber tunggal nilai: `design/ds/absah/tokens.json`. `pnpm tokens:build`
+  membuat `packages/ui/src/tokens.ts` dan `tokens.css` (jangan diedit; tes gagal bila basi). Kelas yang ada hanya yang
+  berasal dari token: `bg-papan`, `text-tinta-muted`, `text-h1`, `text-body`, `rounded-lg`. Kelas bawaan Tailwind seperti
+  `bg-red-500` dan `text-xl` sengaja tidak ada. Spasi `--spacing` = 4 px (`h-11` = 44, `h-13` = 52, `h-16` = 64).
+- Preflight Tailwind tidak dimuat (halaman lama memakai CSS modules). `packages/ui/src/legacy.css` memetakan nama `--absah-*`
+  lama ke token; hapus barisnya bila tidak ada lagi yang memakai.
+- Lint melarang literal warna hex di `apps/**`. Butuh nilai nyata (manifest, viewport)? Pakai `color` dari `@absah/ui/tokens`.
+- Turbopack bisa menyimpan hasil PostCSS yang basi bila CSS di `packages/ui` diubah. Bila build gagal dengan galat CSS yang
+  tidak cocok dengan isi berkas, hapus `apps/*/.next` lalu build ulang.
 - Jangan menulis warna hex, ukuran huruf, atau radius di komponen. Pakai token dari `packages/ui`.
 - Huruf: Plus Jakarta Sans lewat `next/font`. Isi teks HP minimal 15 px, web staf 14 px.
 - Jarak kelipatan 4. Radius 6, 10, atau 16 saja.

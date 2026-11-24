@@ -1,4 +1,12 @@
 {
   "extends": "../config/tsconfig.base.json",
-  "include": ["src"]
+  "include": [
+    "src",
+    "scripts/*.d.mts"
+  ],
+  "compilerOptions": {
+    "types": [
+      "node"
+    ]
+  }
 }

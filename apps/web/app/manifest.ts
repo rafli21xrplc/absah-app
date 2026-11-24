@@ -1,3 +1,4 @@
+import { color } from '@absah/ui/tokens';
 import type { MetadataRoute } from 'next';
 
 /** Install the portal as an app (PWA siswa, ORT-02): Android installs from this, iOS from the apple meta. */
@@ -11,8 +12,8 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: '/',
     display: 'standalone',
     orientation: 'portrait',
-    background_color: '#ffffff',
-    theme_color: '#0f766e',
+    background_color: color.kapur.light,
+    theme_color: color.papan.light,
     lang: 'id',
     icons: [
       { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
