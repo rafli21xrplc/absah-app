@@ -1,12 +1,12 @@
 'use client';
 
-import { AppShell, AppTopBar, Select, Sheet, SideNav, WorkspaceLabel, type SideNavGroup } from '@absah/ui';
+import { AppShell, AppTopBar, BottomNav, Select, Sheet, SideNav, WorkspaceLabel, type SideNavGroup } from '@absah/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo, useState, type ComponentProps, type ReactNode } from 'react';
 import { useCapabilities } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
-import { currentItemKey, menuContext, visibleMenu } from '@/lib/nav-menu';
+import { currentBarKey, currentItemKey, menuContext, TEACHER_BAR, usesTeacherBar, visibleMenu, type BarItem } from '@/lib/nav-menu';
 import { useWorkspace } from '@/lib/workspace';
 
 /** Menu links do not prefetch: ~40 of them on every page would cost a cheap phone's data and the school's. */
@@ -31,7 +31,8 @@ export function StaffShell({ children }: { children: ReactNode }) {
   const open = openedOn === pathname;
   const setOpen = (next: boolean) => setOpenedOn(next ? pathname : null);
 
-  const groups = useMemo(() => visibleMenu(menuContext(roles, capabilities)), [roles, capabilities]);
+  const ctx = useMemo(() => menuContext(roles, capabilities), [roles, capabilities]);
+  const groups = useMemo(() => visibleMenu(ctx), [ctx]);
   const current = currentItemKey(groups, pathname);
   const navGroups: SideNavGroup[] = useMemo(
     () =>
@@ -64,6 +65,18 @@ export function StaffShell({ children }: { children: ReactNode }) {
       </Select>
     ) : null;
   const focusScreen = FOCUS_SCREENS.some((p) => pathname.startsWith(p));
+  // A teacher on a phone gets four tabs at the bottom and no top bar (the greeting is the page's own header).
+  const teacherBar = usesTeacherBar(ctx);
+  const barKey = currentBarKey(pathname);
+  const tab = (item: BarItem) => ({
+    key: item.key,
+    label: item.label,
+    href: item.href,
+    icon: <item.icon aria-hidden strokeWidth={1.75} className="size-6" />,
+    current: item.key === barKey,
+  });
+  const bottomBar =
+    teacherBar && !focusScreen ? <BottomNav linkAs={MenuLink} items={[tab(TEACHER_BAR[0]), tab(TEACHER_BAR[1]), tab(TEACHER_BAR[2]), tab(TEACHER_BAR[3])]} /> : undefined;
 
   return (
     <AppShell
@@ -74,8 +87,9 @@ export function StaffShell({ children }: { children: ReactNode }) {
           <SideNav groups={navGroups} linkAs={MenuLink} />
         </>
       }
+      bottomBar={bottomBar}
       topBar={
-        focusScreen ? undefined : (
+        focusScreen || teacherBar ? undefined : (
           <>
             <AppTopBar onMenu={() => setOpen(true)}>{label}</AppTopBar>
             <Sheet open={open} onOpenChange={setOpen} title="Menu" eyebrow={school.name}>

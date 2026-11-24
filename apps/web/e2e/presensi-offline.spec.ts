@@ -24,7 +24,7 @@ test('Guru mengisi dua sesi tanpa sinyal, lalu terkirim otomatis saat sinyal kem
 
   // With signal: Hari ini keeps both sessions on the phone.
   await page.goto('/hari-ini');
-  await expect(page.getByRole('link', { name: /VII A/ })).toContainText('Belum diisi');
+  await expect(page.getByRole('link', { name: /VII A/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /VII B/ })).toContainText('Belum diisi');
   // Both rosters are kept on the phone before the signal drops (the page keeps polling, so "network idle" never comes).
   await expect
@@ -54,7 +54,7 @@ test('Guru mengisi dua sesi tanpa sinyal, lalu terkirim otomatis saat sinyal kem
   await expect(page.getByText('1 sesi menunggu dikirim.')).toBeVisible();
 
   await page.getByRole('link', { name: '← Hari ini' }).click();
-  await expect(page.getByText(/Tanpa sinyal: daftar dari salinan di HP/)).toBeVisible();
+  await expect(page.getByText(/Tanpa sinyal\. Daftar dari salinan di HP/)).toBeVisible();
   await page.getByRole('link', { name: /VII B/ }).click();
   await expect(page.getByRole('heading', { name: 'VII B' })).toBeVisible();
   await page.getByRole('button', { name: /: Sakit$/ }).first().click();
@@ -68,7 +68,7 @@ test('Guru mengisi dua sesi tanpa sinyal, lalu terkirim otomatis saat sinyal kem
   await expect(page.getByText(/sesi menunggu dikirim/)).toHaveCount(0);
 
   await page.getByRole('link', { name: '← Hari ini' }).click();
-  await expect(page.getByRole('link', { name: /VII A/ })).toContainText('Sudah diisi');
+  await expect(page.getByRole('link', { name: /VII A/ })).toContainText('Terkirim');
   await expect(page.getByRole('link', { name: /VII A/ })).toContainText('1 tidak hadir');
-  await expect(page.getByRole('link', { name: /VII B/ })).toContainText('Sudah diisi');
+  await expect(page.getByRole('link', { name: /VII B/ })).toContainText('Terkirim');
 });

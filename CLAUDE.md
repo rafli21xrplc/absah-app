@@ -669,6 +669,18 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
   `error.tsx` tidak pernah menampilkan teks galat itu sendiri. Berkas ini `'use client'` karena barrel `@absah/ui` memakai konteks React.
 - Portal memakai `PortalFrame` (satu kolom, maks 480 px). Kios belum memakai kerangka: header dan layarnya dikerjakan di U7d.
 
+### Beranda guru dan gaya dasar (U4a)
+- `/hari-ini` memakai `groupToday` (`lib/session-clock.ts`): sesi yang sedang berlangsung ditentukan dari jam server (header `Date` jawaban API,
+  sampai `TodayResponse` punya `serverNow`), dibaca di zona waktu sekolah. Status presensi selalu dari API; klien tidak menghitungnya.
+  Satu tombol utama per layar: kartu "Sedang berlangsung". Baris sesi lain adalah tautan tanpa tombol.
+- Bilah bawah guru (`TEACHER_BAR` di `lib/nav-menu.ts`) hanya untuk guru/wali kelas yang bukan pengelola. Empat tab harus punya halaman
+  nyata; ganti Izin dan Menu dengan Jadwal dan Riwayat bila halamannya sudah ada.
+- `base.css` diimpor ke layer CSS `base` (di bawah `utilities`; urutan dideklarasikan di `globals.css`). Aturan tanpa layer mengalahkan semua kelas
+  Tailwind: jangan menambah aturan elemen (`a`, `button`, ...) di luar layer. CSS modules tetap menang atas keduanya.
+- Spec a11y Storybook gagal juga pada `color-contrast` yang tidak bisa diputuskan axe: rasio 1:1 (teks sewarna latar) dilaporkan axe sebagai
+  `incomplete`, bukan `violation`.
+- Tombol selebar penuh butuh `box-border` (sudah di `button-styles.ts`); `PageMain` (`@absah/ui`) adalah `<main>` halaman dan tempat padding-nya.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.
