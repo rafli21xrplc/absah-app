@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cx } from '../cx';
 
-const iconButton = cva('inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-150 disabled:cursor-not-allowed disabled:text-tinta-muted', {
+const iconButton = cva('inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-(--motion-cepat) disabled:cursor-not-allowed disabled:text-tinta-muted', {
   variants: {
     variant: {
       ghost: 'border border-transparent bg-transparent text-tinta hover:bg-papan-soft active:bg-papan-soft',

@@ -16,7 +16,7 @@ export function FilterChip({ label, count, selected = false, type = 'button', cl
       type={type}
       aria-pressed={selected}
       className={cx(
-        'inline-flex min-h-11 cursor-pointer items-center justify-center gap-1 rounded-md px-3 text-small font-bold transition-colors duration-150',
+        'inline-flex min-h-11 cursor-pointer items-center justify-center gap-1 rounded-md px-3 text-small font-bold transition-colors duration-(--motion-cepat)',
         selected ? 'border border-papan bg-papan text-on-papan' : 'border border-garis bg-kapur-raised text-tinta hover:bg-papan-soft',
         'disabled:cursor-not-allowed disabled:border-transparent disabled:bg-garis disabled:text-tinta-muted disabled:hover:bg-garis',
         className,

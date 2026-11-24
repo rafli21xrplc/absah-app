@@ -5,7 +5,7 @@ aksesibilitas atau capability. Dalam kasus itu berhenti dan tulis pertanyaan di 
 
 ```
 design/
-  boards/*.dc.html     15 papan
+  boards/*.dc.html     18 papan
   boards/canvas.json   letak, ukuran, dan judul papan
   ds/absah/tokens.json token warna, huruf, jarak, sudut (sumber U1)
   reference/*.png      tangkapan layar papan statis (hasil render.mjs)
@@ -17,7 +17,7 @@ design/
 ```
 pnpm install
 pnpm exec playwright install chromium   # sekali saja
-node design/render.mjs                  # tujuh papan statis
+node design/render.mjs                  # sembilan papan statis
 node design/render.mjs Sistem-UI        # satu papan
 ```
 
@@ -28,7 +28,7 @@ sistem dan tangkapan layar akan sedikit berbeda. Hasil render dibuat ulang bila 
 ## Dua jenis papan
 
 **Papan statis** adalah HTML dengan gaya inline. Ukuran, warna, jarak, dan teks tertulis di dalamnya, jadi bisa dibaca
-sebagai spesifikasi dan dirender biasa. Ada tujuh:
+sebagai spesifikasi dan dirender biasa. Ada sembilan:
 
 | Papan | Ukuran | Fase |
 | --- | --- | --- |
@@ -39,11 +39,13 @@ sebagai spesifikasi dan dirender biasa. Ada tujuh:
 | Siswa-pkl | 390 x 844 | U7b |
 | Lapor-tppk | 390 x 844 | U7c |
 | Kios-pulang | 1180 x 820 | U7d |
+| Auth-alur | 2230 x 2332 | UA3, UA4 |
+| Motion-UI | 1520 x 2620 | UA1 |
 
 **Papan bertemplat** memuat kelas `Component` di dalam `<script type="text/x-dc">`, lubang berkurung ganda, serta tag
 `sc-if` dan `sc-for`. Itu hanya bisa dirender di dalam kanvas, jadi **tidak dirender di sini dan tidak dijalankan**.
 Bacalah kelas `Component` sebagai pseudo-kode perilaku (state, aturan, teks) dan baca markup di bawahnya untuk tata
-letak. Ada delapan: Main, Guru-isi-sesi, Setup-jenjang, Data-siswa, Data-rombel, Data-mapel, Data-jadwal, Data-guru.
+letak. Ada sembilan: Main, Guru-isi-sesi, Setup-jenjang, Auth-masuk, Data-siswa, Data-rombel, Data-mapel, Data-jadwal, Data-guru.
 Untuk papan ini tidak ada PNG acuan; perbandingan visual dilakukan di Storybook dan di halaman hasil, dengan papan
 dibuka di kanvas oleh manusia.
 

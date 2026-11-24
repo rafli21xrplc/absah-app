@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Absah · Masuk</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+@property --n { syntax: '<integer>'; initial-value: 0; inherits: false; }
+body{margin:0;background:#F7F5EF}
+a{color:#1E5B4B}a:hover{color:#143F34}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #1E5B4B;outline-offset:2px}
+.onpapan button:focus-visible{outline-color:#FFFFFF}
+input{transition:border-color .12s ease-out, box-shadow .12s ease-out}
+input:focus{border-color:#1E5B4B !important;box-shadow:0 0 0 3px #E3EFEA}
+button{transition:background-color .12s ease-out, transform .12s ease-out}
+button:active:not(:disabled){transform:scale(0.98)}
+@keyframes fadeUp { 0% { opacity: 0; transform: translateY(12px) } 100% { opacity: 1; transform: none } }
+@keyframes bannerIn { 0% { opacity: 0; transform: translateY(-8px) } 100% { opacity: 1; transform: none } }
+@keyframes shakeA { 0% { transform: none } 20% { transform: translateX(-8px) } 40% { transform: translateX(8px) } 60% { transform: translateX(-5px) } 80% { transform: translateX(5px) } 100% { transform: none } }
+@keyframes shakeB { 0% { transform: none } 20% { transform: translateX(-8px) } 40% { transform: translateX(8px) } 60% { transform: translateX(-5px) } 80% { transform: translateX(5px) } 100% { transform: none } }
+@keyframes spin { 0% { transform: rotate(0) } 100% { transform: rotate(360deg) } }
+@keyframes draw { 0% { stroke-dashoffset: 44 } 100% { stroke-dashoffset: 0 } }
+@keyframes pop { 0% { transform: scale(0.6); opacity: 0 } 70% { transform: scale(1.12); opacity: 1 } 100% { transform: scale(1); opacity: 1 } }
+@keyframes hideIt { 0% { opacity: 1 } 100% { opacity: 0 } }
+@keyframes showIt { 0% { opacity: 0 } 100% { opacity: 1 } }
+@keyframes inkIn { 0% { color: #5B6661 } 100% { color: #1B2421 } }
+@keyframes fill { 0% { width: 0 } 100% { width: 100% } }
+@keyframes evLoop { 0% { opacity: 0; transform: translateY(14px) } 6% { opacity: 1; transform: none } 88% { opacity: 1; transform: none } 96% { opacity: 0; transform: none } 100% { opacity: 0; transform: none } }
+@keyframes cntLoop { 0% { --n: 0 } 55% { --n: 862 } 100% { --n: 862 } }
+@keyframes barLoop { 0% { width: 0 } 55% { width: 95.8% } 100% { width: 95.8% } }
+.card-in{animation:fadeUp .32s cubic-bezier(.2,.8,.2,1) both}
+.banner-in{animation:bannerIn .2s cubic-bezier(.2,.8,.2,1) both}
+.shake-a{animation:shakeA .32s ease-in-out}
+.shake-b{animation:shakeB .32s ease-in-out}
+.sp-run{animation:spin .7s linear infinite}
+.ev{opacity:0;animation:evLoop 14s cubic-bezier(.2,.8,.2,1) infinite}
+.ev1{animation-delay:.6s}.ev2{animation-delay:2.4s}.ev3{animation-delay:4.2s}.ev4{animation-delay:6s}
+.cnt{counter-reset:n var(--n);animation:cntLoop 14s linear infinite}
+.cnt::after{content:counter(n)}
+.bar{animation:barLoop 14s cubic-bezier(.2,.8,.2,1) infinite}
+.paused *{animation-play-state:paused !important}
+.chk{stroke-dasharray:44;stroke-dashoffset:44;animation:draw .4s .15s ease-out forwards}
+.st-spin{animation:spin .7s linear infinite, hideIt .01s forwards}
+.st-tick{opacity:0;animation:pop .25s ease-out forwards}
+.s1 .st-spin{animation-delay:0s, .6s}.s1 .st-tick{animation-delay:.6s}.s1 .lab{animation:inkIn .01s .6s forwards}
+.s2 .st-spin{animation-delay:0s, 1.3s}.s2 .st-tick{animation-delay:1.3s}.s2 .lab{animation:inkIn .01s 1.3s forwards}
+.s3 .st-spin{animation-delay:0s, 2s}.s3 .st-tick{animation-delay:2s}.s3 .lab{animation:inkIn .01s 2s forwards}
+.fillbar{animation:fill 2.2s .1s cubic-bezier(.4,0,.2,1) forwards;width:0}
+@media (prefers-reduced-motion: reduce) {
+  .card-in,.banner-in,.shake-a,.shake-b,.chk,.st-tick,.fillbar{animation:none !important}
+  .ev{animation:none !important;opacity:1 !important;transform:none !important}
+  .cnt{animation:none !important;--n:862}
+  .bar{animation:none !important;width:95.8%}
+  .chk{stroke-dashoffset:0}.st-tick{opacity:1}.st-spin{display:none}.fillbar{width:100%}
+  .s1 .lab,.s2 .lab,.s3 .lab{color:#1B2421}
+  input,button{transition:none}
+}
+</style>
+</helmet>
+<div class="{{rootClass}}" style="position: relative; width: 1440px; height: 900px; box-sizing: border-box; overflow: hidden; display: flex; background: #F7F5EF; color: #1B2421; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 15px; line-height: 22px">
+
+  <aside class="onpapan" aria-label="Tentang Absah" style="flex: none; width: 600px; box-sizing: border-box; padding: 44px 52px; background: #1E5B4B; color: #FFFFFF; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(255,255,255,0.06) 31px, rgba(255,255,255,0.06) 32px); display: flex; flex-direction: column; justify-content: space-between">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#FFFFFF"></rect><path d="M17 34 L28 45 L47 22" fill="none" stroke="#1E5B4B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="47" cy="14" r="6" fill="#F2C14E"></circle></svg>
+      <span style="font-size: 24px; line-height: 30px; font-weight: 700; letter-spacing: -0.01em">Absah</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 36px; line-height: 42px; font-weight: 700; letter-spacing: -0.02em">Hadir, tercatat, sah.</h2>
+        <p style="margin: 0; font-size: 16px; line-height: 24px; max-width: 440px; color: #E3EFEA">Guru mengisi presensi dalam hitungan detik. Sekolah dan orang tua langsung melihat hasilnya.</p>
+      </div>
+
+      <section aria-label="Contoh papan kedatangan" style="box-sizing: border-box; padding: 18px; border-radius: 16px; background: #FFFFFF; color: #1B2421; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 12px 32px rgba(10,40,32,0.28)">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <span style="font-weight: 700">Papan kedatangan hari ini</span>
+          <span style="padding: 2px 8px; border-radius: 6px; background: #F7F5EF; border: 1px solid #E2DED3; font-size: 12px; line-height: 16px; font-weight: 600; color: #5B6661">Contoh tampilan</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 10px">
+          <span class="cnt" style="font-size: 40px; line-height: 44px; font-weight: 700; color: #1E5B4B; font-variant-numeric: tabular-nums" aria-label="862 siswa hadir"></span>
+          <span style="font-size: 14px; line-height: 20px; color: #5B6661">siswa hadir dari 900 · 95,8%</span>
+        </div>
+        <div style="height: 8px; border-radius: 9999px; background: #E2DED3; overflow: hidden"><div class="bar" style="height: 8px; border-radius: 9999px; background: #1E5B4B; width: 0"></div></div>
+        <div style="display: flex; flex-direction: column; gap: 8px; min-height: 196px">
+          <div class="ev ev1" style="display: flex; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid #E2DED3; border-radius: 10px"><span style="flex: none; width: 22px; height: 22px; border-radius: 6px; background: #1E5B4B; color: #FFFFFF; font-size: 12px; line-height: 22px; font-weight: 700; text-align: center">H</span><span style="flex: 1; font-size: 14px; line-height: 20px">Kios gerbang mencatat 312 siswa masuk</span><span style="font-size: 12px; line-height: 16px; color: #5B6661">07.05</span></div>
+          <div class="ev ev2" style="display: flex; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid #E2DED3; border-radius: 10px"><span style="flex: none; width: 22px; height: 22px; border-radius: 6px; background: #1E5B4B; color: #FFFFFF; font-size: 12px; line-height: 22px; font-weight: 700; text-align: center">✓</span><span style="flex: 1; font-size: 14px; line-height: 20px">X-2 Matematika: guru mengirim presensi, 24 hadir, 1 izin</span><span style="font-size: 12px; line-height: 16px; color: #5B6661">07.48</span></div>
+          <div class="ev ev3" style="display: flex; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid #E2DED3; border-radius: 10px"><span style="flex: none; width: 22px; height: 22px; border-radius: 6px; background: #2F5FC4; color: #FFFFFF; font-size: 12px; line-height: 22px; font-weight: 700; text-align: center">I</span><span style="flex: 1; font-size: 14px; line-height: 20px">Izin Rizky disetujui wali kelas</span><span style="font-size: 12px; line-height: 16px; color: #5B6661">08.05</span></div>
+          <div class="ev ev4" style="display: flex; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid #E2DED3; border-radius: 10px"><span style="flex: none; width: 22px; height: 22px; border-radius: 6px; background: #9A5B00; color: #FFFFFF; font-size: 12px; line-height: 22px; font-weight: 700; text-align: center">T</span><span style="flex: 1; font-size: 14px; line-height: 20px">Orang tua menerima kabar: Dimas telat 10 menit</span><span style="font-size: 12px; line-height: 16px; color: #5B6661">08.10</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px">
+      <span style="font-size: 13px; line-height: 18px; color: #E3EFEA">Akun dibuat oleh admin sekolah Anda.</span>
+      <button type="button" onClick="{{togglePause}}" aria-pressed="{{paused}}" style="min-height: 44px; padding: 0 16px; border: 1px solid rgba(255,255,255,0.6); border-radius: 10px; background: transparent; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">{{pauseText}}</button>
+    </div>
+  </aside>
+
+  <main style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 150px 32px 32px; position: relative">
+    <div class="{{shakeClass}}" style="width: 420px; display: flex; flex-direction: column; gap: 20px">
+      <div class="card-in" style="display: flex; flex-direction: column; gap: 20px">
+
+        <sc-if value="{{isOk}}" hint-placeholder-val="{{false}}">
+          <section aria-live="polite" style="box-sizing: border-box; padding: 32px 28px; background: #FFFFFF; border: 1px solid #E2DED3; border-radius: 16px; display: flex; flex-direction: column; gap: 22px; align-items: flex-start">
+            <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#E3EFEA"></circle><path class="chk" d="M19 33 L28 42 L45 23" fill="none" stroke="#1E5B4B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.01em">Berhasil masuk</h1>
+              <p style="margin: 0; color: #5B6661">Selamat datang, Pak Hendra.</p>
+            </div>
+            <ul style="list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 12px">
+              <li class="s1" style="display: flex; align-items: center; gap: 12px"><span style="position: relative; flex: none; width: 24px; height: 24px"><svg class="st-spin" style="position: absolute; inset: 0" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#E2DED3" stroke-width="3"></circle><path d="M12 3 a9 9 0 0 1 9 9" stroke="#1E5B4B" stroke-width="3" stroke-linecap="round"></path></svg><svg class="st-tick" style="position: absolute; inset: 0" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1E5B4B"></circle><path d="M7 12.5 L10.5 16 L17 8.5" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span class="lab" style="color: #5B6661; font-weight: 600">Akun dikenali</span></li>
+              <li class="s2" style="display: flex; align-items: center; gap: 12px"><span style="position: relative; flex: none; width: 24px; height: 24px"><svg class="st-spin" style="position: absolute; inset: 0" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#E2DED3" stroke-width="3"></circle><path d="M12 3 a9 9 0 0 1 9 9" stroke="#1E5B4B" stroke-width="3" stroke-linecap="round"></path></svg><svg class="st-tick" style="position: absolute; inset: 0" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1E5B4B"></circle><path d="M7 12.5 L10.5 16 L17 8.5" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span class="lab" style="color: #5B6661; font-weight: 600">Membuka SMA Absah Uji</span></li>
+              <li class="s3" style="display: flex; align-items: center; gap: 12px"><span style="position: relative; flex: none; width: 24px; height: 24px"><svg class="st-spin" style="position: absolute; inset: 0" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#E2DED3" stroke-width="3"></circle><path d="M12 3 a9 9 0 0 1 9 9" stroke="#1E5B4B" stroke-width="3" stroke-linecap="round"></path></svg><svg class="st-tick" style="position: absolute; inset: 0" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1E5B4B"></circle><path d="M7 12.5 L10.5 16 L17 8.5" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span class="lab" style="color: #5B6661; font-weight: 600">Menyiapkan jadwal mengajar hari ini</span></li>
+            </ul>
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 8px">
+              <div style="height: 6px; border-radius: 9999px; background: #E2DED3; overflow: hidden"><div class="fillbar" style="height: 6px; border-radius: 9999px; background: #1E5B4B"></div></div>
+              <span style="font-size: 13px; line-height: 18px; color: #5B6661">Membuka Beranda guru. Tidak perlu menunggu di halaman ini.</span>
+            </div>
+            <button type="button" onClick="{{resetDemo}}" style="min-height: 44px; padding: 0 16px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; font-weight: 600; cursor: pointer">Ulangi demo</button>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{notOk}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; flex-direction: column; gap: 20px">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.01em">Masuk ke Absah</h1>
+              <p style="margin: 0; color: #5B6661">Pilih cara masuk yang sesuai dengan Anda.</p>
+            </div>
+
+            <div role="tablist" aria-label="Saya adalah" style="display: flex; gap: 8px">
+              <button type="button" role="tab" aria-selected="{{isStaf}}" onClick="{{toStaf}}" style="{{tabStaf}}">Guru dan staf</button>
+              <button type="button" role="tab" aria-selected="{{isOrtu}}" onClick="{{toOrtu}}" style="{{tabOrtu}}">Orang tua</button>
+              <button type="button" role="tab" aria-selected="{{isSiswa}}" onClick="{{toSiswa}}" style="{{tabSiswa}}">Siswa</button>
+            </div>
+
+            <sc-if value="{{isOffline}}" hint-placeholder-val="{{false}}">
+              <div class="banner-in" role="status" style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 10px; background: #FBEFD9; border: 1px solid #E8D3AA; color: #6B3F00; font-size: 14px; line-height: 20px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 20h.01M3 3l18 18"></path></svg><span><b>Tidak ada sinyal.</b> Sambungkan internet untuk masuk. Jika Anda sudah masuk sebelumnya di HP ini, presensi tetap bisa diisi tanpa sinyal.</span></div>
+            </sc-if>
+
+            <sc-if value="{{isErr}}" hint-placeholder-val="{{false}}">
+              <div class="banner-in" role="alert" style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 10px; background: #FBE7E7; border: 1px solid #E9BDBD; color: #7E2020; font-size: 14px; line-height: 20px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16.5h.01"></path></svg><span><b>Email atau kata sandi belum cocok.</b> Periksa huruf besar dan kecil. Sisa percobaan: 3 dari 5.</span></div>
+            </sc-if>
+
+            <sc-if value="{{isLocked}}" hint-placeholder-val="{{false}}">
+              <div class="banner-in" role="alert" style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 10px; background: #FBE7E7; border: 1px solid #E9BDBD; color: #7E2020; font-size: 14px; line-height: 20px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><span><b>Akun dikunci sementara.</b> Kata sandi salah 5 kali. Coba lagi pukul 09.52, atau atur ulang kata sandi lewat email supaya bisa masuk sekarang.</span></div>
+            </sc-if>
+
+            <sc-if value="{{isStaf}}" hint-placeholder-val="{{true}}">
+              <form onSubmit="{{submit}}" style="display: flex; flex-direction: column; gap: 16px">
+                <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">Email</span>
+                  <input type="email" autocomplete="username" inputmode="email" value="{{email}}" onChange="{{onEmail}}" readonly="{{busy}}" placeholder="nama@sekolah.sch.id" style="{{emailStyle}}">
+                  <sc-if value="{{hasErrEmail}}" hint-placeholder-val="{{false}}"><span class="banner-in" role="alert" style="font-size: 13px; line-height: 18px; color: #B53434; font-weight: 600">{{errEmail}}</span></sc-if>
+                </label>
+                <label style="display: flex; flex-direction: column; gap: 6px"><span style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 13px; line-height: 18px; font-weight: 600">Kata sandi</span><a href="#lupa" style="font-size: 13px; line-height: 18px; font-weight: 600">Lupa kata sandi?</a></span>
+                  <span style="position: relative; display: flex">
+                    <input type="{{passType}}" autocomplete="current-password" value="{{pass}}" onChange="{{onPass}}" readonly="{{busy}}" style="{{passStyle}}">
+                    <button type="button" onClick="{{toggleShow}}" aria-pressed="{{show}}" style="position: absolute; right: 4px; top: 2px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: #1E5B4B; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">{{showText}}</button>
+                  </span>
+                  <sc-if value="{{hasErrPass}}" hint-placeholder-val="{{false}}"><span class="banner-in" role="alert" style="font-size: 13px; line-height: 18px; color: #B53434; font-weight: 600">{{errPass}}</span></sc-if>
+                </label>
+                <label style="display: flex; align-items: flex-start; gap: 10px; min-height: 44px"><input type="checkbox" checked="{{remember}}" onChange="{{onRemember}}" style="flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: #1E5B4B"><span style="display: flex; flex-direction: column"><span style="font-weight: 500">Ingat saya di HP atau komputer ini</span><span style="font-size: 13px; line-height: 18px; color: #5B6661">Jangan dicentang di komputer bersama.</span></span></label>
+                <button type="submit" disabled="{{btnDisabled}}" style="{{btnStyle}}"><sc-if value="{{busy}}" hint-placeholder-val="{{false}}"><svg class="sp-run" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.35)" stroke-width="3"></circle><path d="M12 3 a9 9 0 0 1 9 9" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"></path></svg></sc-if>{{btnText}}</button>
+              </form>
+            </sc-if>
+
+            <sc-if value="{{isOrtu}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 16px">
+                <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">Nomor WhatsApp yang didaftarkan ke sekolah</span>
+                  <span style="display: flex; gap: 8px"><span style="flex: none; min-height: 48px; padding: 0 14px; box-sizing: border-box; border: 1px solid #848C84; border-radius: 10px; background: #F7F5EF; display: inline-flex; align-items: center; font-weight: 600">+62</span><input type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="812 3456 7890" style="flex: 1; min-width: 0; min-height: 48px; padding: 0 14px; box-sizing: border-box; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; font: inherit; color: #1B2421"></span>
+                </label>
+                <div style="padding: 12px 14px; border-radius: 10px; background: #E3EFEA; font-size: 14px; line-height: 20px">Kami mengirim <b>kode 6 angka</b> lewat WhatsApp. Anda tidak perlu mengingat kata sandi.</div>
+                <button type="button" style="min-height: 52px; border: 0; border-radius: 10px; background: #1E5B4B; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer">Kirim kode</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{isSiswa}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 14px">
+                <div style="padding: 16px; border-radius: 10px; background: #FFFFFF; border: 1px solid #E2DED3; display: flex; flex-direction: column; gap: 8px">
+                  <span style="font-weight: 700">Siswa masuk lewat tautan dari sekolah</span>
+                  <span style="font-size: 14px; line-height: 20px; color: #5B6661">Wali kelas membagikan tautan atau kode QR. Buka satu kali, lalu kartu digital tersimpan di HP.</span>
+                </div>
+                <div style="padding: 12px 14px; border-radius: 10px; background: #E3EFEA; font-size: 14px; line-height: 20px">Belum punya tautan? Tanyakan ke wali kelas. Siswa SD memakai HP orang tua.</div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div role="group" aria-label="Skenario demo prototipe" style="position: absolute; left: 32px; right: 32px; bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap">
+      <span style="font-size: 12px; line-height: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #5B6661">Skenario demo</span>
+      <sc-for list="{{scenarios}}" as="s" hint-placeholder-count="4">
+        <button type="button" onClick="{{s.pick}}" aria-pressed="{{s.on}}" style="{{s.style}}">{{s.label}}</button>
+      </sc-for>
+    </div>
+  </main>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { role: 'staf', email: 'hendra@absahuji.sch.id', pass: 'contoh-sandi-1', show: false, remember: false, phase: 'idle', scenario: 'ok', shakeN: 0, errEmail: '', errPass: '', paused: false };
+  }
+  renderVals() {
+    var self = this;
+    var S = this.state;
+    var busy = S.phase === 'loading';
+    var offline = S.scenario === 'offline';
+    var locked = S.phase === 'locked';
+    function tab(on) { return 'flex: 1; min-height: 44px; padding: 0 8px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; ' + (on ? 'border: 2px solid #1E5B4B; background: #E3EFEA; color: #1B2421' : 'border: 1px solid #E2DED3; background: #FFFFFF; color: #1B2421'); }
+    function field(bad) { return 'width: 100%; box-sizing: border-box; min-height: 48px; padding: 0 14px; border: ' + (bad ? '2px solid #B53434' : '1px solid #848C84') + '; border-radius: 10px; background: #FFFFFF; font: inherit; color: #1B2421'; }
+    var disabled = busy || offline || locked;
+    var btnText = busy ? 'Memeriksa…' : offline ? 'Masuk (perlu sinyal)' : locked ? 'Masuk (dikunci sampai 09.52)' : 'Masuk';
+    var defs = [['ok', 'Berhasil'], ['salah', 'Kata sandi salah'], ['terkunci', 'Akun terkunci'], ['offline', 'Tanpa sinyal']];
+    var scenarios = defs.map(function (d) {
+      var on = S.scenario === d[0];
+      return {
+        label: d[1], on: on,
+        style: 'min-height: 44px; padding: 0 14px; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; ' + (on ? 'border: 1px solid #1B2421; background: #1B2421; color: #FFFFFF' : 'border: 1px solid #848C84; background: #FFFFFF; color: #1B2421'),
+        pick: function () { self.setState({ scenario: d[0], phase: 'idle', errEmail: '', errPass: '' }); }
+      };
+    });
+    return {
+      rootClass: S.paused ? 'paused' : '',
+      paused: S.paused, pauseText: S.paused ? 'Putar animasi' : 'Jeda animasi',
+      togglePause: function () { self.setState({ paused: !S.paused }); },
+      isOk: S.phase === 'ok', notOk: S.phase !== 'ok',
+      isErr: S.phase === 'err', isLocked: locked, isOffline: offline,
+      isStaf: S.role === 'staf', isOrtu: S.role === 'ortu', isSiswa: S.role === 'siswa',
+      tabStaf: tab(S.role === 'staf'), tabOrtu: tab(S.role === 'ortu'), tabSiswa: tab(S.role === 'siswa'),
+      toStaf: function () { self.setState({ role: 'staf' }); },
+      toOrtu: function () { self.setState({ role: 'ortu' }); },
+      toSiswa: function () { self.setState({ role: 'siswa' }); },
+      shakeClass: (S.phase === 'err' || S.phase === 'locked' || S.errEmail || S.errPass) ? (S.shakeN % 2 ? 'shake-a' : 'shake-b') : '',
+      email: S.email, pass: S.pass, remember: S.remember, show: S.show,
+      passType: S.show ? 'text' : 'password', showText: S.show ? 'Sembunyikan' : 'Tampilkan',
+      toggleShow: function () { self.setState({ show: !S.show }); },
+      onEmail: function (e) { self.setState({ email: e.target.value, errEmail: '' }); },
+      onPass: function (e) { self.setState({ pass: e.target.value, errPass: '' }); },
+      onRemember: function (e) { self.setState({ remember: !S.remember }); },
+      busy: busy,
+      emailStyle: field(!!S.errEmail), passStyle: field(!!S.errPass) + '; padding-right: 120px',
+      hasErrEmail: !!S.errEmail, errEmail: S.errEmail, hasErrPass: !!S.errPass, errPass: S.errPass,
+      btnDisabled: disabled, btnText: btnText,
+      btnStyle: 'min-height: 52px; border: 0; border-radius: 10px; font: inherit; font-size: 16px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px; ' + (disabled && !busy ? 'background: #E2DED3; color: #5B6661; cursor: not-allowed' : 'background: #1E5B4B; color: #FFFFFF; cursor: ' + (busy ? 'progress' : 'pointer')),
+      scenarios: scenarios,
+      resetDemo: function () { self.setState({ phase: 'idle' }); },
+      submit: function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var em = S.email.trim(), pw = S.pass, ee = '', ep = '';
+        if (!em) ee = 'Isi email Anda.'; else if (em.indexOf('@') < 1 || em.indexOf('.') < 0) ee = 'Email belum lengkap. Contoh: nama@sekolah.sch.id';
+        if (!pw) ep = 'Isi kata sandi Anda.';
+        if (ee || ep) { self.setState({ errEmail: ee, errPass: ep, phase: 'idle', shakeN: S.shakeN + 1 }); return; }
+        if (offline || locked || busy) return;
+        self.setState({ phase: 'loading', errEmail: '', errPass: '' });
+        setTimeout(function () {
+          var sc = self.state.scenario;
+          if (sc === 'ok') self.setState({ phase: 'ok' });
+          else if (sc === 'salah') self.setState({ phase: 'err', shakeN: self.state.shakeN + 1 });
+          else self.setState({ phase: 'locked', shakeN: self.state.shakeN + 1 });
+        }, 1100);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

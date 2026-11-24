@@ -24,6 +24,12 @@
   --alpa: #B53434;
   --alpa-soft: #FBE7E7;
   --focus: #1E5B4B;
+  --motion-cepat: 120ms;
+  --motion-biasa: 200ms;
+  --motion-masuk: 320ms;
+  --motion-rayakan: 600ms;
+  --ease-masuk: cubic-bezier(.2, .8, .2, 1);
+  --ease-keluar: cubic-bezier(.4, 0, 1, 1);
 }
 
 @media (prefers-color-scheme: dark) {

@@ -1,185 +1,219 @@
 {
-  "v": 3,
-  "createdOnFiles": {
-    "v": 1,
-    "at": "2026-11-20T11:20:00Z"
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-20T11:20:00Z"
+ },
+ "title": "Absah — Desain UI",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1240,
+   "title": "Staf · Hari ini (admin dan kepala sekolah)",
+   "expand": "fill"
   },
-  "title": "Absah — Desain UI",
-  "launch": {
-    "view": "canvas"
+  "Setup-jenjang.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Staf · Wizard setup: profil jenjang",
+   "expand": "fill",
+   "is_interactive": true
   },
-  "pages": [],
-  "boards": {
-    "Main.dc.html": {
-      "x": 0,
-      "y": 0,
-      "w": 1440,
-      "h": 1240,
-      "title": "Staf · Hari ini (admin dan kepala sekolah)",
-      "expand": "fill"
-    },
-    "Setup-jenjang.dc.html": {
-      "x": 1520,
-      "y": 0,
-      "w": 1440,
-      "h": 900,
-      "title": "Staf · Wizard setup: profil jenjang",
-      "expand": "fill",
-      "is_interactive": true
-    },
-    "Guru-isi-sesi.dc.html": {
-      "x": 0,
-      "y": 4400,
-      "w": 390,
-      "h": 844,
-      "title": "Guru · Isi presensi (prototipe, bisa dicoba)",
-      "is_interactive": true
-    },
-    "Ortu-portal-sd.dc.html": {
-      "x": 0,
-      "y": 1660,
-      "w": 390,
-      "h": 844,
-      "title": "Orang tua · Portal (anak SD)"
-    },
-    "Siswa-pkl.dc.html": {
-      "x": 470,
-      "y": 1660,
-      "w": 390,
-      "h": 844,
-      "title": "Siswa SMK · Check-in PKL"
-    },
-    "Lapor-tppk.dc.html": {
-      "x": 940,
-      "y": 1660,
-      "w": 390,
-      "h": 844,
-      "title": "Siapa pun · Lapor ke TPPK"
-    },
-    "Kios-pulang.dc.html": {
-      "x": 1410,
-      "y": 1660,
-      "w": 1180,
-      "h": 820,
-      "title": "Kios · Pulang dengan penjemput resmi"
-    },
-    "Data-siswa.dc.html": {
-      "x": 0,
-      "y": 2924,
-      "w": 1440,
-      "h": 980,
-      "title": "Data sekolah · Siswa (tambah, ubah, keluarkan)",
-      "expand": "fill",
-      "is_interactive": true
-    },
-    "Data-rombel.dc.html": {
-      "x": 1520,
-      "y": 2924,
-      "w": 1440,
-      "h": 900,
-      "title": "Data sekolah · Rombel dan kelompok belajar",
-      "expand": "fill"
-    },
-    "Data-mapel.dc.html": {
-      "x": 3040,
-      "y": 2924,
-      "w": 1440,
-      "h": 1040,
-      "title": "Data sekolah · Mata pelajaran",
-      "expand": "fill"
-    },
-    "Data-jadwal.dc.html": {
-      "x": 4560,
-      "y": 2924,
-      "w": 1440,
-      "h": 1040,
-      "title": "Data sekolah · Jadwal pelajaran",
-      "expand": "fill"
-    },
-    "Data-guru.dc.html": {
-      "x": 6080,
-      "y": 2924,
-      "w": 1440,
-      "h": 900,
-      "title": "Data sekolah · Guru dan staf",
-      "expand": "fill"
-    },
-    "Alur-presensi.dc.html": {
-      "x": 470,
-      "y": 4400,
-      "w": 3090,
-      "h": 1170,
-      "title": "Guru · Alur presensi di HP, 7 langkah"
-    },
-    "Sistem-UI.dc.html": {
-      "x": 0,
-      "y": 5870,
-      "w": 1520,
-      "h": 2960,
-      "title": "Sistem UI Absah (warna, status, komponen, bahasa)"
-    },
-    "Riset-UI.dc.html": {
-      "x": 1600,
-      "y": 5870,
-      "w": 1520,
-      "h": 2260,
-      "title": "Riset UI presensi dan keputusan desain"
-    }
+  "Guru-isi-sesi.dc.html": {
+   "x": 0,
+   "y": 4400,
+   "w": 390,
+   "h": 844,
+   "title": "Guru · Isi presensi (prototipe, bisa dicoba)",
+   "is_interactive": true
   },
-  "order": [
-    "Main.dc.html",
-    "Setup-jenjang.dc.html",
-    "Ortu-portal-sd.dc.html",
-    "Siswa-pkl.dc.html",
-    "Lapor-tppk.dc.html",
-    "Kios-pulang.dc.html",
-    "Data-siswa.dc.html",
-    "Data-rombel.dc.html",
-    "Data-mapel.dc.html",
-    "Data-jadwal.dc.html",
-    "Data-guru.dc.html",
-    "Guru-isi-sesi.dc.html",
-    "Alur-presensi.dc.html",
-    "Sistem-UI.dc.html",
-    "Riset-UI.dc.html"
-  ],
-  "notes": {
-    "t-web": {
-      "x": 0,
-      "y": -300,
-      "text": "Web staf",
-      "kind": "title1",
-      "maxW": 2960
-    },
-    "t-mobile": {
-      "x": 0,
-      "y": 1360,
-      "text": "HP dan kios",
-      "kind": "title1",
-      "maxW": 2590
-    },
-    "t-data": {
-      "x": 0,
-      "y": 2624,
-      "text": "Data sekolah (CRUD)",
-      "kind": "title1",
-      "maxW": 7520
-    },
-    "t-ux": {
-      "x": 0,
-      "y": 4100,
-      "text": "Presensi di HP dan sistem UI",
-      "kind": "title1",
-      "maxW": 3560
-    }
+  "Ortu-portal-sd.dc.html": {
+   "x": 0,
+   "y": 1660,
+   "w": 390,
+   "h": 844,
+   "title": "Orang tua · Portal (anak SD)"
   },
-  "designSystems": [
-    {
-      "title": "Absah",
-      "namespace": "absah",
-      "artifact": "https://claude.ai/artifact/ADCvXJTQfs2gbEo3LdrGzt",
-      "version": null,
-      "copiedAt": "2026-11-20T11:20:00Z"
-    }
-  ]
+  "Siswa-pkl.dc.html": {
+   "x": 470,
+   "y": 1660,
+   "w": 390,
+   "h": 844,
+   "title": "Siswa SMK · Check-in PKL"
+  },
+  "Lapor-tppk.dc.html": {
+   "x": 940,
+   "y": 1660,
+   "w": 390,
+   "h": 844,
+   "title": "Siapa pun · Lapor ke TPPK"
+  },
+  "Kios-pulang.dc.html": {
+   "x": 1410,
+   "y": 1660,
+   "w": 1180,
+   "h": 820,
+   "title": "Kios · Pulang dengan penjemput resmi"
+  },
+  "Data-siswa.dc.html": {
+   "x": 0,
+   "y": 2924,
+   "w": 1440,
+   "h": 980,
+   "title": "Data sekolah · Siswa (tambah, ubah, keluarkan)",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "Data-rombel.dc.html": {
+   "x": 1520,
+   "y": 2924,
+   "w": 1440,
+   "h": 900,
+   "title": "Data sekolah · Rombel dan kelompok belajar",
+   "expand": "fill"
+  },
+  "Data-mapel.dc.html": {
+   "x": 3040,
+   "y": 2924,
+   "w": 1440,
+   "h": 1040,
+   "title": "Data sekolah · Mata pelajaran",
+   "expand": "fill"
+  },
+  "Data-jadwal.dc.html": {
+   "x": 4560,
+   "y": 2924,
+   "w": 1440,
+   "h": 1040,
+   "title": "Data sekolah · Jadwal pelajaran",
+   "expand": "fill"
+  },
+  "Data-guru.dc.html": {
+   "x": 6080,
+   "y": 2924,
+   "w": 1440,
+   "h": 900,
+   "title": "Data sekolah · Guru dan staf",
+   "expand": "fill"
+  },
+  "Alur-presensi.dc.html": {
+   "x": 470,
+   "y": 4400,
+   "w": 3090,
+   "h": 1170,
+   "title": "Guru · Alur presensi di HP, 7 langkah"
+  },
+  "Sistem-UI.dc.html": {
+   "x": 0,
+   "y": 5870,
+   "w": 1520,
+   "h": 2960,
+   "title": "Sistem UI Absah (warna, status, komponen, bahasa)"
+  },
+  "Riset-UI.dc.html": {
+   "x": 1600,
+   "y": 5870,
+   "w": 1520,
+   "h": 2260,
+   "title": "Riset UI presensi dan keputusan desain"
+  },
+  "Auth-masuk.dc.html": {
+   "x": 0,
+   "y": 9300,
+   "w": 1440,
+   "h": 900,
+   "title": "Masuk · Guru, orang tua, siswa (prototipe, bisa dicoba)",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "Auth-alur.dc.html": {
+   "x": 1600,
+   "y": 9300,
+   "w": 2230,
+   "h": 2332,
+   "title": "Masuk dan akun · 10 layar HP"
+  },
+  "Motion-UI.dc.html": {
+   "x": 0,
+   "y": 10400,
+   "w": 1520,
+   "h": 2620,
+   "title": "Gerak · 12 gerak dengan alasan",
+   "expand": "fill"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Setup-jenjang.dc.html",
+  "Ortu-portal-sd.dc.html",
+  "Siswa-pkl.dc.html",
+  "Lapor-tppk.dc.html",
+  "Kios-pulang.dc.html",
+  "Data-siswa.dc.html",
+  "Data-rombel.dc.html",
+  "Data-mapel.dc.html",
+  "Data-jadwal.dc.html",
+  "Data-guru.dc.html",
+  "Guru-isi-sesi.dc.html",
+  "Alur-presensi.dc.html",
+  "Sistem-UI.dc.html",
+  "Riset-UI.dc.html",
+  "Auth-masuk.dc.html",
+  "Auth-alur.dc.html",
+  "Motion-UI.dc.html"
+ ],
+ "notes": {
+  "t-web": {
+   "x": 0,
+   "y": -300,
+   "text": "Web staf",
+   "kind": "title1",
+   "maxW": 2960
+  },
+  "t-mobile": {
+   "x": 0,
+   "y": 1360,
+   "text": "HP dan kios",
+   "kind": "title1",
+   "maxW": 2590
+  },
+  "t-data": {
+   "x": 0,
+   "y": 2624,
+   "text": "Data sekolah (CRUD)",
+   "kind": "title1",
+   "maxW": 7520
+  },
+  "t-ux": {
+   "x": 0,
+   "y": 4100,
+   "text": "Presensi di HP dan sistem UI",
+   "kind": "title1",
+   "maxW": 3560
+  },
+  "t-auth": {
+   "x": 0,
+   "y": 9000,
+   "text": "Masuk, akun, dan gerak",
+   "kind": "title1",
+   "maxW": 3830
+  }
+ },
+ "designSystems": [
+  {
+   "title": "Absah",
+   "namespace": "absah",
+   "artifact": "https://claude.ai/artifact/ADCvXJTQfs2gbEo3LdrGzt",
+   "version": null,
+   "copiedAt": "2026-11-20T11:20:00Z"
+  }
+ ]
 }

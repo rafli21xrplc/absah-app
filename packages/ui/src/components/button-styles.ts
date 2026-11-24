@@ -2,12 +2,14 @@ import { cva } from 'class-variance-authority';
 
 /** The class names of a button. Pure (no React), so a server component or a plain link can use it too. */
 export const buttonStyles = cva(
-  'box-border inline-flex select-none items-center justify-center gap-2 rounded-md px-5 text-body-strong font-bold transition-colors duration-150',
+  'box-border inline-flex select-none items-center justify-center gap-2 rounded-md px-5 text-body-strong font-bold transition-colors duration-(--motion-cepat)',
   {
     variants: {
       variant: { primary: '', stabilo: '', secondary: '', ghost: '', danger: '' },
       size: { '44': 'min-h-11', '48': 'min-h-12', '52': 'min-h-13', '64': 'min-h-16 px-6' },
       blocked: { true: 'cursor-not-allowed border border-transparent bg-garis text-tinta-muted', false: 'cursor-pointer' },
+      // Working is not the same as unavailable (Motion-UI 2): the button keeps its colour, shows the ring and ignores presses.
+      busy: { true: '!cursor-progress', false: '' },
     },
     // Colours live here, not in `variant`, so a blocked button replaces them instead of fighting them.
     compoundVariants: [
@@ -28,6 +30,6 @@ export const buttonStyles = cva(
       { variant: 'ghost', blocked: false, class: 'border border-transparent bg-transparent text-papan hover:bg-papan-soft active:bg-papan-soft' },
       { variant: 'danger', blocked: false, class: 'border border-alpa bg-kapur-raised text-alpa hover:bg-alpa-soft active:bg-alpa-soft' },
     ],
-    defaultVariants: { variant: 'primary', size: '44', blocked: false },
+    defaultVariants: { variant: 'primary', size: '44', blocked: false, busy: false },
   },
 );

@@ -662,6 +662,19 @@ export const messages = {
     notFoundBody: 'Alamat ini tidak ada atau sudah dipindah.',
     home: 'Ke beranda',
   },
+  motion: {
+    /** Stands where a spinner would turn when the person asks for less motion. */
+    working: '…',
+    stepWaiting: 'menunggu',
+    stepRunning: 'sedang berjalan',
+    stepDone: 'selesai',
+    /** Spoken by the countdown: at the start, for the last 10 seconds and at the end, never every second. */
+    countdownStart: 'Sisa waktu {time}.',
+    countdownLast: 'Tinggal {n} detik.',
+    countdownDone: 'Waktu habis.',
+    pause: 'Jeda animasi',
+    resume: 'Putar animasi',
+  },
 } as const;
 
 export type Messages = typeof messages;

@@ -58,3 +58,14 @@ export const radius = {
   "radius-lg": "16px",
   "radius-full": "9999px",
 } as const;
+
+export const motion = {
+  "motion-cepat": "120ms",
+  "motion-biasa": "200ms",
+  "motion-masuk": "320ms",
+  "motion-rayakan": "600ms",
+  "ease-masuk": "cubic-bezier(.2, .8, .2, 1)",
+  "ease-keluar": "cubic-bezier(.4, 0, 1, 1)",
+} as const;
+
+export type MotionName = keyof typeof motion;

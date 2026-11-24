@@ -172,3 +172,19 @@ Keputusan kerja (mudah dibalik) untuk batas yang belum ditentukan:
 - **Regresi visual dengan screenshot**: tidak dipasang (baseline macOS dan Linux CI berbeda). Bukti visual tetap `docs/ui/uNN/` per PR.
 - Temuan: dasar bersama sekitar 240 kB gzip (React + Next); halaman aplikasi menambah sekitar 60 kB, sebagian besar zod dari `@absah/contracts` di klien. Memperkecilnya butuh perubahan di absah-api (skema tanpa zod di klien), bukan di sini.
 
+
+## 9. Fase UA (masuk, akun, gerak)
+
+Sumber: dokumen "Prompt Claude Code: Slicing UI/UX Absah", bagian Fase UA, dan tiga papan baru `Auth-masuk`, `Auth-alur`, `Motion-UI`
+(disalin ke `design/boards`; `Auth-alur` dan `Motion-UI` punya acuan PNG). UA1 sampai UA4, satu PR per fase.
+
+Keputusan kerja (mudah dibalik), berlaku untuk seluruh fase:
+- **Rute tetap di grup `(akun)`**, bukan `(auth)` seperti usulan prompt: `/masuk`, `/undangan` dan `/keamanan/dua-langkah` sudah dipakai e2e, tautan WhatsApp, dan PWA. Rute baru ditambah di grup yang sama.
+- **Angka waktu** (tautan 30 menit, kode 5 menit, kirim ulang 60 detik, sesi diam 30 menit, kunci 10 menit setelah 5 salah, ingat saya 30 hari) ada di satu berkas, `apps/web/lib/auth-config.ts`. Server yang memutuskan; klien hanya menampilkan.
+- **Server belum punya** pemulihan kata sandi (tidak ada pengirim email di absah-api; Better Auth menjawab "Reset password isn't enabled"), hitungan sisa percobaan, dan kunci akun dengan jam buka. Halaman ditulis terhadap kontrak Better Auth yang standar dan memetakan jawaban yang ada (401 salah, 429 terlalu banyak dengan `X-Retry-After`). Bagian yang butuh server diberi tanda di PR sebagai catatan backlog absah-api, bukan dibuat-buat di klien.
+- **Gerak baru** hanya dari token di `tokens.json` (UA1). Gerak yang tidak punya padanan komponen dicatat di PR, tidak diciptakan.
+
+### UA1
+Token gerak masuk ke `tokens.json` (bukan hanya CSS), keyframes dan kelas `motion-*` di `base.css`, lima komponen dan dua hook di `packages/ui/src/components/motion`.
+`Button loading` kini tetap berwarna (papan Motion-UI kartu 2: sibuk bukan nonaktif). `Banner` turun 8 px saat muncul. Peta 12 gerak ke komponen: Storybook, Gerak/Komponen.
+Kartu tanpa padanan: 6 (syarat menyala, dibuat di UA3), 10 (status berganti), 11 (garis Urungkan menyusut). Kartu 8 (lembar naik) sudah dipenuhi `Sheet`.
