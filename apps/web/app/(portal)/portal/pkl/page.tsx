@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatePklAttachmentResponse, PklCheckin, PklJournal, PklToday, type PklCheckinBody } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Banner, Button, Card, ErrorState, Field, Input, PageMain, SkeletonRows, Textarea, messages } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -10,7 +10,9 @@ import { putPhoto, toJpeg } from '@/lib/pickup';
 import { clockIn, CONFIRM_LABELS, readPosition, REASON_LABELS, STATUS_WORDS } from '@/lib/pkl';
 import { useWorkspace } from '@/lib/workspace';
 import { PklJournals } from '../../../_pkl/journals';
-import styles from '../../portal.module.css';
+
+const t = messages.pkl;
+const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ''));
 
 /** One press of Check-in/Check-out: the same key and body are resent until the server answered. */
 interface Attempt {
@@ -19,7 +21,7 @@ interface Attempt {
 }
 
 function checkinText(c: PklCheckin, timezone: string): string {
-  const what = c.kind === 'in' ? 'Datang' : 'Pulang';
+  const what = c.kind === 'in' ? t.came : t.left;
   const state = c.status ? STATUS_WORDS[c.status] : c.confirmStatus ? CONFIRM_LABELS[c.confirmStatus] : 'tercatat';
   const reasons = c.reviewReasons.length > 0 && !c.status ? ` (${c.reviewReasons.map((r) => REASON_LABELS[r]).join(', ')}; guru pembimbing akan meninjau)` : '';
   return `${what} ${clockIn(c.recordedAt, timezone)} · ${c.distanceM} m dari DUDI · ${state}${reasons}`;
@@ -41,7 +43,7 @@ export default function PortalPklPage() {
     if (!schoolId) return;
     api('/pkl/me', PklToday, { schoolId })
       .then(setToday)
-      .catch((err: unknown) => setError(err instanceof ApiError ? err.message : 'Tidak bisa memuat PKL. Periksa internet.'));
+      .catch((err: unknown) => setError(err instanceof ApiError ? err.message : t.loadFailedBody));
   }, [schoolId]);
   useEffect(load, [load]);
 
@@ -59,7 +61,7 @@ export default function PortalPklPage() {
     } catch (err) {
       // The server answered: this press is over (409 already_recorded, no_placement, ...).
       if (err instanceof ApiError) attempt.current = null;
-      setError(err instanceof Error ? err.message : 'Belum terkirim.');
+      setError(err instanceof Error ? err.message : t.notSent);
       if (err instanceof ApiError && err.status === 409) load();
     } finally {
       setBusy(false);
@@ -89,10 +91,10 @@ export default function PortalPklPage() {
       await api('/pkl/journals', PklJournal, { method: 'POST', schoolId, idempotencyKey: journalKey.current, body });
       journalKey.current = null;
       formEl.reset();
-      setSaved('Jurnal hari ini tersimpan.');
+      setSaved(t.journalSaved);
       setReload((n) => n + 1);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Jurnal belum terkirim. Periksa sinyal, lalu kirim lagi.');
+      setError(err instanceof ApiError ? err.message : t.journalFailed);
     } finally {
       setBusy(false);
     }
@@ -100,63 +102,86 @@ export default function PortalPklPage() {
 
   const p = today?.placement;
   return (
-    <IfCap name="pkl.enabled" fallback={<main className={styles.main}>PKL belum diaktifkan.</main>}>
-      <main className={styles.main}>
-        <Link href="/portal">← Portal</Link>
-        <h1 className={styles.title}>PKL</h1>
-        {!hasRole('siswa') && <p>Halaman ini untuk siswa PKL.</p>}
-        {error && <p role="alert">{error}</p>}
-        {today && !p && <p>Tidak ada PKL yang berjalan hari ini.</p>}
+    <IfCap name="pkl.enabled" fallback={<PageMain><p className="m-0 text-body">{t.disabled}</p></PageMain>}>
+      <PageMain>
+        <Link href="/portal" className="text-body-strong text-papan">
+          {t.back}
+        </Link>
+        <h1 className="m-0 text-h1">{t.title}</h1>
+        {!hasRole('siswa') && <p className="m-0 text-body">{t.studentsOnly}</p>}
+        {error && !today && (
+          <ErrorState title={t.loadFailed} onRetry={() => { setError(null); load(); }}>
+            {error}
+          </ErrorState>
+        )}
+        {error && today && (
+          <Banner kind="error" title={t.notSent}>
+            <span role="alert">{error}</span>
+          </Banner>
+        )}
+        {!today && !error && <SkeletonRows count={3} />}
+        {today && !p && <p className="m-0 text-body">{t.noPlacement}</p>}
         {p && schoolId && (
           <>
-            <section className={styles.card} aria-label="Tempat PKL">
-              <strong>{p.partner.name}</strong>
-              <br />
-              {p.partner.address}
-              <br />
-              {p.hours ? `Jam kerja hari ini ${p.hours.startsAt.replace(':', '.')}–${p.hours.endsAt.replace(':', '.')}` : 'Hari ini DUDI libur.'}
-              <br />
-              Pembimbing: {p.schoolMentor ?? '–'} (sekolah), {p.industryMentor ?? 'belum ada'} (industri)
-            </section>
-            <section aria-label="Kehadiran hari ini">
-              {today.checkIn && <p role="status">{checkinText(today.checkIn, timezone)}</p>}
-              {today.checkOut && <p role="status">{checkinText(today.checkOut, timezone)}</p>}
+            <Card as="section" aria-label={t.placeLabel} className="flex flex-col gap-1">
+              <strong className="text-h3">{p.partner.name}</strong>
+              <span className="text-body text-tinta-muted">{p.partner.address}</span>
+              <span className="text-body">{p.hours ? fill(t.hours, { start: p.hours.startsAt.replace(':', '.'), end: p.hours.endsAt.replace(':', '.') }) : t.dudiOff}</span>
+              <span className="text-body">{fill(t.mentors, { school: p.schoolMentor ?? '–', industry: p.industryMentor ?? t.noMentor })}</span>
+            </Card>
+            <Card as="section" aria-label={t.todayLabel} className="flex flex-col gap-3">
+              <h2 className="m-0 text-h2">{t.todayLabel}</h2>
+              {today.checkIn && (
+                <p role="status" className="m-0 text-body">
+                  {checkinText(today.checkIn, timezone)}
+                </p>
+              )}
+              {today.checkOut && (
+                <p role="status" className="m-0 text-body">
+                  {checkinText(today.checkOut, timezone)}
+                </p>
+              )}
               {!today.checkIn && (
-                <Button disabled={busy} onClick={() => void check('in')}>
-                  {busy ? 'Membaca lokasi…' : 'Check-in sekarang'}
+                <Button size="64" disabled={busy} onClick={() => void check('in')}>
+                  {busy ? t.reading : t.checkIn}
                 </Button>
               )}
               {today.checkIn && !today.checkOut && (
-                <Button variant="secondary" disabled={busy} onClick={() => void check('out')}>
-                  {busy ? 'Membaca lokasi…' : 'Check-out pulang'}
+                <Button size="64" variant="secondary" disabled={busy} onClick={() => void check('out')}>
+                  {busy ? t.reading : t.checkOut}
                 </Button>
               )}
-              <p className={styles.muted}>Lokasi hanya dibaca saat tombol ditekan, dalam radius {p.partner.radiusM} m dari DUDI.</p>
-            </section>
-            <form onSubmit={(e) => void writeJournal(e)} onChange={() => (journalKey.current = null)} aria-labelledby="jurnal-baru">
-              <h2 id="jurnal-baru">Jurnal hari ini</h2>
-              <label>
-                Kegiatan
-                <textarea name="activity" required minLength={5} maxLength={2000} rows={4} />
-              </label>
-              <label>
-                Kompetensi yang dilatih (boleh kosong)
-                <input name="competency" maxLength={300} />
-              </label>
-              <label>
-                Foto atau PDF (boleh kosong)
-                <input name="file" type="file" accept="image/*,application/pdf" />
-              </label>
-              <Button type="submit" disabled={busy}>
-                {busy ? 'Mengirim…' : 'Kirim jurnal'}
-              </Button>
-              {saved && <p role="status">{saved}</p>}
-            </form>
-            <h2>Jurnal saya</h2>
+              <p className="m-0 text-small text-tinta-muted">{fill(t.locationNote, { radius: p.partner.radiusM })}</p>
+            </Card>
+            <Card as="section" aria-labelledby="jurnal-baru">
+              <form onSubmit={(e) => void writeJournal(e)} onChange={() => (journalKey.current = null)} className="flex flex-col gap-4">
+                <h2 id="jurnal-baru" className="m-0 text-h2">
+                  {t.journalTitle}
+                </h2>
+                <Field label={t.activity}>
+                  <Textarea name="activity" required minLength={5} maxLength={2000} rows={4} />
+                </Field>
+                <Field label={t.competency}>
+                  <Input name="competency" maxLength={300} />
+                </Field>
+                <Field label={t.file}>
+                  <Input name="file" type="file" accept="image/*,application/pdf" />
+                </Field>
+                <Button type="submit" loading={busy}>
+                  {t.sendJournal}
+                </Button>
+                {saved && (
+                  <p role="status" className="m-0 text-body text-hadir">
+                    {saved}
+                  </p>
+                )}
+              </form>
+            </Card>
+            <h2 className="m-0 text-h2">{t.myJournals}</h2>
             <PklJournals schoolId={schoolId} reload={reload} showStudent={false} />
           </>
         )}
-      </main>
+      </PageMain>
     </IfCap>
   );
 }
