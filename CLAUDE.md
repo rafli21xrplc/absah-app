@@ -464,6 +464,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   current month/teacher is shown (loaded.key), never the previous month's while loading.
 - No export yet; the API has none (JSON only).
 
+## E2E guru (apps/web/e2e/guru.spec.ts)
+- SD school (daily sessions by wali kelas): Bu Wali (wali_kelas) holds VII A; Pak Pengganti (guru) is free. Check-in is
+  only exercised on Mon-Fri on the Jakarta clock (the API answers 409 not_school_day otherwise, and there is no calendar
+  endpoint to open a weekend); on a weekend the spec asserts the "bukan hari sekolah" message and no button instead.
+- Flow: izin today -> /pengganti still empty while pending -> admin approves -> VII A shows "Belum ada pengganti" and the
+  count -> candidates (the absent teacher is not offered) -> assign -> report row of Pak Pengganti shows 1 mengganti and
+  Bu Wali's daily detail opens. Clash prevention is the API's tests (teacher-substitutes), not repeated here.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
