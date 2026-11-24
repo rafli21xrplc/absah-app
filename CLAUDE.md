@@ -553,6 +553,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - e2e presensi-offline.spec.ts: `next dev` has no service worker, so "no signal" is `page.route('**/api/v1/**', abort)`;
   two sessions of one wali kelas are filled that way, then the route is removed and the 15 s retry sends both.
 
+## Papan kedatangan (GRB-08; (staf)/gerbang/papan, lib/gate.ts)
+- /gerbang/papan (link on /gerbang; GATE_VIEWERS, behind gate.enabled): GET /gate/board = counts only, per rombel on time / late /
+  not in yet (`excused` = covered by an approved izin, shown as "(n izin)" and left out of toChase). Polled every BOARD_POLL_MS
+  (5 s) with a self-rescheduling timeout, only while the tab is visible (visibilitychange fetches at once); a failed poll keeps the
+  last board and, after BOARD_STALE_MS (20 s) without an answer, a notice says the numbers may have changed. Rombel with most
+  students to chase first (boardOrder). Updated time is the server's, on the school clock. No names here: the lists stay on /gerbang.
+- e2e papan-kedatangan.spec.ts: board opens at 0, a manual arrival made through the API shows up without a reload.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
