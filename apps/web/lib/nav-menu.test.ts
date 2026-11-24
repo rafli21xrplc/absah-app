@@ -23,6 +23,12 @@ describe('staff menu by role', () => {
     for (const href of ['/dasbor', '/siswa', '/rombel', '/jadwal', '/setup', '/ekspor-data']) expect(h).not.toContain(href);
   });
 
+  it('lists Mata pelajaran only where lessons have subjects (per-period schools)', () => {
+    expect(hrefs(['admin'])).toContain('/mapel');
+    expect(hrefs(['admin'], presetCapabilities('sd', false))).not.toContain('/mapel');
+    expect(hrefs(['guru'])).not.toContain('/mapel');
+  });
+
   it('admin and guru menus differ', () => {
     expect(hrefs(['admin'])).not.toEqual(hrefs(['guru']));
     expect(hrefs(['admin']).length).toBeGreaterThan(hrefs(['guru']).length);

@@ -2,6 +2,7 @@ import type { CapabilityKey, CapabilityValues } from '@absah/capabilities';
 import type { Role } from '@absah/contracts';
 import {
   Bell,
+  BookOpen,
   BookOpenCheck,
   CalendarCheck,
   CalendarDays,
@@ -122,6 +123,7 @@ export const STAFF_MENU: readonly MenuGroup[] = [
     items: [
       { key: 'siswa', label: 'Siswa', href: '/siswa', icon: Users, visible: (c) => c.hasRole(...STUDENT_READERS) },
       { key: 'rombel', label: 'Rombel', href: '/rombel', icon: UsersRound, visible: (c) => c.hasRole(...STUDENT_READERS) },
+      { key: 'mapel', label: 'Mata pelajaran', href: '/mapel', icon: BookOpen, visible: (c) => c.hasRole(...SCHEDULE_PAGE_READERS) && perPeriod(c) },
       { key: 'jadwal', label: (c) => (c.cap('attendance.mode') === 'daily' ? 'Wali kelas dan jadwal' : 'Jadwal pelajaran'), href: '/jadwal', icon: CalendarDays, visible: (c) => c.hasRole(...SCHEDULE_PAGE_READERS) },
       {
         key: 'impor',
