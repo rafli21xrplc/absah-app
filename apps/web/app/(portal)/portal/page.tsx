@@ -103,6 +103,11 @@ export default function PortalHome() {
           <Link href="/portal/hafalan">Hafalan Al-Qur&apos;an: riwayat setoran</Link>
         </p>
       </IfCap>
+      <IfCap name="student.billing">
+        <p>
+          <Link href="/portal/tagihan">Tagihan sekolah: lihat dan bayar</Link>
+        </p>
+      </IfCap>
       {hasRole('orang_tua') && (
         <p>
           <Link href="/portal/preferensi">Pesan WhatsApp: pilih yang ingin diterima</Link>
