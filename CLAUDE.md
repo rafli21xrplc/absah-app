@@ -759,6 +759,14 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
   yang sudah memakai `messages/id.ts` tidak boleh punya kalimat yang diketik langsung di JSX. Halaman yang selesai direstyle masuk daftar ini.
 - Halaman lama (sekitar 110 berkas, 1000 teks) tidak dipindah massal: dipindah bersama restyle masing-masing, supaya satu PR tetap bisa ditinjau.
 
+### Anggaran performa (U9b)
+- `pnpm --filter @absah/web budget` (jalan di CI setelah `pnpm build`): jumlah gzip semua skrip yang diunduh browser saat pertama membuka tiap halaman
+  statis, dibaca dari HTML hasil build. Batas di `apps/web/scripts/budget.json`: 330 kB untuk halaman mana pun (terbesar saat ditetapkan 310,5 kB), 260 kB untuk
+  halaman masuk (240 kB), 310 kB untuk lapor (295 kB). Dasar bersama (React, Next) sekitar 240 kB; sisanya halaman itu sendiri dan zod dari `@absah/contracts`.
+- Menurunkan batas boleh kapan saja; menaikkan hanya dengan alasan di PR. `--table` mencetak semua halaman dari terbesar.
+- Tidak dipakai: Lighthouse di CI (skor kinerja bergeser antar-mesin CI, sehingga memblokir PR tanpa sebab); regresi visual dengan screenshot (huruf dan anti-alias
+  beda antara macOS dan Linux CI, baseline tidak bisa dipakai bersama). Gantinya: anggaran ukuran (deterministik), axe (U9a), dan screenshot di `docs/ui/` sebagai bukti PR.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

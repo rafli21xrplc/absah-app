@@ -163,3 +163,12 @@ halaman lama yang belum direstyle. Memindahkannya dalam satu PR tidak bisa ditin
 2. Penjaga: `packages/ui/src/repo-conventions.test.ts` (token yang tidak ada, daftar halaman yang sudah bersih dari teks di JSX).
 3. axe pada halaman nyata: `apps/web/e2e/a11y.spec.ts` (terang, gelap, laptop, HP).
 Sisanya mengikuti aturan: halaman lama dipindahkan bersama restyle-nya dan masuk daftar `MOVED`.
+
+## 8. Catatan U9b (visual, performa, CI)
+
+Keputusan kerja (mudah dibalik) untuk batas yang belum ditentukan:
+- **Performa**: anggaran ukuran JS pertama-buka per halaman (gzip) dari hasil build, diperiksa di CI. Angka saat ditetapkan: terbesar 310,5 kB, masuk 240 kB, lapor 295 kB; batas 330 / 260 / 310 kB.
+- **Lighthouse**: tidak dipasang di CI. Skor kinerjanya bergeser antar-mesin dan memblokir PR tanpa sebab; aksesibilitasnya sudah diuji axe pada halaman nyata (U9a). Bila nanti dipasang: aksesibilitas >= 0,95 dan praktik terbaik >= 0,9 sebagai pemblokir, kinerja hanya peringatan.
+- **Regresi visual dengan screenshot**: tidak dipasang (baseline macOS dan Linux CI berbeda). Bukti visual tetap `docs/ui/uNN/` per PR.
+- Temuan: dasar bersama sekitar 240 kB gzip (React + Next); halaman aplikasi menambah sekitar 60 kB, sebagian besar zod dari `@absah/contracts` di klien. Memperkecilnya butuh perubahan di absah-api (skema tanpa zod di klien), bukan di sini.
+

@@ -32,6 +32,9 @@ jobs:
         run: pnpm turbo lint typecheck test
       - name: Build web and kiosk
         run: pnpm build
+      # First-load JS per page (gzip) against apps/web/scripts/budget.json. Lower a limit when a page gets lighter; raise one only with a reason in the PR.
+      - name: First-load JS budget
+        run: pnpm --filter @absah/web budget
 
   # Design system: builds Storybook and runs axe (WCAG 2.2 AA, colour contrast included) over every story in the light and
   # dark theme at phone width. Needs no absah-api.
