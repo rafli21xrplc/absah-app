@@ -506,6 +506,21 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   409 payments_unavailable (no PaymentProvider) shows the API's message ("Hubungi sekolah").
 - No amounts or bills in the WhatsApp reminder: it only says something is due and links to the portal.
 
+## Ujian, staff pages (apps/web/app/(staf)/ujian; UJN-01/02/03)
+- Home card "Ujian" (EXAM_VIEWING) or "Ruang ujian saya" (any other staff member), behind exam.enabled. /ujian lists the
+  exam periods (closed ones on request) with ruleSummary; managers (wakasek, admin) create one with PeriodFormFields
+  (shared with "Ubah aturan": min attendance %, sakit/izin counted, count-from date, bills that must be paid and which fee
+  types). One Idempotency-Key per form state. Every pengawas also sees "Ruang yang saya awasi" from GET /exam/my-rooms.
+- /ujian/[id]: rule, close/reopen, and "Boleh ujian": GET .../eligibility, only those who may not sit by default, with
+  reasonLabel per reason (never amounts); wali kelas get their own rombels (the API scopes), others pick a rombel.
+  There is no single-period read; the page finds its period in the list with includeClosed.
+- /ujian/[id]/ruang: rooms with seated/capacity/pengawas, the count of students without a room, create (pengawas from
+  /school/members through staffCandidates), "Isi dengan rombel" (POST students {classId}; moves from other rooms; 409
+  room_full changes nothing), delete (204 -> z.null()).
+- /ujian/ruang/[roomId]: GET attendance; check-in by a scanner typing the card text into the field + Enter (POST /scan,
+  the same dynamic card QR as the daily card) or "Catat hadir" (POST /attendance, manual); refusals read through
+  checkInProblem. A student who may not sit shows "Belum boleh ujian" with no button. There is no camera scanner on this page.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
