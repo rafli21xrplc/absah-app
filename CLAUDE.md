@@ -96,6 +96,27 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   Entered by the wali kelas = approved at once; the session screen shows the student fixed.
 - Parents get the same flow in the portal and action links (prompt 3.3).
 
+## Kiosk app (apps/kiosk, GRB-02/03)
+- One page, three phases (lib/use-kiosk.ts): loading -> unpaired (PairScreen: one-time code typed,
+  scanned with the camera or a USB scanner; one Idempotency-Key per code) -> ready (ScanScreen).
+  401 from any kiosk call = revoked: wipe the store and show pairing again.
+- Calls absah-api directly (lib/kiosk-api.ts, NEXT_PUBLIC_API_URL, `Authorization: Kiosk <token>`,
+  no cookies); the API allows the kiosk origin through KIOSK_ORIGINS.
+- Offline: GET /kiosk/day (school-day keys today+tomorrow, lateAfter, roster with first name and
+  rombel) is stored in IndexedDB (lib/store.ts; memoryStore in tests and as fallback) and
+  refreshed every 30 min and on a new school date. checkLocally (lib/verify.ts) gives the instant
+  verdict: verifyCardToken -> roster/bound device -> local list of today's arrivals.
+- Every card token is queued (clientEventId = uuid) before the screen answers; syncQueue (lib/sync.ts)
+  sends batches of 200 oldest first every 15 s, after each scan and on `online`, removing items
+  only after the server answered (the server dedups by clientEventId, so resends are safe).
+  Heartbeat every minute with the queue size. The server's answer is the record; the local
+  verdict is only what the student sees.
+- Input: Camera (BarcodeDetector, jsQR fallback, 150 ms frames) and wedgeReader (fast keystrokes
+  + Enter). The same code is ignored for 5 s. Feedback: green on time, amber late/already in,
+  red rejected with a short hint (lib/feedback.ts), plus a tone (lib/beep.ts).
+- public/sw.js (registered in production builds only): network first, cache when offline, API
+  never cached. Bump APP_VERSION (lib/use-kiosk.ts) with kiosk changes; heartbeat reports it.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
