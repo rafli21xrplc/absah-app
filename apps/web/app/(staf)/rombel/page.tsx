@@ -79,7 +79,7 @@ export default function RombelPage() {
         <EmptyState title={t.empty}>
           {canManage ? (
             <>
-              Rombel dibuat otomatis saat <Link href="/import">import data siswa</Link>.
+              {t.emptyAuto} <Link href="/import">{t.emptyAutoLink}</Link>.
             </>
           ) : (
             t.emptyBody

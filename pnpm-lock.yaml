@@ -112,6 +112,9 @@ importers:
       '@absah/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@axe-core/playwright':
+        specifier: ^4.14.0
+        version: 4.14.0(playwright-core@1.65.1)
       '@playwright/test':
         specifier: ^1.65.1
         version: 1.65.1

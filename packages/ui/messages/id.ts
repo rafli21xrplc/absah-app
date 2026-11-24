@@ -488,6 +488,8 @@ export const messages = {
   },
   classes: {
     title: 'Rombel',
+    emptyAuto: 'Rombel dibuat otomatis saat',
+    emptyAutoLink: 'import data siswa',
     subtitle: '{n} rombel',
     searchLabel: 'Cari rombel',
     searchPlaceholder: 'Nama rombel',

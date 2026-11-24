@@ -257,7 +257,7 @@ function ChildLeave({ schoolId, enrollmentId }: { schoolId: string; enrollmentId
   if (!items || items.length === 0) return null;
   return (
     <>
-      <h3 className="m-0 text-h3">{t.leaveTitle}</h3>
+      <h3 className="m-0 text-body-strong">{t.leaveTitle}</h3>
       <ul aria-label={t.leaveList} className="m-0 flex list-none flex-col gap-1 p-0">
         {items.map((l) => (
           <li key={l.id} className="flex min-h-11 items-center justify-between gap-3 border-b border-garis py-1 last:border-b-0">
