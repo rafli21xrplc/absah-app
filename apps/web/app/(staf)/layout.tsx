@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
+import { WorkspaceProvider } from '@/lib/workspace';
 
-// Staff area: admin, operator, guru, wali kelas, piket, ... (auth arrives in Fase 1).
+// Staff area: admin, operator, guru, wali kelas, piket, ... Requires a session.
 export default function StafLayout({ children }: { children: ReactNode }) {
-  return children;
+  return <WorkspaceProvider>{children}</WorkspaceProvider>;
 }

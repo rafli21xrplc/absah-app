@@ -1,15 +1,99 @@
+'use client';
+
+import { SchoolSetupResponse } from '@absah/contracts';
+import { Button } from '@absah/ui';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { api } from '@/lib/api';
+import { signOut } from '@/lib/auth';
+import { IfCap } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
+import { useWorkspace } from '@/lib/workspace';
 import styles from '../shell.module.css';
 
 export default function StafHome() {
+  const router = useRouter();
+  const { me, schoolId, isAdmin, selectSchool } = useWorkspace();
+  const school = me.schools.find((s) => s.id === schoolId);
+
+  // A new school's admin lands in the setup wizard until it is finished.
+  useEffect(() => {
+    if (!schoolId || !isAdmin) return;
+    api('/school/setup', SchoolSetupResponse, { schoolId })
+      .then((setup) => {
+        if (!setup.completedAt) router.replace('/setup');
+      })
+      .catch(() => undefined);
+  }, [schoolId, isAdmin, router]);
+
+  if (me.schools.length === 0) {
+    return (
+      <main className={styles.main}>
+        <h1 className={styles.title}>Belum ada sekolah</h1>
+        <p>Akun Anda belum terdaftar di sekolah mana pun. Minta tautan undangan dari admin sekolah.</p>
+      </main>
+    );
+  }
+
+  if (!school) {
+    return (
+      <main className={styles.main}>
+        <h1 className={styles.title}>Pilih sekolah</h1>
+        <div className={styles.list}>
+          {me.schools.map((s) => (
+            <Button key={s.id} variant="secondary" onClick={() => selectSchool(s.id)}>
+              {s.name} · {LEVEL_LABELS[s.level]}
+            </Button>
+          ))}
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className={styles.main}>
-      <p className={styles.eyebrow}>Staf sekolah</p>
-      <h1 className={styles.title}>Hari ini</h1>
-      <p>Absah sedang disiapkan. Masuk dan layar presensi hadir di fase berikutnya.</p>
-      <div className={styles.card}>
-        <strong>Jenjang yang didukung</strong>
-        <p>{Object.values(LEVEL_LABELS).join(' · ')}</p>
+      <p className={styles.eyebrow}>
+        {school.name} · {LEVEL_LABELS[school.level]}
+      </p>
+      <h1 className={styles.title}>Halo, {me.user.name}</h1>
+      <nav className={styles.list} aria-label="Menu">
+        <span className={styles.card}>Presensi</span>
+        <IfCap name="gate.enabled">
+          <span className={styles.card}>Gerbang</span>
+        </IfCap>
+        <IfCap name="gate.pickup">
+          <span className={styles.card}>Penjemputan</span>
+        </IfCap>
+        <IfCap name="pkl.enabled">
+          <span className={styles.card}>PKL</span>
+        </IfCap>
+        <IfCap name="mbg.enabled">
+          <span className={styles.card}>MBG</span>
+        </IfCap>
+        {isAdmin && (
+          <Link className={styles.card} href="/setup">
+            Pengaturan sekolah
+          </Link>
+        )}
+      </nav>
+      <div className={styles.actions}>
+        {me.schools.length > 1 && (
+          <Button variant="secondary" onClick={() => selectSchool(null)}>
+            Ganti sekolah
+          </Button>
+        )}
+        <Button
+          variant="secondary"
+          onClick={() =>
+            void signOut().then(() => {
+              selectSchool(null);
+              router.replace('/masuk');
+            })
+          }
+        >
+          Keluar
+        </Button>
       </div>
     </main>
   );
