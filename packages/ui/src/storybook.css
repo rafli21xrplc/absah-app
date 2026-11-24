@@ -1,0 +1,19 @@
+/* Storybook uses the same pipeline as the apps (see globals.css in each app): theme, utilities, tokens, base. */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import './tokens.css';
+@import './base.css';
+
+@source '.';
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('../fonts/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2');
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+/* In the apps next/font sets this variable; here the family name is enough. */
+:root {
+  --font-plus-jakarta: 'Plus Jakarta Sans';
+}

@@ -9,25 +9,45 @@
     "./base.css": "./src/base.css",
     "./legacy.css": "./src/legacy.css",
     "./tokens": "./src/tokens.ts",
-    "./fonts/*": "./fonts/*"
+    "./fonts/*": "./fonts/*",
+    "./messages": "./messages/id.ts"
   },
   "scripts": {
     "tokens:build": "node scripts/build-tokens.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "storybook build -o storybook-static --quiet",
+    "test:a11y": "playwright test"
   },
   "peerDependencies": {
     "react": "^19.0.0"
   },
   "devDependencies": {
     "@absah/config": "workspace:*",
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
+    "@storybook/addon-a11y": "^10.6.8",
+    "@storybook/react-vite": "^10.6.8",
+    "@tailwindcss/vite": "^4.3.5",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.13",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "axe-core": "^4.14.1",
+    "jsdom": "^31.0.1",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "storybook": "^10.6.8",
+    "storybook-addon-pseudo-states": "^10.6.8",
+    "tailwindcss": "^4",
+    "vite": "^8.3.8"
   },
   "dependencies": {
-    "gsap": "^3"
+    "@radix-ui/react-toast": "^1.3.1",
+    "class-variance-authority": "^0.7.1",
+    "gsap": "^3",
+    "lucide-react": "^1.79.0"
   }
 }

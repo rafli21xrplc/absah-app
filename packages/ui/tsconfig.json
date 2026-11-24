@@ -2,11 +2,18 @@
   "extends": "../config/tsconfig.base.json",
   "include": [
     "src",
-    "scripts/*.d.mts"
+    "messages",
+    "scripts/*.d.mts",
+    ".storybook/*.ts",".storybook/*.tsx",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "playwright.config.ts",
+    "e2e"
   ],
   "compilerOptions": {
     "types": [
       "node"
-    ]
+    ],
+    "jsx": "react-jsx"
   }
 }
