@@ -58,7 +58,12 @@ test('Integrasi: admin membuat kunci API, kunci itu membaca presensi, dicabut di
   await expect(page.getByText('https://hooks.e2e.example', { exact: true })).toBeVisible();
   await expect(page.getByText('token=RAHASIA')).toHaveCount(0);
 
+  // The test ping is stored at once and shows in the history (the worker's answer may come later); a switched-off address cannot be tested.
+  await page.getByRole('button', { name: 'Kirim tes ke https://hooks.e2e.example' }).click();
+  await expect(page.getByText('Tes dari Absah')).toBeVisible();
+
   await page.getByRole('button', { name: 'Matikan https://hooks.e2e.example' }).click();
+  await expect(page.getByRole('button', { name: 'Kirim tes ke https://hooks.e2e.example' })).toBeDisabled();
   await expect(page.getByText('Dimatikan')).toBeVisible();
   page.once('dialog', (d) => void d.accept());
   await page.getByRole('button', { name: 'Hapus https://hooks.e2e.example' }).click();

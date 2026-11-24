@@ -1,11 +1,11 @@
 'use client';
 
-import { CreatedWebhook, Webhook, WebhookList, WEBHOOK_EVENTS, type WebhookEventType } from '@absah/contracts';
+import { CreatedWebhook, Webhook, WebhookDeliveryList, WebhookList, WebhookTestQueued, WEBHOOK_EVENTS, type WebhookDelivery, type WebhookEventType } from '@absah/contracts';
 import { Button } from '@absah/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
-import { EVENT_LABELS, toggle, webhookInput } from '@/lib/integration';
+import { anyPending, DELIVERY_STATUS_LABELS, deliveryError, EVENT_LABELS, eventLabel, toggle, webhookInput } from '@/lib/integration';
 import forms from '../../forms.module.css';
 import styles from '../data.module.css';
 import local from './integrasi.module.css';
@@ -13,6 +13,91 @@ import { SecretNotice } from './keys';
 
 const SIGNATURE_EXAMPLE = `X-Absah-Signature: t=1800000000,v1=<hex>
 v1 = HMAC-SHA256(secret, "<t>.<isi permintaan apa adanya>")`;
+
+const POLL_MS = 3000;
+const POLL_MAX = 20;
+
+/** The last calls to one address, and the ping: the admin sees at once whether the receiver answers. */
+function Activity({ hook, schoolId }: { hook: Webhook; schoolId: string }) {
+  const [items, setItems] = useState<WebhookDelivery[] | null>(null);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const testKey = useRef<string | null>(null);
+  const polls = useRef(0);
+
+  const load = useCallback(() => api(`/integrations/webhooks/${hook.id}/deliveries`, WebhookDeliveryList, { schoolId }).then((r) => r.items), [hook.id, schoolId]);
+  const fail = (err: unknown) => setMessage(err instanceof ApiError ? err.message : 'Tidak terkirim. Periksa sinyal, lalu coba lagi.');
+
+  useEffect(() => {
+    if (!open) return;
+    void load().then(setItems, fail);
+  }, [open, load]);
+
+  // While a call waits, ask again every few seconds (at most a minute), so "Menunggu" turns into the answer.
+  useEffect(() => {
+    if (!open || !items || !anyPending(items) || polls.current >= POLL_MAX) return;
+    const timer = setTimeout(() => {
+      polls.current += 1;
+      void load().then(setItems, fail);
+    }, POLL_MS);
+    return () => clearTimeout(timer);
+  }, [open, items, load]);
+
+  async function test() {
+    testKey.current ??= newIdempotencyKey();
+    setBusy(true);
+    setMessage(null);
+    try {
+      await api(`/integrations/webhooks/${hook.id}/test`, WebhookTestQueued, { method: 'POST', schoolId, idempotencyKey: testKey.current });
+      testKey.current = null;
+      polls.current = 0;
+      setOpen(true);
+      setItems(await load());
+    } catch (err) {
+      if (err instanceof ApiError) testKey.current = null;
+      fail(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <div className={local.row}>
+        <Button variant="secondary" disabled={busy || !hook.active} onClick={() => void test()}>
+          {busy ? 'Mengirim…' : `Kirim tes ke ${hook.urlPreview}`}
+        </Button>
+        <Button variant="secondary" onClick={() => setOpen(!open)} aria-expanded={open}>
+          {open ? `Tutup riwayat ${hook.urlPreview}` : `Riwayat ${hook.urlPreview}`}
+        </Button>
+      </div>
+      {!hook.active && <p className={styles.muted}>Nyalakan alamat ini untuk mengirim tes.</p>}
+      {message && (
+        <p className={forms.error} role="alert">
+          {message}
+        </p>
+      )}
+      {open && (
+        <div aria-live="polite">
+          {!items && !message && <p role="status">Memuat…</p>}
+          {items?.length === 0 && <p className={styles.muted}>Belum ada pengiriman.</p>}
+          <ul>
+            {items?.map((d) => (
+              <li key={d.id}>
+                <span className={d.status === 'delivered' ? styles.badgeOk : d.status === 'failed' ? styles.badgeBad : styles.badgeWarn}>{DELIVERY_STATUS_LABELS[d.status]}</span> {eventLabel(d.eventType)} ·{' '}
+                {new Date(d.createdAt).toLocaleString('id-ID')}
+                {d.lastStatus !== null && d.status === 'delivered' ? ` · jawaban ${d.lastStatus}` : ''}
+                {d.status === 'failed' ? ` · ${deliveryError(d.lastError)}` : ''}
+                {d.attempts > 1 ? ` · ${d.attempts} percobaan` : ''}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
+  );
+}
 
 /** Webhook (PLT-09): where Absah posts the chosen events, signed with a secret shown once. */
 export function Webhooks({ schoolId }: { schoolId: string }) {
@@ -127,6 +212,7 @@ export function Webhooks({ schoolId }: { schoolId: string }) {
                 Hapus {h.urlPreview}
               </Button>
             </div>
+            <Activity hook={h} schoolId={schoolId} />
           </li>
         ))}
       </ul>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { keyState, parseRate, toggle, webhookInput } from './integration';
+import { anyPending, deliveryError, eventLabel, keyState, parseRate, toggle, webhookInput } from './integration';
 
 describe('integration helpers (PLT-09)', () => {
   it('names a key by what happened to it, revoked first', () => {
@@ -29,5 +29,27 @@ describe('integration helpers (PLT-09)', () => {
     expect(webhookInput('hooks.example', ['leave.approved'])).toEqual({ error: 'Alamat harus diawali https://.' });
     expect(webhookInput('https://hooks.example/in', [])).toEqual({ error: 'Pilih minimal satu kejadian.' });
     expect(webhookInput(`https://h.example/${'a'.repeat(500)}`, ['leave.approved'])).toEqual({ error: 'Alamat terlalu panjang.' });
+  });
+
+  it('names the ping and the chosen events, and keeps an unknown type as it is', () => {
+    expect(eventLabel('webhook.test')).toBe('Tes dari Absah');
+    expect(eventLabel('leave.approved')).toBe('Izin siswa disetujui');
+    expect(eventLabel('sesuatu.baru')).toBe('sesuatu.baru');
+  });
+
+  it('says why a call failed in words, and shows a code it does not know', () => {
+    expect(deliveryError(null)).toBe('');
+    expect(deliveryError('http_503')).toBe('Penerima menjawab 503.');
+    expect(deliveryError('dns')).toBe('Nama alamat tidak ditemukan.');
+    expect(deliveryError('network')).toBe('Tidak tersambung ke penerima.');
+    expect(deliveryError('blocked_address')).toBe('Alamat mengarah ke jaringan dalam, jadi tidak dikirim.');
+    expect(deliveryError('endpoint_off')).toBe('Alamat sedang dimatikan.');
+    expect(deliveryError('aneh')).toBe('aneh');
+  });
+
+  it('keeps asking only while a call waits', () => {
+    expect(anyPending([{ status: 'delivered' }, { status: 'failed' }])).toBe(false);
+    expect(anyPending([{ status: 'delivered' }, { status: 'pending' }])).toBe(true);
+    expect(anyPending([])).toBe(false);
   });
 });

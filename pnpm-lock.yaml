@@ -36,8 +36,8 @@ importers:
   apps/kiosk:
     dependencies:
       '@absah/contracts':
-        specifier: github:rafli21xrplc/absah-api#5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e&path:/packages/contracts
-        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e#path:/packages/contracts
+        specifier: github:rafli21xrplc/absah-api#35abcccffb369bc1045df350ac2211c6602109cf&path:/packages/contracts
+        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/35abcccffb369bc1045df350ac2211c6602109cf#path:/packages/contracts
       '@absah/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -70,11 +70,11 @@ importers:
   apps/web:
     dependencies:
       '@absah/capabilities':
-        specifier: github:rafli21xrplc/absah-api#5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e&path:/packages/capabilities
-        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e#path:/packages/capabilities
+        specifier: github:rafli21xrplc/absah-api#35abcccffb369bc1045df350ac2211c6602109cf&path:/packages/capabilities
+        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/35abcccffb369bc1045df350ac2211c6602109cf#path:/packages/capabilities
       '@absah/contracts':
-        specifier: github:rafli21xrplc/absah-api#5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e&path:/packages/contracts
-        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e#path:/packages/contracts
+        specifier: github:rafli21xrplc/absah-api#35abcccffb369bc1045df350ac2211c6602109cf&path:/packages/contracts
+        version: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/35abcccffb369bc1045df350ac2211c6602109cf#path:/packages/contracts
       '@absah/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -135,12 +135,12 @@ importers:
 
 packages:
 
-  '@absah/capabilities@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e#path:/packages/capabilities':
-    resolution: {path: /packages/capabilities, tarball: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e}
+  '@absah/capabilities@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/35abcccffb369bc1045df350ac2211c6602109cf#path:/packages/capabilities':
+    resolution: {path: /packages/capabilities, tarball: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/35abcccffb369bc1045df350ac2211c6602109cf}
     version: 0.0.0
 
-  '@absah/contracts@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e#path:/packages/contracts':
-    resolution: {path: /packages/contracts, tarball: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e}
+  '@absah/contracts@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/35abcccffb369bc1045df350ac2211c6602109cf#path:/packages/contracts':
+    resolution: {path: /packages/contracts, tarball: https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/35abcccffb369bc1045df350ac2211c6602109cf}
     version: 0.0.0
 
   '@asteasolutions/zod-to-openapi@9.1.0':
@@ -2361,9 +2361,9 @@ packages:
 
 snapshots:
 
-  '@absah/capabilities@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e#path:/packages/capabilities': {}
+  '@absah/capabilities@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/35abcccffb369bc1045df350ac2211c6602109cf#path:/packages/capabilities': {}
 
-  '@absah/contracts@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/5fe17a402fd9c9a4b9a12ab0d8a6d11ca774cf1e#path:/packages/contracts':
+  '@absah/contracts@https://codeload.github.com/rafli21xrplc/absah-api/tar.gz/35abcccffb369bc1045df350ac2211c6602109cf#path:/packages/contracts':
     dependencies:
       '@asteasolutions/zod-to-openapi': 9.1.0(zod@4.6.7)
       zod: 4.6.7
