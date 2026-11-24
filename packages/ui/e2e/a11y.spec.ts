@@ -10,6 +10,8 @@ test('every story passes axe', async ({ page, request }) => {
   const index = (await (await request.get('/index.json')).json()) as StoryIndex;
   const stories = Object.values(index.entries).filter((e) => e.type === 'story');
   expect(stories.length).toBeGreaterThan(10);
+  // One test walks every story, so its time grows with the number of stories (a slow CI runner needs ~1 s each, light and dark in parallel).
+  test.setTimeout(Math.max(60_000, stories.length * 3_000));
 
   const failures: string[] = [];
   for (const story of stories) {
