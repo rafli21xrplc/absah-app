@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { STATUS_LABELS } from '@/lib/attendance';
 import { signOut } from '@/lib/auth';
-import { IfCap } from '@/lib/capabilities';
+import { IfCap, useCapability } from '@/lib/capabilities';
 import { loadKeys, storeKeys } from '@/lib/card';
 import { timeIn } from '@/lib/gate';
 import { useWorkspace } from '@/lib/workspace';
@@ -22,6 +22,7 @@ const dayLabel = (date: string) => new Intl.DateTimeFormat('id-ID', { timeZone: 
 export default function PortalHome() {
   const router = useRouter();
   const { me, schoolId, hasRole, selectSchool } = useWorkspace();
+  const kaih = useCapability('habits.kaih');
   const timezone = me.schools.find((s) => s.id === schoolId)?.timezone ?? 'Asia/Jakarta';
   const allowed = hasRole('siswa', 'orang_tua');
   const [data, setData] = useState<PortalAttendance | null>(null);
@@ -71,6 +72,30 @@ export default function PortalHome() {
       <IfCap name="gate.enabled">
         <Cards schoolId={schoolId} />
       </IfCap>
+      {kaih && kaih !== 'off' && (
+        <p>
+          <Link href="/portal/kebiasaan">7 Kebiasaan Anak Indonesia Hebat: isi jurnal hari ini</Link>
+        </p>
+      )}
+      <IfCap name="religious.memorization">
+        <p>
+          <Link href="/portal/hafalan">Hafalan Al-Qur&apos;an: riwayat setoran</Link>
+        </p>
+      </IfCap>
+      {hasRole('orang_tua') && (
+        <IfCap name="gate.pickup">
+          <p>
+            <Link href="/portal/penjemput">Penjemput anak: siapa saja yang boleh menjemput</Link>
+          </p>
+        </IfCap>
+      )}
+      {hasRole('orang_tua') && (
+        <IfCap name="portal.liaison">
+          <p>
+            <Link href="/portal/penghubung">Buku penghubung: pesan dengan wali kelas dan guru</Link>
+          </p>
+        </IfCap>
+      )}
       {data?.items.map((s) => (
         <section key={s.studentId} className={styles.card} aria-label={`Kehadiran ${s.name}`}>
           <h2>

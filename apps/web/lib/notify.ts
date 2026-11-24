@@ -15,9 +15,16 @@ export const TEMPLATE_LABELS: Record<TemplateCode, string> = {
   absent_marked: 'Alpa',
   leave_approved: 'Izin disetujui',
   leave_rejected: 'Izin ditolak',
+  liaison_message: 'Buku penghubung',
   login_otp: 'Kode masuk',
   mbg_count: 'Jumlah hadir MBG',
   mbg_count_corrected: 'Koreksi MBG',
+  mbg_forecast: 'Prakiraan MBG',
+  student_sent_home: 'Dipulangkan dari UKS',
+  student_picked_up: 'Dijemput pulang',
+  unlisted_pickup: 'Penjemput tidak terdaftar',
+  tppk_report_received: 'Laporan TPPK baru',
+  tppk_team_changed: 'Tim TPPK diubah',
 };
 
 /** Plain words for the common failure codes; the code itself stays visible for support. */

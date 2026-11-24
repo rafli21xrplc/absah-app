@@ -25,6 +25,7 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
   const [marks, setMarks] = useState<Marks>({});
   const [correcting, setCorrecting] = useState(false);
   const [reason, setReason] = useState('');
+  const [topic, setTopic] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const actionKey = useRef<string | null>(null);
@@ -35,6 +36,7 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
       .then((d) => {
         setDetail(d);
         setMarks(initialMarks(d));
+        setTopic(d.topic ?? '');
       })
       .catch((err: unknown) => setMessage({ ok: false, text: err instanceof ApiError ? err.message : 'Tidak bisa memuat sesi.' }));
   }, [schoolId, id]);
@@ -46,6 +48,8 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
     [detail, marks],
   );
   const absent = detail ? detail.students.filter((s) => marks[s.enrollmentId] !== 'H' && marks[s.enrollmentId] !== 'T').length : 0;
+
+  const lesson = detail?.mode === 'per_period';
 
   function mark(enrollmentId: string, status: AttendanceStatus) {
     actionKey.current = null; // a different answer is a new action
@@ -73,9 +77,10 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
       const exceptions = detail.students
         .filter((s) => !s.fixed && marks[s.enrollmentId] !== 'H')
         .map((s) => ({ enrollmentId: s.enrollmentId, status: marks[s.enrollmentId] }));
-      const saved = await api(`/sessions/${id}/submit`, SessionDetail, { method: 'POST', body: { exceptions }, schoolId, idempotencyKey });
+      const saved = await api(`/sessions/${id}/submit`, SessionDetail, { method: 'POST', body: lesson ? { exceptions, topic: topic.trim() } : { exceptions }, schoolId, idempotencyKey });
       setDetail(saved);
       setMarks(initialMarks(saved));
+      setTopic(saved.topic ?? '');
       setMessage({ ok: true, text: 'Presensi tersimpan.' });
     });
 
@@ -121,6 +126,23 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
         </div>
       )}
       {!locked && editable && <p className={forms.hint}>Semua hadir kecuali yang Anda tandai.</p>}
+      {lesson && editable && !correcting && (
+        <label className={forms.field}>
+          Topik pelajaran (boleh dikosongkan)
+          <input
+            type="text"
+            maxLength={200}
+            placeholder="mis. Rantai makanan"
+            value={topic}
+            disabled={busy}
+            onChange={(e) => {
+              actionKey.current = null; // a different answer is a new action
+              setTopic(e.target.value);
+            }}
+          />
+        </label>
+      )}
+      {lesson && !editable && detail.topic && <p className={styles.muted}>Topik: {detail.topic}</p>}
 
       <ul className={ui.students}>
         {detail.students.map((s) => (

@@ -25,6 +25,8 @@ export interface ApiOptions {
   linkToken?: string;
   baseUrl?: string;
   signal?: AbortSignal;
+  /** Send no cookies at all (anonymous TPPK report): the request carries nothing about who sent it. */
+  anonymous?: boolean;
 }
 
 /** Calls /api/v1 and validates the response with its contract from absah-api. */
@@ -39,7 +41,7 @@ export async function api<S extends z.ZodType>(path: string, schema: S, options:
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
     // A link page has no session to send; leaving cookies out keeps the link the only credential.
-    credentials: options.linkToken ? 'omit' : 'same-origin',
+    credentials: options.linkToken || options.anonymous ? 'omit' : 'same-origin',
     signal: options.signal,
   });
   const json: unknown = await res.json().catch(() => null);
