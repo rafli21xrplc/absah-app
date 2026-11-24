@@ -48,17 +48,24 @@ export const Periksa: Story = { args: { students: students(FILLED), initialView:
 /** Step 6: sent, with the way on. */
 export const Terkirim: Story = { args: { students: students(FILLED), initialView: { sent: true }, next: { label: 'X-3 · Fisika, 09.15', href: '#next' } } };
 
-/** Step 7: no signal. The banner says what happens to the answers. */
+/** Step 7: no signal. The yellow banner says what happens to the answers, and the main button becomes "Simpan presensi di HP". */
 export const TanpaSinyal: Story = {
   args: {
     students: students(FILLED),
+    offline: true,
     banner: (
-      <Banner kind="offline" className="rounded-none border-x-0">
-        Daftar siswa dari salinan di HP (pukul 07.58). Presensi yang diisi dikirim otomatis saat sinyal kembali.
+      <Banner kind="offline" title="Tidak ada sinyal" className="rounded-none border-x-0">
+        Presensi disimpan di HP dan dikirim otomatis saat sinyal kembali.
       </Banner>
     ),
   },
 };
+
+/** Step 7, the sheet: it says the answers stay on this phone and the button is "Simpan di HP". */
+export const TanpaSinyalPeriksa: Story = { args: { students: students(FILLED), offline: true, initialView: { review: true } } };
+
+/** After "Simpan presensi di HP": "Tersimpan di HP" with the "Menunggu · n" badge. */
+export const TersimpanDiHp: Story = { args: { students: students(FILLED), offline: true, waitingCount: 2, initialView: { saved: true }, next: { label: 'X-3 · Fisika, 09.15', href: '#next' } } };
 
 export const FilterBelum: Story = { args: { initialView: { filter: 'unfilled' } } };
 export const FilterTidakHadir: Story = { args: { students: students(FILLED), initialView: { filter: 'absent' } } };

@@ -76,6 +76,19 @@ describe('SessionItem', () => {
     expect(container.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(3);
   });
 
+  it('a session filled without signal says "Menunggu dikirim" with an icon, and stays a plain link', async () => {
+    const { container } = render(
+      <ul>
+        <SessionItem variant="waiting" time="08.30–09.15" title="X-2 · Matematika" meta="Jam ke-3 · 25 siswa" href="/sesi/1" />
+      </ul>,
+    );
+    expect(screen.getByText('Menunggu dikirim')).toBeTruthy();
+    expect(container.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(1);
+    expect(screen.getByRole('link').getAttribute('href')).toBe('/sesi/1');
+    expect(screen.queryByRole('button')).toBeNull();
+    await expectNoAxeViolations(container);
+  });
+
   it('a finished session carries a check that is decorative, and says what was sent', () => {
     const { container } = render(
       <ul>

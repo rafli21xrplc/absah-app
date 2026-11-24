@@ -205,10 +205,13 @@ export async function markStudents(page: Page, exceptions: { name: string; statu
   for (const e of exceptions) await pickStatus(page, e.name, e.status);
 }
 
-/** From a complete screen: "Periksa dan kirim", then "Kirim presensi" in the check sheet. Does not wait for the answer. */
+/**
+ * From a complete screen: "Periksa dan kirim", then "Kirim presensi" in the check sheet. Without signal the same two taps are
+ * "Simpan presensi di HP" and "Simpan di HP" (U5). Does not wait for the answer.
+ */
 export async function sendReview(page: Page): Promise<void> {
-  await page.getByRole('button', { name: 'Periksa dan kirim' }).click();
-  await page.getByRole('dialog', { name: 'Periksa sebelum kirim' }).getByRole('button', { name: 'Kirim presensi' }).click();
+  await page.getByRole('button', { name: /^(Periksa dan kirim|Simpan presensi di HP)$/ }).click();
+  await page.getByRole('dialog', { name: 'Periksa sebelum kirim' }).getByRole('button', { name: /^(Kirim presensi|Simpan di HP)$/ }).click();
 }
 
 /** Fills the open session the way a teacher does, sends it, and waits for "Presensi X terkirim". */

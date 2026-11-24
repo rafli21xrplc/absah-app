@@ -1,4 +1,4 @@
-import { CircleAlert, CircleCheck, Lock } from 'lucide-react';
+import { CircleAlert, CircleCheck, Clock, Lock } from 'lucide-react';
 import type { ElementType, ReactNode } from 'react';
 import { messages } from '../../messages/id';
 import { cx } from '../cx';
@@ -59,7 +59,8 @@ export function SessionHero({ pill = messages.today.current, time, title, meta, 
   );
 }
 
-export type SessionItemVariant = 'next' | 'unfilled' | 'done' | 'missed' | 'locked';
+/** `waiting`: filled on the phone without signal, not at the school yet. */
+export type SessionItemVariant = 'next' | 'unfilled' | 'done' | 'missed' | 'locked' | 'waiting';
 
 export interface SessionItemProps {
   variant: SessionItemVariant;
@@ -75,6 +76,7 @@ const STATE: Record<Exclude<SessionItemVariant, 'next' | 'done'>, { text: string
   unfilled: { text: messages.today.unfilled, tone: 'text-telat', icon: CircleAlert },
   missed: { text: messages.today.missed, tone: 'text-alpa', icon: CircleAlert },
   locked: { text: messages.today.locked, tone: 'text-tinta-muted', icon: Lock },
+  waiting: { text: messages.today.waiting, tone: 'text-telat', icon: Clock },
 };
 
 /** One quiet row of a session that is not the current one. The state is a word plus an icon, never colour alone. */

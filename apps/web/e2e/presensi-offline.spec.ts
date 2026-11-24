@@ -43,18 +43,41 @@ test('Guru mengisi dua sesi tanpa sinyal, lalu terkirim otomatis saat sinyal kem
     )
     .toBe(2);
 
-  await page.route('**/api/v1/**', (route) => route.abort('internetdisconnected'));
+  // One handler for the whole run: no signal drops every call; once the signal is back, the first three sends of the waiting
+  // presensi still get no answer (a flaky network), and every try is logged with its Idempotency-Key.
+  const tries: { session: string; key: string; answered: boolean }[] = [];
+  let signal = false;
+  let failuresLeft = 3;
+  await page.route('**/api/v1/**', async (route) => {
+    const request = route.request();
+    const sync = /\/sessions\/([^/]+)\/sync$/.exec(new URL(request.url()).pathname);
+    if (sync) {
+      const failing = !signal || failuresLeft > 0;
+      if (signal && failuresLeft > 0) failuresLeft -= 1;
+      tries.push({ session: sync[1] ?? '', key: request.headers()['idempotency-key'] ?? '', answered: !failing });
+      if (failing) return route.abort('internetdisconnected');
+      return route.continue();
+    }
+    if (!signal) return route.abort('internetdisconnected');
+    return route.continue();
+  });
 
   await page.getByRole('link', { name: /VII A/ }).click();
   await expect(page.getByRole('heading', { name: 'VII A' })).toBeVisible();
   await expect(page.getByText(/Daftar siswa dari salinan di HP/)).toBeVisible();
-  await markStudents(page, [{ name: 'ADITYA PRATAMA', status: 'Alpa' }]);
-  await sendReview(page);
+  // The yellow banner says what happens, and the main button is now "Simpan presensi di HP".
   await expect(page.getByText(/Presensi disimpan di HP dan dikirim otomatis saat sinyal kembali/)).toBeVisible();
-  await expect(page.getByText('1 sesi menunggu dikirim.')).toBeVisible();
+  await markStudents(page, [{ name: 'ADITYA PRATAMA', status: 'Alpa' }]);
+  await expect(page.getByRole('button', { name: 'Simpan presensi di HP' })).toBeVisible();
+  await sendReview(page);
+  await expect(page.getByRole('heading', { name: 'Presensi VII A tersimpan di HP' })).toBeVisible();
+  await expect(page.locator('main').getByText('Menunggu · 1')).toBeVisible();
+  await expect(page.getByText('1 presensi menunggu dikirim.')).toBeVisible();
 
   await page.getByRole('link', { name: 'Kembali ke Hari ini' }).click();
   await expect(page.getByText(/Tanpa sinyal\. Daftar dari salinan di HP/)).toBeVisible();
+  // On Hari ini the card of VII A says it waits.
+  await expect(page.getByRole('link', { name: /VII A/ })).toContainText('Menunggu dikirim');
   await page.getByRole('link', { name: /VII B/ }).click();
   await expect(page.getByRole('heading', { name: 'VII B' })).toBeVisible();
   await page.getByRole('button', { name: /: Belum diisi\. Ketuk untuk mengubah\.$/ }).first().waitFor();
@@ -62,15 +85,41 @@ test('Guru mengisi dua sesi tanpa sinyal, lalu terkirim otomatis saat sinyal kem
   const first = await page.getByRole('button', { name: /: Hadir\. Ketuk untuk mengubah\.$/ }).first().getAttribute('aria-label');
   await pickStatus(page, (first ?? '').split(':')[0] ?? '', 'Sakit');
   await sendReview(page);
-  await expect(page.getByText('2 sesi menunggu dikirim.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Presensi VII B tersimpan di HP' })).toBeVisible();
+  await expect(page.locator('main').getByText('Menunggu · 2')).toBeVisible();
+  await expect(page.getByText('2 presensi menunggu dikirim.')).toBeVisible();
 
-  // Signal is back: nothing to press, the retry (every 15 s) sends both ("Kirim sekarang" only hurries it).
-  await page.unroute('**/api/v1/**');
-  await expect(page.getByText('VII A: presensi terkirim.')).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByText('VII B: presensi terkirim.')).toBeVisible();
-  await expect(page.getByText(/sesi menunggu dikirim/)).toHaveCount(0);
+  // Signing out with something waiting says how many are still on the phone, and does not lose them.
+  await page.goto('/');
+  // The button is the last thing on a long page and the Next dev-tools badge sits over it on a phone: the click is sent to the button itself.
+  await page.getByRole('button', { name: 'Keluar' }).dispatchEvent('click');
+  await expect(page.getByRole('alertdialog', { name: 'Ada presensi yang belum terkirim' })).toContainText('2 presensi masih di HP ini');
+  await page.getByRole('button', { name: 'Tetap di sini' }).click();
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
 
-  await page.getByRole('link', { name: 'Kembali ke Hari ini' }).click();
+  // Signal is back, but the first three sends get no answer: "Kirim sekarang" tries at once each time (the automatic wait would
+  // be 15 s, 30 s, 1 min). The fourth goes through. Every try carried the same Idempotency-Key, and each presensi was answered once.
+  signal = true;
+  for (let n = 1; n <= 3; n += 1) {
+    await page.getByRole('button', { name: 'Kirim sekarang' }).click();
+    await expect.poll(() => tries.filter((x) => !x.answered).length, { timeout: 15_000 }).toBeGreaterThanOrEqual(n);
+  }
+  const sendNow = page.getByRole('button', { name: 'Kirim sekarang' });
+  if (await sendNow.isVisible()) await sendNow.click();
+  await expect(page.getByText(/VII A: presensi terkirim\./)).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText(/VII B: presensi terkirim\./)).toBeVisible();
+  await expect(page.getByText(/presensi menunggu dikirim/)).toHaveCount(0);
+
+  const sessions = [...new Set(tries.map((x) => x.session))];
+  expect(sessions).toHaveLength(2);
+  for (const session of sessions) {
+    const mine = tries.filter((x) => x.session === session);
+    expect(new Set(mine.map((x) => x.key)).size).toBe(1);
+    expect(mine.filter((x) => x.answered)).toHaveLength(1);
+  }
+  expect(tries.filter((x) => !x.answered).length).toBeGreaterThanOrEqual(3);
+
+  await page.goto('/hari-ini');
   await expect(page.getByRole('link', { name: /VII A/ })).toContainText('Terkirim');
   await expect(page.getByRole('link', { name: /VII A/ })).toContainText('1 tidak hadir');
   await expect(page.getByRole('link', { name: /VII B/ })).toContainText('Terkirim');

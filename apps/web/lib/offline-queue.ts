@@ -16,7 +16,33 @@ export interface QueuedSession {
   capturedAt: string;
   /** One key per queued item, reused by every resend (the API replies with the same answer). */
   idempotencyKey: string;
+  /** Sends that got no answer so far (no signal, gateway down). */
+  attempts?: number;
+  /** Not before this moment (ISO): the wait grows with `attempts`. "Kirim sekarang" and a back-online signal ignore it. */
+  nextAttemptAt?: string;
+  /** The server answered "no" for good (e.g. the change window is over). The item stays, with the reason in plain words, until "Coba lagi". */
+  rejected?: { message: string; at: string };
 }
+
+/** Wait before the next automatic try after `attempts` failures: 15 s, 30 s, 1 min, 2 min, then 5 min at most. */
+export function backoffMs(attempts: number): number {
+  return Math.min(15_000 * 2 ** Math.max(0, attempts - 1), 300_000);
+}
+
+/** One more send without an answer: counts it and sets when the next automatic try may happen. */
+export function afterNoAnswer(item: QueuedSession, now: Date): QueuedSession {
+  const attempts = (item.attempts ?? 0) + 1;
+  return { ...item, attempts, nextAttemptAt: new Date(now.getTime() + backoffMs(attempts)).toISOString() };
+}
+
+/** "Coba lagi": the refusal is forgotten and the item is due at once. The key stays: the answer to a resend is the same. */
+export function forRetry(item: QueuedSession): QueuedSession {
+  const { rejected: _rejected, nextAttemptAt: _next, ...rest } = item;
+  return rest;
+}
+
+/** Waiting for its turn (not refused, and its wait is over). */
+export const isDue = (item: QueuedSession, now: Date): boolean => !item.rejected && (item.nextAttemptAt === undefined || item.nextAttemptAt <= now.toISOString());
 
 export const queuedId = (userId: string, sessionId: string) => `${userId}:${sessionId}`;
 

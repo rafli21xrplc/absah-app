@@ -83,6 +83,17 @@ export const Semua: Story = {
   ),
 };
 
+/** Filled without signal: still on the phone, not at the school. */
+export const MenungguDikirim: Story = {
+  render: () => (
+    <Phone>
+      <SessionGroup title="Menunggu dikirim">
+        <SessionItem variant="waiting" time="08.30–09.15" title="X-2 · Matematika" meta="Jam ke-3 · 25 siswa" href="#e" />
+      </SessionGroup>
+    </Phone>
+  ),
+};
+
 export const Memuat: Story = { render: () => <Phone><SkeletonRows count={3} /></Phone> };
 export const Kosong: Story = { render: () => <Phone><EmptyState title="Tidak ada jadwal mengajar hari ini">Jadwal muncul di sini pada hari mengajar.</EmptyState></Phone> };
 export const Galat: Story = { render: () => <Phone><ErrorState title="Jadwal belum bisa dimuat" onRetry={() => undefined}>Data Anda aman. Coba lagi sebentar lagi.</ErrorState></Phone> };
