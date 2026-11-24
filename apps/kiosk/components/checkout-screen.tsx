@@ -1,6 +1,7 @@
 'use client';
 
 import type { KioskUnlistedPickup } from '@absah/contracts';
+import { Button, Field, Input, messages } from '@absah/ui';
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import styles from '@/app/page.module.css';
 import { beep } from '@/lib/beep';
@@ -11,6 +12,9 @@ import { newAttempt, type Attempt } from '@/lib/visitors';
 import { wedgeReader } from '@/lib/wedge';
 import { Camera } from './camera';
 import { PhotoCapture } from './photo-capture';
+
+const t = messages.pickup;
+const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ''));
 
 type Ready = Extract<KioskState, { phase: 'ready' }>;
 type Pick = Extract<CheckoutVerdict, { kind: 'pick' }>;
@@ -74,9 +78,9 @@ export function CheckoutScreen({ state, actions, onClose }: { state: Ready; acti
       if (text === last.current.text && now - last.current.at < SAME_CODE_MS) return;
       last.current = { text, at: now };
       const v = await actions.checkoutScan(text);
-      if (!v) return finish({ color: FEEDBACK.rejected.color, label: 'Data hari ini belum terunduh', name: null, detail: 'Sambungkan kios ke internet sebentar.' }, 'error');
+      if (!v) return finish({ color: FEEDBACK.rejected.color, label: t.notDownloaded, name: null, detail: t.connectBriefly }, 'error');
       if (v.kind === 'rejected') return finish({ color: FEEDBACK.rejected.color, label: FEEDBACK.rejected.label, name: null, detail: REJECT_HINTS[v.reason] }, 'error');
-      if (v.kind === 'already_out') return finish({ color: FEEDBACK.duplicate.color, label: 'Sudah pulang', name: v.firstName, detail: 'Sudah dijemput hari ini.' }, 'warn');
+      if (v.kind === 'already_out') return finish({ color: FEEDBACK.duplicate.color, label: t.alreadyOut, name: v.firstName, detail: t.alreadyOutDetail }, 'warn');
       beep('ok');
       setStep({ step: 'pick', v });
     },
@@ -102,9 +106,9 @@ export function CheckoutScreen({ state, actions, onClose }: { state: Ready; acti
         .then(async (now) => {
           if (now.status === 'released') {
             await actions.markOut(held.v.schoolDate, held.v.cardId);
-            finish({ color: FEEDBACK.on_time.color, label: 'Boleh pulang', name: held.v.firstName, detail: `Bersama ${now.pickupName}, disetujui ${now.decidedVia === 'guardian' ? 'orang tua' : 'wali kelas'}.` }, 'ok');
+            finish({ color: FEEDBACK.on_time.color, label: t.mayLeave, name: held.v.firstName, detail: fill(t.mayLeaveDetail, { name: now.pickupName, by: now.decidedVia === 'guardian' ? t.byGuardian : t.byTeacher }) }, 'ok');
           } else if (now.status !== 'held') {
-            finish({ color: FEEDBACK.rejected.color, label: 'Tidak diizinkan', name: held.v.firstName, detail: 'Anak tetap di sekolah. Hubungi wali kelas.' }, 'error');
+            finish({ color: FEEDBACK.rejected.color, label: t.denied, name: held.v.firstName, detail: t.deniedDetail }, 'error');
           }
         })
         .catch(() => undefined); // offline for a moment: keep asking
@@ -112,7 +116,7 @@ export function CheckoutScreen({ state, actions, onClose }: { state: Ready; acti
     return () => clearInterval(timer);
   }, [held, actions, finish]);
 
-  const status = state.online ? 'Tersambung' : 'Offline';
+  const status = state.online ? t.online : t.offline;
   return (
     <main className={styles.kiosk}>
       <header className={styles.bar}>
@@ -121,18 +125,18 @@ export function CheckoutScreen({ state, actions, onClose }: { state: Ready; acti
         </span>
         <span data-testid="kiosk-status">
           {status}
-          {state.queueSize > 0 ? ` · antrean ${state.queueSize}` : ''}
+          {state.queueSize > 0 ? ` · ${fill(t.queue, { n: state.queueSize })}` : ''}
         </span>
       </header>
       <button type="button" className={styles.guestButton} onClick={onClose}>
-        Mode datang
+        {t.modeArrive}
       </button>
       {step.step === 'idle' && (
         <>
           <section className={styles.stage} aria-live="assertive" data-testid="kiosk-feedback">
             <div className={styles.answer}>
-              <p className={styles.idle}>Pulang: tunjukkan kartu siswa</p>
-              <p className={styles.hint}>Penjemput dipilih dari foto setelah kartu terbaca.</p>
+              <p className={styles.idle}>{t.scanHint}</p>
+              <p className={styles.hint}>{t.scanDetail}</p>
             </div>
           </section>
           <Camera onCode={(text) => void onCode(text)} className={styles.camera} />
@@ -148,47 +152,52 @@ export function CheckoutScreen({ state, actions, onClose }: { state: Ready; acti
         </section>
       )}
       {step.step === 'pick' && (
-        <section className={styles.screen} aria-label="Pilih penjemput">
-          <h1 className={styles.title}>
+        <section className="flex flex-col items-center gap-6 p-6 text-center" aria-label={t.pickTitle}>
+          <h1 className="m-0 text-display">
             {step.v.firstName} · {step.v.className}
           </h1>
-          {step.v.guardians.length === 0 ? <p className={styles.hint}>Belum ada penjemput resmi yang disetujui.</p> : <p className={styles.hint}>Pilih penjemput yang hadir:</p>}
-          <div className={styles.pickGrid}>
+          <p className="m-0 text-h3 text-tinta-muted">{step.v.guardians.length === 0 ? t.noGuardians : t.pickWho}</p>
+          <div className="grid w-full max-w-4xl grid-cols-[repeat(auto-fit,minmax(11rem,13rem))] justify-center gap-4">
             {step.v.guardians.map((g) => (
-              <button key={g.id} type="button" className={styles.pickCard} onClick={() => setStep({ step: 'confirm', v: step.v, guardian: g })}>
-                <StoredPhoto id={g.id} alt={`Foto ${g.name}`} photoOf={actions.photoOf} />
-                <span>{g.name}</span>
-                <small>{RELATION_LABELS[g.relation]}</small>
+              <button
+                key={g.id}
+                type="button"
+                className="flex min-h-16 cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-papan bg-kapur-raised p-3 text-h3 text-tinta"
+                onClick={() => setStep({ step: 'confirm', v: step.v, guardian: g })}
+              >
+                <StoredPhoto id={g.id} alt={fill(t.photoOf, { name: g.name })} photoOf={actions.photoOf} />
+                <span className="text-h2">{g.name}</span>
+                <small className="text-body text-tinta-muted">{RELATION_LABELS[g.relation]}</small>
               </button>
             ))}
           </div>
-          <button type="button" className={styles.secondary} onClick={() => setStep({ step: 'unlisted', v: step.v })}>
-            Penjemput tidak terdaftar
-          </button>
-          <button type="button" className={styles.secondary} onClick={() => setStep({ step: 'idle' })}>
-            Batal
-          </button>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button size="64" variant="secondary" onClick={() => setStep({ step: 'unlisted', v: step.v })}>
+              {t.unlistedButton}
+            </Button>
+            <Button size="64" variant="ghost" onClick={() => setStep({ step: 'idle' })}>
+              {t.cancel}
+            </Button>
+          </div>
         </section>
       )}
       {step.step === 'confirm' && (
-        <section className={styles.screen} aria-label="Konfirmasi penjemput">
-          <div className={styles.pair}>
-            <StoredPhoto id={step.guardian.id} alt={`Foto ${step.guardian.name}`} photoOf={actions.photoOf} />
-            <h1 className={styles.title}>
-              {step.v.firstName} pulang bersama {step.guardian.name}?
-            </h1>
-            <button
-              type="button"
-              className={styles.primary}
+        <section className="flex flex-col items-center gap-6 p-6 text-center" aria-label={t.confirmTitle}>
+          <div className="flex w-full max-w-md flex-col items-center gap-4">
+            <StoredPhoto id={step.guardian.id} alt={fill(t.photoOf, { name: step.guardian.name })} photoOf={actions.photoOf} />
+            <h1 className="m-0 text-h1">{fill(t.confirmQuestion, { child: step.v.firstName, guardian: step.guardian.name })}</h1>
+            <Button
+              size="64"
+              className="w-full"
               onClick={() =>
-                void actions.confirmCheckout(step.v, step.guardian.id).then(() => finish({ color: FEEDBACK.on_time.color, label: 'Hati-hati di jalan', name: step.v.firstName, detail: `Pulang bersama ${step.guardian.name}.` }, 'ok'))
+                void actions.confirmCheckout(step.v, step.guardian.id).then(() => finish({ color: FEEDBACK.on_time.color, label: t.safeTrip, name: step.v.firstName, detail: fill(t.leftWith, { guardian: step.guardian.name }) }, 'ok'))
               }
             >
-              Konfirmasi
-            </button>
-            <button type="button" className={styles.secondary} onClick={() => setStep({ step: 'pick', v: step.v })}>
-              Kembali
-            </button>
+              {t.confirm}
+            </Button>
+            <Button size="64" variant="secondary" className="w-full" onClick={() => setStep({ step: 'pick', v: step.v })}>
+              {t.back}
+            </Button>
           </div>
         </section>
       )}
@@ -196,12 +205,12 @@ export function CheckoutScreen({ state, actions, onClose }: { state: Ready; acti
       {step.step === 'waiting' && (
         <section className={styles.stage} aria-live="polite" data-testid="kiosk-feedback">
           <div className={styles.answer}>
-            <p className={styles.label}>Menunggu persetujuan</p>
+            <p className={styles.label}>{t.waiting}</p>
             <p className={styles.name}>{step.v.firstName}</p>
-            <p className={styles.detail}>{step.held.pickupName} belum terdaftar. Orang tua sudah dikirimi pesan; wali kelas juga bisa mengizinkan. Anak tetap di sekolah sampai ada persetujuan.</p>
-            <button type="button" className={styles.secondary} onClick={() => setStep({ step: 'idle' })}>
-              Tutup (permintaan tetap berjalan)
-            </button>
+            <p className={styles.detail}>{fill(t.waitingDetail, { name: step.held.pickupName })}</p>
+            <Button size="64" variant="secondary" className="mt-4" onClick={() => setStep({ step: 'idle' })}>
+              {t.closeWaiting}
+            </Button>
           </div>
         </section>
       )}
@@ -218,8 +227,8 @@ function UnlistedForm({ v, hold, onHeld, onBack }: { v: Pick; hold: CheckoutActi
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!name.trim()) return setError('Tulis nama penjemput.');
-    if (!photo) return setError('Ambil foto penjemput.');
+    if (!name.trim()) return setError(t.needName);
+    if (!photo) return setError(t.needPhoto);
     setBusy(true);
     setError(null);
     try {
@@ -232,12 +241,11 @@ function UnlistedForm({ v, hold, onHeld, onBack }: { v: Pick; hold: CheckoutActi
   }
 
   return (
-    <section className={styles.screen}>
-      <form className={styles.pair} onSubmit={(e) => void submit(e)}>
-        <h1 className={styles.title}>Penjemput tidak terdaftar untuk {v.firstName}</h1>
-        <label className={styles.field}>
-          Nama penjemput
-          <input
+    <section className="flex justify-center p-6">
+      <form className="flex w-full max-w-md flex-col gap-4" onSubmit={(e) => void submit(e)}>
+        <h1 className="m-0 text-h1">{fill(t.unlistedTitle, { child: v.firstName })}</h1>
+        <Field label={t.guardianName}>
+          <Input
             value={name}
             onChange={(e) => {
               attempt.current = newAttempt();
@@ -246,7 +254,7 @@ function UnlistedForm({ v, hold, onHeld, onBack }: { v: Pick; hold: CheckoutActi
             maxLength={100}
             autoComplete="off"
           />
-        </label>
+        </Field>
         <PhotoCapture
           photo={photo}
           onPhoto={(p) => {
@@ -257,16 +265,16 @@ function UnlistedForm({ v, hold, onHeld, onBack }: { v: Pick; hold: CheckoutActi
           optional={false}
         />
         {error ? (
-          <p role="alert" className={styles.alert}>
+          <p role="alert" className="m-0 text-body text-alpa">
             {error}
           </p>
         ) : null}
-        <button type="submit" className={styles.primary} disabled={busy}>
-          {busy ? 'Mengirim…' : 'Minta persetujuan'}
-        </button>
-        <button type="button" className={styles.secondary} onClick={onBack} disabled={busy}>
-          Kembali
-        </button>
+        <Button type="submit" size="64" loading={busy}>
+          {t.askApproval}
+        </Button>
+        <Button variant="secondary" size="64" onClick={onBack} disabled={busy}>
+          {t.back}
+        </Button>
       </form>
     </section>
   );
@@ -285,5 +293,5 @@ function StoredPhoto({ id, alt, photoOf }: { id: string; alt: string; photoOf: (
   const url = useMemo(() => (blob ? URL.createObjectURL(blob) : null), [blob]);
   useEffect(() => (url ? () => URL.revokeObjectURL(url) : undefined), [url]);
   // eslint-disable-next-line @next/next/no-img-element -- a local blob: URL, nothing to optimise
-  return url ? <img src={url} alt={alt} className={styles.pickPhoto} /> : <span className={styles.pickPhoto} role="img" aria-label={`${alt} belum terunduh`} />;
+  return url ? <img src={url} alt={alt} className="aspect-[3/4] w-full rounded-lg bg-garis object-cover" /> : <span className="block aspect-[3/4] w-full rounded-lg bg-garis" role="img" aria-label={fill(t.photoMissing, { alt })} />;
 }
