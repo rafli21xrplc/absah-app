@@ -1,7 +1,7 @@
 'use client';
 
+import { Banner, ChildTabs, messages } from '@absah/ui';
 import { childLabel, type PortalChild } from '@/lib/portal-children';
-import styles from '../portal.module.css';
 
 /**
  * "Pilih anak" at the top of every portal page. Shown only when there is more than one child to choose
@@ -11,17 +11,20 @@ export function ChildPicker({ items, selected, onSelect, partial }: { items: rea
   const schoolCount = new Set(items.map((c) => c.schoolId)).size;
   if (items.length < 2 && !partial) return null;
   return (
-    <nav className={styles.picker} aria-label="Pilih anak">
-      {items.map((c) => (
-        <button key={c.key} type="button" className={styles.pickerItem} aria-pressed={selected?.key === c.key} onClick={() => onSelect(c)}>
-          {childLabel(c, schoolCount)}
-        </button>
-      ))}
+    <div className="flex flex-col gap-2">
+      <ChildTabs
+        items={items.map((c) => ({ key: c.key, label: childLabel(c, schoolCount) }))}
+        selectedKey={selected?.key ?? null}
+        onSelect={(key) => {
+          const next = items.find((c) => c.key === key);
+          if (next) onSelect(next);
+        }}
+      />
       {partial && (
-        <p role="status" className={styles.muted}>
-          Sebagian sekolah belum bisa dimuat, jadi tidak semua anak tampil. Muat ulang halaman sebentar lagi.
-        </p>
+        <Banner kind="warning" className="mt-1">
+          <span role="status">{messages.portal.partial}</span>
+        </Banner>
       )}
-    </nav>
+    </div>
   );
 }

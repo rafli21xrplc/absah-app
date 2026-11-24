@@ -1,27 +1,28 @@
 'use client';
 
 import { CardDeviceKeys, LeaveRequestList, MyCards, PortalAttendance } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Banner, Button, Card, CountsRow, ErrorState, LinkRow, PageMain, SegmentedControl, SkeletonRows, StatusChip, messages, type StatusCode } from '@absah/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
-import { STATUS_LABELS } from '@/lib/attendance';
 import { signOut } from '@/lib/auth';
 import { IfCap, useCapability } from '@/lib/capabilities';
 import { loadKeys, storeKeys } from '@/lib/card';
 import { timeIn } from '@/lib/gate';
 import { dateRangeLabel, LEAVE_KIND_LABELS, LEAVE_STATUS_LABELS } from '@/lib/leave';
+import { isTransient } from '@/lib/offline-queue';
 import { HISTORY_RANGES, type HistoryRange } from '@/lib/portal-children';
 import { useWorkspace } from '@/lib/workspace';
 import { CardQr } from '../card-qr';
 import { useChildren } from './children';
-import styles from '../portal.module.css';
-import { StatusBadge } from '../status-badge';
+
+const t = messages.portal;
+const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ''));
 
 const dayLabel = (date: string) => new Intl.DateTimeFormat('id-ID', { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(`${date}T00:00:00Z`));
 
-/** PWA siswa (ORT-02): today, the dynamic card, and the last 30 days. Also serves parents' children. */
+/** PWA siswa (ORT-02; U7a): today, the dynamic card, and the history. Also serves parents' children. */
 export default function PortalHome() {
   const router = useRouter();
   const { me, schoolId, hasRole, selectSchool } = useWorkspace();
@@ -32,7 +33,8 @@ export default function PortalHome() {
   const parent = hasRole('orang_tua');
   const [days, setDays] = useState<HistoryRange>(30);
   const [data, setData] = useState<PortalAttendance | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<'error' | 'offline' | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   // A parent sees one child at a time (picked at the top, any school); a siswa sees themselves.
   const ready = parent ? selected !== null && selected.schoolId === schoolId : true;
@@ -43,139 +45,119 @@ export default function PortalHome() {
     api(`/portal/attendance?${query.toString()}`, PortalAttendance, { schoolId })
       .then((res) => {
         setData(res);
-        setError(null);
+        setFailure(null);
       })
-      .catch((err: unknown) => setError(err instanceof ApiError ? err.message : 'Tidak bisa memuat kehadiran. Periksa internet.'));
-  }, [schoolId, allowed, ready, parent, selected, days]);
+      .catch((err: unknown) => setFailure(isTransient(err) ? 'offline' : 'error'));
+  }, [schoolId, allowed, ready, parent, selected, days, attempt]);
 
   async function leave() {
     await signOut();
     router.replace('/masuk/hp');
   }
 
-  if (!schoolId && (childrenStatus === 'loading' || kids.length > 0)) return <p role="status">Memuat…</p>;
+  if (!schoolId && (childrenStatus === 'loading' || kids.length > 0)) return <SkeletonRows count={3} />;
   if (!schoolId) {
     return (
-      <main className={styles.main}>
-        <h1 className={styles.title}>Pilih sekolah</h1>
-        <div className={styles.actions}>
+      <PageMain>
+        <h1 className="m-0 text-h1">{t.chooseSchool}</h1>
+        <div className="flex flex-col gap-2">
           {me.schools.map((s) => (
             <Button key={s.id} variant="secondary" onClick={() => selectSchool(s.id)}>
               {s.name}
             </Button>
           ))}
         </div>
-      </main>
+      </PageMain>
     );
   }
   if (!allowed) {
     return (
-      <main className={styles.main}>
-        <p>Halaman ini untuk siswa dan orang tua.</p>
-        {hasRole('pembimbing_industri') ? <Link href="/dudi">Ke halaman pembimbing industri</Link> : <Link href="/">Ke beranda staf</Link>}
-      </main>
+      <PageMain>
+        <p className="m-0 text-body">{t.forbidden}</p>
+        {hasRole('pembimbing_industri') ? <Link href="/dudi">{t.toIndustry}</Link> : <Link href="/">{t.toStaff}</Link>}
+      </PageMain>
     );
   }
 
   return (
-    <main className={styles.main}>
-      <p className={styles.eyebrow}>{me.schools.find((s) => s.id === schoolId)?.name}</p>
-      <h1 className={styles.title}>Halo, {me.user.name.split(/\s+/)[0]}</h1>
-      {error && <p role="alert">{error}</p>}
-      {!data && !error && <p role="status">Memuat…</p>}
+    <PageMain>
+      <header className="flex flex-col gap-1">
+        <p className="m-0 text-small text-tinta-muted">{me.schools.find((s) => s.id === schoolId)?.name}</p>
+        <h1 className="m-0 text-h1">{fill(t.hello, { name: me.user.name.split(/\s+/)[0] ?? '' })}</h1>
+      </header>
+      {failure === 'offline' && <Banner kind="offline">{t.offlineBody}</Banner>}
+      {failure === 'error' && (
+        <ErrorState title={t.loadFailed} onRetry={() => { setFailure(null); setAttempt((n) => n + 1); }}>
+          {t.loadFailedBody}
+        </ErrorState>
+      )}
+      {!data && !failure && <SkeletonRows count={3} />}
       <IfCap name="gate.enabled">
         <Cards schoolId={schoolId} only={parent ? selected?.studentId : undefined} />
       </IfCap>
-      {kaih && kaih !== 'off' && (
-        <p>
-          <Link href="/portal/kebiasaan">7 Kebiasaan Anak Indonesia Hebat: isi jurnal hari ini</Link>
-        </p>
-      )}
-      {hasRole('siswa') && (
-        <IfCap name="pkl.enabled">
-          <p>
-            <Link href="/portal/pkl">PKL: check-in di DUDI dan jurnal harian</Link>
-          </p>
+      <nav aria-label="Menu portal" className="flex flex-col gap-2">
+        {kaih && kaih !== 'off' && <LinkRow linkAs={Link} href="/portal/kebiasaan" title={t.linkHabits} detail={t.linkHabitsBody} />}
+        {hasRole('siswa') && (
+          <IfCap name="pkl.enabled">
+            <LinkRow linkAs={Link} href="/portal/pkl" title={t.linkPkl} detail={t.linkPklBody} />
+          </IfCap>
+        )}
+        <IfCap name="religious.memorization">
+          <LinkRow linkAs={Link} href="/portal/hafalan" title={t.linkMemorization} detail={t.linkMemorizationBody} />
         </IfCap>
-      )}
-      <IfCap name="religious.memorization">
-        <p>
-          <Link href="/portal/hafalan">Hafalan Al-Qur&apos;an: riwayat setoran</Link>
-        </p>
-      </IfCap>
-      <IfCap name="exam.enabled">
-        <p>
-          <Link href="/portal/ujian">Kartu ujian: ruang, tempat duduk, dan syarat</Link>
-        </p>
-      </IfCap>
-      <IfCap name="student.billing">
-        <p>
-          <Link href="/portal/tagihan">Tagihan sekolah: lihat dan bayar</Link>
-        </p>
-      </IfCap>
-      {hasRole('orang_tua') && (
-        <p>
-          <Link href="/portal/preferensi">Pesan WhatsApp: pilih yang ingin diterima</Link>
-        </p>
-      )}
-      {hasRole('orang_tua') && (
-        <IfCap name="gate.pickup">
-          <p>
-            <Link href="/portal/penjemput">Penjemput anak: siapa saja yang boleh menjemput</Link>
-          </p>
+        <IfCap name="exam.enabled">
+          <LinkRow linkAs={Link} href="/portal/ujian" title={t.linkExam} detail={t.linkExamBody} />
         </IfCap>
-      )}
-      {hasRole('orang_tua') && (
-        <IfCap name="portal.liaison">
-          <p>
-            <Link href="/portal/penghubung">Buku penghubung: pesan dengan wali kelas dan guru</Link>
-          </p>
+        <IfCap name="student.billing">
+          <LinkRow linkAs={Link} href="/portal/tagihan" title={t.linkBilling} detail={t.linkBillingBody} />
         </IfCap>
-      )}
-      <div className={styles.range} role="group" aria-label="Rentang riwayat">
-        {HISTORY_RANGES.map((r) => (
-          <Button key={r} variant={r === days ? 'primary' : 'secondary'} aria-pressed={r === days} onClick={() => setDays(r)}>
-            {r} hari
-          </Button>
-        ))}
-      </div>
+        {hasRole('orang_tua') && <LinkRow linkAs={Link} href="/portal/preferensi" title={t.linkPrefs} detail={t.linkPrefsBody} />}
+        {hasRole('orang_tua') && (
+          <IfCap name="gate.pickup">
+            <LinkRow linkAs={Link} href="/portal/penjemput" title={t.linkPickup} detail={t.linkPickupBody} />
+          </IfCap>
+        )}
+        {hasRole('orang_tua') && (
+          <IfCap name="portal.liaison">
+            <LinkRow linkAs={Link} href="/portal/penghubung" title={t.linkLiaison} detail={t.linkLiaisonBody} />
+          </IfCap>
+        )}
+      </nav>
+      <SegmentedControl
+        label={t.range}
+        value={String(days) as `${HistoryRange}`}
+        onChange={(v) => setDays(Number(v) as HistoryRange)}
+        options={HISTORY_RANGES.map((r) => ({ value: String(r) as `${HistoryRange}`, label: fill(t.rangeDays, { n: r }) }))}
+      />
       {data?.items.map((s) => (
-        <section key={s.studentId} className={styles.card} aria-label={`Kehadiran ${s.name}`}>
-          <h2>
+        <Card as="section" key={s.studentId} aria-label={fill(t.attendanceOf, { name: s.name })} className="flex flex-col gap-3">
+          <h2 className="m-0 text-h2">
             {s.name} · {s.className}
           </h2>
-          <p>
-            Hari ini: <StatusBadge status={s.today.status} />
-            {s.today.arrivedAt && <span className={styles.muted}> · tiba {timeIn(timezone, s.today.arrivedAt)}</span>}
+          <p className="m-0 flex flex-wrap items-center gap-2 text-body">
+            {t.today}: <StatusChip code={s.today.status as StatusCode | null} empty={t.notRecorded} />
+            {s.today.arrivedAt && <span className="text-tinta-muted"> · {fill(t.arrived, { time: timeIn(timezone, s.today.arrivedAt) })}</span>}
           </p>
-          <p className={styles.counts} aria-label={`${days} hari terakhir`}>
-            {(['H', 'T', 'S', 'I', 'A'] as const).map((k) => (
-              <span key={k}>
-                <strong>{s.counts[k] ?? 0}</strong> {STATUS_LABELS[k].toLowerCase()}
-              </span>
-            ))}
-          </p>
+          <CountsRow label={fill(t.countsOf, { n: days })} counts={s.counts} />
           {s.days.length === 0 ? (
-            <p className={styles.muted}>Belum ada rekap {days} hari terakhir.</p>
+            <p className="m-0 text-body text-tinta-muted">{fill(t.noRecap, { n: days })}</p>
           ) : (
-            <ul className={styles.list} aria-label="Riwayat">
+            <ul aria-label={t.history} className="m-0 flex list-none flex-col gap-1 p-0">
               {s.days.map((d) => (
-                <li key={d.date}>
+                <li key={d.date} className="flex min-h-11 items-center justify-between gap-3 border-b border-garis py-1 last:border-b-0">
                   <span>{dayLabel(d.date)}</span>
-                  <span>{STATUS_LABELS[d.status]}</span>
+                  <StatusChip code={d.status as StatusCode} />
                 </li>
               ))}
             </ul>
           )}
           {parent && <ChildLeave schoolId={schoolId} enrollmentId={s.enrollmentId} />}
-        </section>
+        </Card>
       ))}
-      <div className={styles.actions}>
-        <Button variant="secondary" onClick={() => void leave()}>
-          Keluar
-        </Button>
-      </div>
-    </main>
+      <Button variant="secondary" onClick={() => void leave()}>
+        {t.signOut}
+      </Button>
+    </PageMain>
   );
 }
 
@@ -232,29 +214,35 @@ function StudentCard({ schoolId, studentId, name }: { schoolId: string; studentI
       setKeys(k);
       setLost(false);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Tidak bisa terhubung. Coba lagi.');
+      setError(err instanceof ApiError ? err.message : t.cardFailed);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <section className={styles.card} aria-labelledby={`kartu-${studentId}`}>
-      <h2 id={`kartu-${studentId}`}>Kartu {name}</h2>
+    <Card as="section" aria-labelledby={`kartu-${studentId}`} className="flex flex-col gap-3">
+      <h2 id={`kartu-${studentId}`} className="m-0 text-h2">
+        {fill(t.cardTitle, { name })}
+      </h2>
       {keys ? (
         <CardQr keys={keys} name={name} />
       ) : (
         <>
-          <p className={styles.muted}>{lost ? 'Kartu sekarang aktif di HP lain.' : 'Kartu belum aktif di HP ini.'} Mengaktifkan di sini menghentikan kartu di HP sebelumnya.</p>
-          <div className={styles.actions}>
-            <Button disabled={busy} onClick={() => void activate()}>
-              Aktifkan kartu di HP ini
-            </Button>
-          </div>
+          <p className="m-0 text-body text-tinta-muted">
+            {lost ? t.cardLost : t.cardInactive} {t.cardNote}
+          </p>
+          <Button loading={busy} onClick={() => void activate()}>
+            {t.cardActivate}
+          </Button>
         </>
       )}
-      {error && <p role="alert">{error}</p>}
-    </section>
+      {error && (
+        <p role="alert" className="m-0 text-body text-alpa">
+          {error}
+        </p>
+      )}
+    </Card>
   );
 }
 
@@ -269,14 +257,14 @@ function ChildLeave({ schoolId, enrollmentId }: { schoolId: string; enrollmentId
   if (!items || items.length === 0) return null;
   return (
     <>
-      <h3>Izin</h3>
-      <ul className={styles.list} aria-label="Riwayat izin">
+      <h3 className="m-0 text-h3">{t.leaveTitle}</h3>
+      <ul aria-label={t.leaveList} className="m-0 flex list-none flex-col gap-1 p-0">
         {items.map((l) => (
-          <li key={l.id}>
+          <li key={l.id} className="flex min-h-11 items-center justify-between gap-3 border-b border-garis py-1 last:border-b-0">
             <span>
               {LEAVE_KIND_LABELS[l.kind]} · {dateRangeLabel(l.startsOn, l.endsOn)}
             </span>
-            <span>{LEAVE_STATUS_LABELS[l.status]}</span>
+            <span className="text-body-strong">{LEAVE_STATUS_LABELS[l.status]}</span>
           </li>
         ))}
       </ul>
