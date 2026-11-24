@@ -170,6 +170,21 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   keyed on the saved portal state so form.reset() cannot bring back the old tick.
 - E2E gets the link with absah-api `notify:last-link` (helpers.lastActionLink, dev only).
 
+## Parent portal across schools (ORT-03/04/05; (portal)/portal/children.tsx, child-picker.tsx, lib/portal-children.ts)
+- One login can be an orang tua at several schools. There is NO cross-school API call: ChildrenProvider (in the
+  signed-in portal layout) asks every school where the login is orang_tua (parentSchools(me)) for GET
+  /portal/attendance?days=1 with that school's X-School-Id, and puts the answers together (RLS decides per
+  school; a school that fails shows "Sebagian sekolah belum bisa dimuat" instead of hiding the error).
+- A child is keyed `<schoolId>:<studentId>` (childKey): a student id alone is only unique inside a school.
+  ChildPicker ("Pilih anak", aria-pressed buttons, 44px) shows only with 2+ children and names the school only
+  when there are 2+ schools. Choosing a child at another school calls selectSchool, so capabilities and the other
+  portal pages (kebiasaan, penghubung, penjemput) follow the active school. The choice is remembered in
+  localStorage (best effort); the provider renders only after the workspace loaded on the client, so reading it
+  in the useState initialiser is safe.
+- /portal for a parent shows the selected child only: GET /portal/attendance?days=30|90|180&studentId=, their
+  cards (filtered to the child) and ChildLeave (GET /leave-requests?status=all matched on enrollmentId). A siswa
+  is unchanged. Poin and tagihan history will come with 5.8 / 5.10 behind their capabilities.
+
 ## Kiosk app (apps/kiosk, GRB-02/03)
 - One page, three phases (lib/use-kiosk.ts): loading -> unpaired (PairScreen: one-time code typed,
   scanned with the camera or a USB scanner; one Idempotency-Key per code) -> ready (ScanScreen).

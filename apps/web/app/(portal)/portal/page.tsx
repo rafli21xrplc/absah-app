@@ -1,6 +1,6 @@
 'use client';
 
-import { CardDeviceKeys, MyCards, PortalAttendance } from '@absah/contracts';
+import { CardDeviceKeys, LeaveRequestList, MyCards, PortalAttendance } from '@absah/contracts';
 import { Button } from '@absah/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,8 +11,11 @@ import { signOut } from '@/lib/auth';
 import { IfCap, useCapability } from '@/lib/capabilities';
 import { loadKeys, storeKeys } from '@/lib/card';
 import { timeIn } from '@/lib/gate';
+import { dateRangeLabel, LEAVE_KIND_LABELS, LEAVE_STATUS_LABELS } from '@/lib/leave';
+import { HISTORY_RANGES, type HistoryRange } from '@/lib/portal-children';
 import { useWorkspace } from '@/lib/workspace';
 import { CardQr } from '../card-qr';
+import { useChildren } from './children';
 import styles from '../portal.module.css';
 import { StatusBadge } from '../status-badge';
 
@@ -25,21 +28,32 @@ export default function PortalHome() {
   const kaih = useCapability('habits.kaih');
   const timezone = me.schools.find((s) => s.id === schoolId)?.timezone ?? 'Asia/Jakarta';
   const allowed = hasRole('siswa', 'orang_tua');
+  const { selected, status: childrenStatus, children: kids } = useChildren();
+  const parent = hasRole('orang_tua');
+  const [days, setDays] = useState<HistoryRange>(30);
   const [data, setData] = useState<PortalAttendance | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // A parent sees one child at a time (picked at the top, any school); a siswa sees themselves.
+  const ready = parent ? selected !== null && selected.schoolId === schoolId : true;
   useEffect(() => {
-    if (!schoolId || !allowed) return;
-    api('/portal/attendance', PortalAttendance, { schoolId })
-      .then(setData)
+    if (!schoolId || !allowed || !ready) return;
+    const query = new URLSearchParams({ days: String(days) });
+    if (parent && selected) query.set('studentId', selected.studentId);
+    api(`/portal/attendance?${query.toString()}`, PortalAttendance, { schoolId })
+      .then((res) => {
+        setData(res);
+        setError(null);
+      })
       .catch((err: unknown) => setError(err instanceof ApiError ? err.message : 'Tidak bisa memuat kehadiran. Periksa internet.'));
-  }, [schoolId, allowed]);
+  }, [schoolId, allowed, ready, parent, selected, days]);
 
   async function leave() {
     await signOut();
     router.replace('/masuk/hp');
   }
 
+  if (!schoolId && (childrenStatus === 'loading' || kids.length > 0)) return <p role="status">Memuat…</p>;
   if (!schoolId) {
     return (
       <main className={styles.main}>
@@ -70,7 +84,7 @@ export default function PortalHome() {
       {error && <p role="alert">{error}</p>}
       {!data && !error && <p role="status">Memuat…</p>}
       <IfCap name="gate.enabled">
-        <Cards schoolId={schoolId} />
+        <Cards schoolId={schoolId} only={parent ? selected?.studentId : undefined} />
       </IfCap>
       {kaih && kaih !== 'off' && (
         <p>
@@ -103,6 +117,13 @@ export default function PortalHome() {
           </p>
         </IfCap>
       )}
+      <div className={styles.range} role="group" aria-label="Rentang riwayat">
+        {HISTORY_RANGES.map((r) => (
+          <Button key={r} variant={r === days ? 'primary' : 'secondary'} aria-pressed={r === days} onClick={() => setDays(r)}>
+            {r} hari
+          </Button>
+        ))}
+      </div>
       {data?.items.map((s) => (
         <section key={s.studentId} className={styles.card} aria-label={`Kehadiran ${s.name}`}>
           <h2>
@@ -112,7 +133,7 @@ export default function PortalHome() {
             Hari ini: <StatusBadge status={s.today.status} />
             {s.today.arrivedAt && <span className={styles.muted}> · tiba {timeIn(timezone, s.today.arrivedAt)}</span>}
           </p>
-          <p className={styles.counts} aria-label="30 hari terakhir">
+          <p className={styles.counts} aria-label={`${days} hari terakhir`}>
             {(['H', 'T', 'S', 'I', 'A'] as const).map((k) => (
               <span key={k}>
                 <strong>{s.counts[k] ?? 0}</strong> {STATUS_LABELS[k].toLowerCase()}
@@ -120,7 +141,7 @@ export default function PortalHome() {
             ))}
           </p>
           {s.days.length === 0 ? (
-            <p className={styles.muted}>Belum ada rekap 30 hari terakhir.</p>
+            <p className={styles.muted}>Belum ada rekap {days} hari terakhir.</p>
           ) : (
             <ul className={styles.list} aria-label="Riwayat">
               {s.days.map((d) => (
@@ -131,6 +152,7 @@ export default function PortalHome() {
               ))}
             </ul>
           )}
+          {parent && <ChildLeave schoolId={schoolId} enrollmentId={s.enrollmentId} />}
         </section>
       ))}
       <div className={styles.actions}>
@@ -143,7 +165,7 @@ export default function PortalHome() {
 }
 
 /** Cards this account holds; each is bound to this phone once and then works offline for a week. */
-function Cards({ schoolId }: { schoolId: string }) {
+function Cards({ schoolId, only }: { schoolId: string; only?: string }) {
   const [cards, setCards] = useState<MyCards['items']>([]);
   useEffect(() => {
     api('/cards/mine', MyCards, { schoolId })
@@ -152,9 +174,11 @@ function Cards({ schoolId }: { schoolId: string }) {
   }, [schoolId]);
   return (
     <>
-      {cards.map((c) => (
-        <StudentCard key={c.studentId} schoolId={schoolId} studentId={c.studentId} name={c.name.split(/\s+/)[0] ?? c.name} />
-      ))}
+      {cards
+        .filter((c) => !only || c.studentId === only)
+        .map((c) => (
+          <StudentCard key={c.studentId} schoolId={schoolId} studentId={c.studentId} name={c.name.split(/\s+/)[0] ?? c.name} />
+        ))}
     </>
   );
 }
@@ -216,5 +240,31 @@ function StudentCard({ schoolId, studentId, name }: { schoolId: string; studentI
       )}
       {error && <p role="alert">{error}</p>}
     </section>
+  );
+}
+
+/** The child's izin, newest first (parents can already read their children's requests, ORT-05). */
+function ChildLeave({ schoolId, enrollmentId }: { schoolId: string; enrollmentId: string }) {
+  const [items, setItems] = useState<LeaveRequestList['items'] | null>(null);
+  useEffect(() => {
+    api('/leave-requests?status=all', LeaveRequestList, { schoolId })
+      .then((res) => setItems(res.items.filter((l) => l.student.enrollmentId === enrollmentId).slice(0, 10)))
+      .catch(() => setItems([]));
+  }, [schoolId, enrollmentId]);
+  if (!items || items.length === 0) return null;
+  return (
+    <>
+      <h3>Izin</h3>
+      <ul className={styles.list} aria-label="Riwayat izin">
+        {items.map((l) => (
+          <li key={l.id}>
+            <span>
+              {LEAVE_KIND_LABELS[l.kind]} · {dateRangeLabel(l.startsOn, l.endsOn)}
+            </span>
+            <span>{LEAVE_STATUS_LABELS[l.status]}</span>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
