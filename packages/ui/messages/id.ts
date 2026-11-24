@@ -32,6 +32,26 @@ export const messages = {
   progress: {
     of: 'dari',
   },
+  dialog: {
+    cancel: 'Batal',
+  },
+  sheet: {
+    cancel: 'Batal',
+  },
+  drawer: {
+    close: 'Tutup',
+    cancel: 'Batal',
+  },
+  skeleton: {
+    label: 'Sedang memuat',
+  },
+  errorState: {
+    retry: 'Coba lagi',
+    pending: 'Menunggu',
+  },
+  bottomNav: {
+    label: 'Menu utama',
+  },
 } as const;
 
 export type Messages = typeof messages;
