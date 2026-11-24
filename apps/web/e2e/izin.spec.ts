@@ -29,7 +29,7 @@ test('Izin dari wali kelas mengisi sesi; dibatalkan, siswa kembali bisa dipilih'
   await page.goto('/hari-ini');
   await page.getByRole('link', { name: /VII A/ }).click();
   await expect(page.getByText('Sakit · Izin disetujui')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'ADITYA PRATAMA: Hadir' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^ADITYA PRATAMA: / })).toHaveCount(0);
   const sessionUrl = page.url();
 
   await page.goto('/izin');
@@ -41,6 +41,6 @@ test('Izin dari wali kelas mengisi sesi; dibatalkan, siswa kembali bisa dipilih'
   // The worker processes leave.cancelled; the student is a normal choice again.
   await expect(async () => {
     await page.goto(sessionUrl);
-    await expect(page.getByRole('button', { name: 'ADITYA PRATAMA: Hadir' })).toBeVisible({ timeout: 1_000 });
+    await expect(page.getByRole('button', { name: /^ADITYA PRATAMA: / })).toBeVisible({ timeout: 1_000 });
   }).toPass({ timeout: 30_000 });
 });

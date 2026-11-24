@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, generateSessions, onboardAdmin } from './helpers';
+import { createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
 
 test('Rekap: alpa hari ini masuk rekap rombel dan siswa, ekspor e-Rapor dibuat worker, pengisian sesi', async ({ page }) => {
   test.slow(); // onboarding, import, a session and the worker building the file
@@ -19,9 +19,7 @@ test('Rekap: alpa hari ini masuk rekap rombel dan siswa, ekspor e-Rapor dibuat w
   generateSessions(schoolId);
   await page.goto('/hari-ini');
   await page.getByRole('link', { name: /VII A/ }).click();
-  await page.getByRole('button', { name: 'ADITYA PRATAMA: Alpa' }).click();
-  await page.getByRole('button', { name: 'Kirim: 3 hadir, 1 tidak hadir' }).click();
-  await expect(page.getByText('Presensi tersimpan.')).toBeVisible();
+  await fillSession(page, [{ name: 'ADITYA PRATAMA', status: 'Alpa' }]);
 
   // Rekap per rombel: the current semester by default.
   await page.goto('/rekap');

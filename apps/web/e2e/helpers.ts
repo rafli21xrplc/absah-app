@@ -185,3 +185,35 @@ export async function otpLogin(page: Page, localPhone: string, next: string) {
 
 /** A 1x1 PNG: a photo for file inputs (the web turns it into a JPEG before upload). */
 export const TINY_PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
+
+export type AbsentStatus = 'Telat' | 'Izin' | 'Sakit' | 'Alpa';
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** Opens a student's choice sheet and taps one reason: two taps, as a teacher does. */
+export async function pickStatus(page: Page, name: string, status: AbsentStatus | 'Hadir'): Promise<void> {
+  await page.getByRole('button', { name: new RegExp(`^${escapeRe(name)}: `) }).click();
+  const sheet = page.getByRole('dialog', { name: `Pilih kehadiran untuk ${name}` });
+  await sheet.getByRole('button', { name: new RegExp(`^${status}:`) }).click();
+  await sheet.waitFor({ state: 'hidden' });
+}
+
+/** "Semua hadir" (or "Sisanya hadir") when there is anyone left to mark, then the named exceptions. Nothing is sent. */
+export async function markStudents(page: Page, exceptions: { name: string; status: AbsentStatus }[] = []): Promise<void> {
+  const rest = page.getByRole('button', { name: /^(Semua hadir|Sisanya hadir)/ });
+  await page.getByRole('button', { name: /: (Belum diisi|Hadir|Telat|Izin|Sakit|Alpa)\. Ketuk untuk mengubah\.$/ }).first().waitFor();
+  if (await rest.count()) await rest.click();
+  for (const e of exceptions) await pickStatus(page, e.name, e.status);
+}
+
+/** From a complete screen: "Periksa dan kirim", then "Kirim presensi" in the check sheet. Does not wait for the answer. */
+export async function sendReview(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Periksa dan kirim' }).click();
+  await page.getByRole('dialog', { name: 'Periksa sebelum kirim' }).getByRole('button', { name: 'Kirim presensi' }).click();
+}
+
+/** Fills the open session the way a teacher does, sends it, and waits for "Presensi X terkirim". */
+export async function fillSession(page: Page, exceptions: { name: string; status: AbsentStatus }[] = []): Promise<void> {
+  await markStudents(page, exceptions);
+  await sendReview(page);
+  await page.getByRole('heading', { name: /^Presensi .+ terkirim$/ }).waitFor();
+}

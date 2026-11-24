@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { acceptInvite, createSchool, onboardAdmin } from './helpers';
+import { acceptInvite, createSchool, fillSession, onboardAdmin } from './helpers';
 
 test('Kegiatan: admin membuat ekskul, pembina mengatur peserta dan mengisi presensi kegiatan', async ({ page, browser }) => {
   const { schoolId, inviteUrl, email } = createSchool('SMP Ekskul E2E', 'smp');
@@ -46,9 +46,7 @@ test('Kegiatan: admin membuat ekskul, pembina mengatur peserta dan mengisi prese
   await expect(coach.getByRole('heading', { name: 'Peserta (1)' })).toBeVisible();
   await coach.getByRole('button', { name: 'Presensi kegiatan hari ini' }).click();
   await expect(coach).toHaveURL(/\/sesi\//);
-  await coach.getByRole('button', { name: 'ADITYA PRATAMA: Alpa' }).click();
-  await coach.getByRole('button', { name: 'Kirim: 0 hadir, 1 tidak hadir' }).click();
-  await expect(coach.getByText('Presensi tersimpan.')).toBeVisible();
+  await fillSession(coach, [{ name: 'ADITYA PRATAMA', status: 'Alpa' }]);
 
   // The rekap kegiatan counts it, separate from the class rekap.
   await coach.goBack();

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomInt, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, generateSessions, onboardAdmin } from './helpers';
+import { createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
 
 test('MBG: admin mengatur jam batas dan PIC, alpa tidak dihitung hadir', async ({ page }) => {
   test.slow(); // onboarding, import and a session
@@ -20,9 +20,7 @@ test('MBG: admin mengatur jam batas dan PIC, alpa tidak dihitung hadir', async (
   generateSessions(schoolId);
   await page.goto('/hari-ini');
   await page.getByRole('link', { name: /VII A/ }).click();
-  await page.getByRole('button', { name: 'ADITYA PRATAMA: Alpa' }).click();
-  await page.getByRole('button', { name: 'Kirim: 3 hadir, 1 tidak hadir' }).click();
-  await expect(page.getByText('Presensi tersimpan.')).toBeVisible();
+  await fillSession(page, [{ name: 'ADITYA PRATAMA', status: 'Alpa' }]);
 
   // Off by default: the page answers 404 until the school receives MBG.
   await page.goto('/mbg');

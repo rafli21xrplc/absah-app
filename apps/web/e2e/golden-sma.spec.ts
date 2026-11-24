@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, generateSessions, onboardAdmin } from './helpers';
+import { createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
 
 /** ISO weekday (1 = Senin) of today in Jakarta: the lesson is put on today, whatever day CI runs. */
 const todayIsoDay = () => {
@@ -55,9 +55,7 @@ test('SMA: kelompok belajar lintas rombel, sesi kelompok, jam siswa, dan rekap k
   generateSessions(schoolId);
   await page.goto('/hari-ini');
   await page.getByRole('link', { name: /Fisika A · Fisika/ }).click();
-  await page.getByRole('button', { name: 'ADITYA PRATAMA: Alpa' }).click();
-  await page.getByRole('button', { name: 'Kirim: 1 hadir, 1 tidak hadir' }).click();
-  await expect(page.getByText('Presensi tersimpan.')).toBeVisible();
+  await fillSession(page, [{ name: 'ADITYA PRATAMA', status: 'Alpa' }]);
 
   // The wali kelas of VII A sees the group lesson in each student's day.
   await page.goto('/jam-siswa');

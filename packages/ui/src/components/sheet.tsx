@@ -30,12 +30,30 @@ export function Sheet({ open, onOpenChange, title, eyebrow, children, cancelLabe
         <RDialog.Content
           aria-describedby={undefined}
           onCloseAutoFocus={restoreFocus}
-          className="fixed inset-x-0 bottom-0 z-50 flex max-h-dvh flex-col gap-4 overflow-y-auto rounded-t-lg border border-b-0 border-garis bg-kapur-raised px-4 pb-4 pt-3 text-tinta sm:mx-auto sm:max-w-120"
+          // Focus lands on the sheet itself, not on its first field: on a phone a focused text field opens the keyboard over what the person came to read.
+          tabIndex={-1}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+            (e.currentTarget as HTMLElement).focus();
+          }}
+          className="outline-none fixed inset-x-0 bottom-0 z-50 flex max-h-dvh flex-col gap-4 overflow-y-auto rounded-t-lg border border-b-0 border-garis bg-kapur-raised px-4 pb-4 pt-3 text-tinta sm:mx-auto sm:max-w-120"
         >
           <div aria-hidden className="mx-auto h-1 w-10 rounded-full bg-garis-kuat" />
           <header className="flex flex-col">
-            {eyebrow && <p className="m-0 text-small text-tinta-muted">{eyebrow}</p>}
-            <RDialog.Title className="m-0 text-h2">{title}</RDialog.Title>
+            {eyebrow && (
+              <p aria-hidden className="m-0 text-small text-tinta-muted">
+                {eyebrow}
+              </p>
+            )}
+            {/* The eyebrow is read as part of the name ("Pilih kehadiran untuk Gilang"), shown once. */}
+            <RDialog.Title className="m-0 text-h2">
+              {eyebrow && (
+                <>
+                  <span className="sr-only">{eyebrow}</span>{' '}
+                </>
+              )}
+              {title}
+            </RDialog.Title>
           </header>
           {children}
           <RDialog.Close asChild>
