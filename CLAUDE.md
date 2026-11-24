@@ -59,6 +59,10 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   API's `school:create` CLI. Never point E2E_DATABASE_URL at a shared database.
 - Specs cannot import @absah/* source (Playwright does not transpile node_modules): check through the API.
 - CI job e2e checks out absah-api at the commit pinned in apps/web/package.json.
+- The kiosk runs in e2e as it ships: `next build` (static export, NEXT_PUBLIC_API_URL = the e2e API)
+  served by e2e/static-server.ts on 3711 (KIOSK_ORIGINS on the API). Kiosk specs use their own
+  browser context with serviceWorkers: 'block' (so page.route sees API calls) and page.clock.
+  Card tokens come from helpers.cardToken with keys from absah-api `gate:load-fixture` (dev only).
 
 ## Student data pages (apps/web/app/(staf)/siswa, rombel, import)
 - Role gates mirror the API (lib/student-access.ts): readers admin/operator/kepsek/wakasek,
@@ -95,6 +99,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   school timezone, lib/leave.ts todayIn), reason, optional photo/PDF (presign -> PUT -> id).
   Entered by the wali kelas = approved at once; the session screen shows the student fixed.
 - Parents get the same flow in the portal and action links (prompt 3.3).
+
+## Gate pages (apps/web/app/(staf)/gerbang, gerbang/kios)
+- Menu "Gerbang" for GATE_VIEWERS (lib/gate.ts) when gate.enabled. /gerbang: GET /gate/today
+  (counts, late list, not-arrived list with approved izin flagged); "Catat datang" (ARRIVAL_RECORDERS)
+  posts /gate/arrivals with a required reason, one Idempotency-Key per form.
+- /gerbang/kios (admin, operator): "Buat kode pasang" shows the one-time code as QR (qrcode) and
+  text; list of kiosks with online/offline, last heartbeat, queue size and version, refreshed every
+  30 s; "Cabut" revokes after a confirm.
 
 ## Kiosk app (apps/kiosk, GRB-02/03)
 - One page, three phases (lib/use-kiosk.ts): loading -> unpaired (PairScreen: one-time code typed,
