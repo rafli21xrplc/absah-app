@@ -19,7 +19,7 @@ const TARGET_LABELS = { erapor: 'e-Rapor', rdm: 'RDM (uji coba)' } as const;
 export function ExportButtons({ semesterId, classId, stream }: { semesterId: string; classId?: string; stream?: ClassStream }) {
   const { schoolId } = useWorkspace();
   const target = useCapability('report.target') ?? 'erapor';
-  const [busy, setBusy] = useState<ExportFormat | null>(null);
+  const [busy, setBusy] = useState<ExportFormat | 'character' | null>(null);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   // Stops polling when the page is left. Reset on mount: StrictMode mounts, cleans up and mounts again.
   const cancelled = useRef(false);
@@ -30,12 +30,16 @@ export function ExportButtons({ semesterId, classId, stream }: { semesterId: str
     };
   }, []);
 
-  async function run(format: ExportFormat) {
+  /** `character`: the semester character report of the rombel (KEG-04), a PDF with one page per student. */
+  async function run(format: ExportFormat | 'character') {
     if (!schoolId) return;
     setBusy(format);
     setMessage({ ok: true, text: 'Menyiapkan berkas…' });
     try {
-      let job = await api('/exports', ExportJob, { method: 'POST', schoolId, idempotencyKey: newIdempotencyKey(), body: { format, semesterId, classId, stream } });
+      let job =
+        format === 'character'
+          ? await api('/exports/character-reports', ExportJob, { method: 'POST', schoolId, idempotencyKey: newIdempotencyKey(), body: { semesterId, classId } })
+          : await api('/exports', ExportJob, { method: 'POST', schoolId, idempotencyKey: newIdempotencyKey(), body: { format, semesterId, classId, stream } });
       while (job.status === 'queued') {
         await new Promise((r) => setTimeout(r, POLL_MS));
         if (cancelled.current) return;
@@ -65,6 +69,11 @@ export function ExportButtons({ semesterId, classId, stream }: { semesterId: str
         <Button variant="secondary" disabled={busy !== null} onClick={() => void run('pdf')}>
           {busy === 'pdf' ? 'Menyiapkan…' : 'PDF arsip (tanda tangan)'}
         </Button>
+        {classId && (
+          <Button variant="secondary" disabled={busy !== null} onClick={() => void run('character')}>
+            {busy === 'character' ? 'Menyiapkan…' : 'Rapor karakter (PDF)'}
+          </Button>
+        )}
       </div>
       {message && (
         <p role={message.ok ? 'status' : 'alert'} className={message.ok ? styles.muted : undefined}>

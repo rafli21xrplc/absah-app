@@ -11,6 +11,7 @@ import { offlineStore } from '@/lib/offline-queue';
 import { IfCap, useCapability } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { CORRECTION_DECIDERS } from '@/lib/attendance';
+import { DASHBOARD_READERS } from '@/lib/dashboard';
 import { GATE_VIEWERS } from '@/lib/gate';
 import { HABIT_SUMMARY_READERS } from '@/lib/habits';
 import { JOURNAL_VIEWERS } from '@/lib/journal';
@@ -81,6 +82,11 @@ export default function StafHome() {
       </p>
       <h1 className={styles.title}>Halo, {me.user.name}</h1>
       <nav className={styles.list} aria-label="Menu">
+        {hasRole(...DASHBOARD_READERS) && (
+          <Link className={styles.card} href="/dasbor">
+            Dasbor sekolah
+          </Link>
+        )}
         <Link className={styles.card} href="/hari-ini">
           Presensi hari ini
         </Link>
