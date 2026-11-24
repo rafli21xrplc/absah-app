@@ -482,6 +482,19 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   (own attendance % and the minimum, count of open installments, never an amount), ruleSummary, examWindowLabel and
   checkInProblem (API reason/cardReason -> what the pengawas does next).
 
+## Tagihan siswa, staff pages (apps/web/app/(staf)/tagihan-siswa; TGH-01/02/04)
+- Home card "Tagihan siswa" (STUDENT_BILLING_READING, behind student.billing). /tagihan-siswa lists GET
+  /student-billing/bills with filters (status default "Belum lunas", jenis, rombel, periode, hanya lewat jatuh tempo);
+  "Batalkan" (prompt for a reason, POST .../void) only for managers on an open bill with nothing paid (the API refuses
+  has_payments anyway). Links: /rekap for readers, /terbitkan and /jenis for bendahara + admin.
+- /jenis: fee types (POST, PATCH active / defaultAmount via prompt; never deleted). Changing the amount does not touch bills.
+- /terbitkan: jenis, periode, optional judul and nominal, target rombel or angkatan, "Dibayar dalam" 1..12 with a preview from
+  evenInstallments, then POST /student-billing/issue with ONE Idempotency-Key per form state (any change renews it). The
+  answer says how many were created and how many were skipped because they already existed. Rombel come from
+  GET /student-billing/classes (the bendahara cannot read /classes).
+- /rekap: GET /student-billing/recap?month=&feeTypeId=: money received that month by day and method, a notice when payments
+  were flagged (counted for nothing), and owed per rombel. Only the answer to the current month/filter is shown (loaded.key).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
