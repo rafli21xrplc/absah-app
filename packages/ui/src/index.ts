@@ -38,3 +38,4 @@ export { DataHeader, type DataHeaderProps } from './features/data/data-page';
 export { ExitDialog, type ExitDialogProps, type ExitReason } from './features/data/exit-dialog';
 export { WeekGrid, type WeekGridCell, type WeekGridProps, type WeekGridRow } from './features/jadwal/week-grid';
 export { ChildTabs, CountsRow, LinkRow, StatusChip, type ChildTab } from './features/portal/portal-parts';
+export { ChoiceGroup, PresetSummary, Stepper, WizardNav, type Choice, type StepperItem } from './features/setup/setup-parts';
