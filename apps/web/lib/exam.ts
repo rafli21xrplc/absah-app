@@ -106,3 +106,13 @@ export function periodBody(f: PeriodForm) {
     feeTypeIds: f.requirePaid ? f.feeTypeIds : [],
   };
 }
+
+export type ExamCardView = 'over' | 'arrived' | 'before' | 'blocked' | 'show';
+
+/** What the student's exam card shows today (a school date, YYYY-MM-DD): the QR only on an exam day, only to someone who may sit. */
+export function examCardView(exam: { period: { startsOn: string; endsOn: string }; eligible: boolean; arrived: boolean }, today: string): ExamCardView {
+  if (today > exam.period.endsOn) return 'over';
+  if (exam.arrived) return 'arrived';
+  if (today < exam.period.startsOn) return 'before';
+  return exam.eligible ? 'show' : 'blocked';
+}

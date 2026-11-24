@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkInProblem, EMPTY_PERIOD_FORM, examWindowLabel, formFromPeriod, periodBody, periodProblem, reasonLabel, ruleSummary } from './exam';
+import { checkInProblem, examCardView, EMPTY_PERIOD_FORM, examWindowLabel, formFromPeriod, periodBody, periodProblem, reasonLabel, ruleSummary } from './exam';
 
 describe('reasonLabel', () => {
   it('says the student’s own number and the minimum, and how many installments are open, never an amount', () => {
@@ -65,5 +65,23 @@ describe('period form', () => {
     const form = formFromPeriod(period);
     expect(form).toMatchObject({ useMin: false, attendanceFrom: '2026-07-13', excusedCounts: false, requirePaid: true, feeTypeIds: ['f'] });
     expect(periodBody(form)).toEqual({ name: 'PAS', startsOn: '2026-12-01', endsOn: '2026-12-05', minAttendance: null, attendanceFrom: '2026-07-13', excusedCounts: false, requirePaid: true, feeTypeIds: ['f'] });
+  });
+});
+
+describe('examCardView', () => {
+  const exam = (o: Partial<{ eligible: boolean; arrived: boolean }> = {}) => ({ period: { startsOn: '2026-12-01', endsOn: '2026-12-03' }, eligible: true, arrived: false, ...o });
+
+  it('shows the QR only on an exam day to someone who may sit and has not arrived', () => {
+    expect(examCardView(exam(), '2026-12-01')).toBe('show');
+    expect(examCardView(exam(), '2026-12-03')).toBe('show');
+    expect(examCardView(exam(), '2026-11-30')).toBe('before');
+    expect(examCardView(exam(), '2026-12-04')).toBe('over');
+  });
+
+  it('turns away the one who may not sit, and thanks the one who is already in', () => {
+    expect(examCardView(exam({ eligible: false }), '2026-12-02')).toBe('blocked');
+    expect(examCardView(exam({ eligible: false }), '2026-11-30')).toBe('before'); // still time to settle it
+    expect(examCardView(exam({ arrived: true }), '2026-12-02')).toBe('arrived');
+    expect(examCardView(exam({ arrived: true }), '2026-12-04')).toBe('over');
   });
 });
