@@ -32,3 +32,11 @@ describe('workHoursLabel', () => {
     expect(workHoursLabel([], DAY_LABELS)).toBe('Belum ada hari kerja');
   });
 });
+
+describe('clockIn', () => {
+  it('shows the school clock', async () => {
+    const { clockIn } = await import('./pkl');
+    expect(clockIn('2027-01-12T00:52:00Z', 'Asia/Jakarta')).toBe('07.52');
+    expect(clockIn('2027-01-12T00:52:00Z', 'Asia/Makassar')).toBe('08.52');
+  });
+});
