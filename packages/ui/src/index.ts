@@ -37,3 +37,4 @@ export { AlertRow, BarList, BoardSection, StatusBoard, type AlertRowProps, type 
 export { DataHeader, type DataHeaderProps } from './features/data/data-page';
 export { ExitDialog, type ExitDialogProps, type ExitReason } from './features/data/exit-dialog';
 export { WeekGrid, type WeekGridCell, type WeekGridProps, type WeekGridRow } from './features/jadwal/week-grid';
+export { ChildTabs, CountsRow, LinkRow, StatusChip, type ChildTab } from './features/portal/portal-parts';
