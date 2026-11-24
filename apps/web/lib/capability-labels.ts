@@ -24,6 +24,7 @@ export const CAPABILITY_LABELS: Record<CapabilityKey, string> = {
   'student.billing': 'Tagihan siswa: SPP, kegiatan, dan pembayaran',
   'exam.enabled': 'Ujian: boleh ujian, ruang, dan absen ujian',
   'portal.liaison': 'Buku penghubung',
+  'platform.openApi': 'API terbuka dan webhook untuk pihak ketiga',
   'data.source': 'Sumber data siswa',
   'report.target': 'Ekspor rapor',
 };
