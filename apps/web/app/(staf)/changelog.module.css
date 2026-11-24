@@ -1,0 +1,38 @@
+.card {
+  margin: 0 0 20px;
+  padding: 16px;
+  border: 1px solid var(--absah-border);
+  border-radius: var(--absah-radius);
+  background: var(--absah-surface);
+  display: grid;
+  gap: 8px;
+}
+.heading {
+  margin: 0;
+  font-size: 18px;
+}
+.date {
+  margin: 0;
+  color: var(--absah-muted);
+  font-size: 14px;
+}
+.sub {
+  margin: 8px 0 0;
+  font-size: 16px;
+}
+.list {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+}
+.body p {
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
