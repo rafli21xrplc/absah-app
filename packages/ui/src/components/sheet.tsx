@@ -1,3 +1,5 @@
+'use client';
+
 import * as RDialog from '@radix-ui/react-dialog';
 import type { ReactNode } from 'react';
 import { messages } from '../../messages/id';

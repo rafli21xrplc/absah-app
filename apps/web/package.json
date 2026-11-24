@@ -16,6 +16,7 @@
     "@absah/capabilities": "github:rafli21xrplc/absah-api#0ff5db9a073c540cb7132bc467cd11b80e280b74&path:/packages/capabilities",
     "@absah/contracts": "github:rafli21xrplc/absah-api#0ff5db9a073c540cb7132bc467cd11b80e280b74&path:/packages/contracts",
     "@absah/ui": "workspace:*",
+    "lucide-react": "^1.79.0",
     "next": "^16.4.6",
     "qrcode": "1.5.4",
     "react": "^19.3.1",

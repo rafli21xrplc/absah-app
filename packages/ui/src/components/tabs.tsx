@@ -1,3 +1,5 @@
+'use client';
+
 import * as RTabs from '@radix-ui/react-tabs';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { cx } from '../cx';

@@ -49,7 +49,8 @@ test('MA: import EMIS, ibadah berjamaah, setoran hafalan dilihat siswa, rekap pe
   await acceptInvite(ustadz, ((await invited.json()) as { inviteUrl: string }).inviteUrl, ustadzEmail);
   await expect(ustadz).not.toHaveURL(/\/masuk/);
   await ustadz.goto('/');
-  await ustadz.getByRole('link', { name: 'Setoran hafalan' }).click();
+  // The side menu has the same link; the home card sits in the page's main.
+  await ustadz.getByRole('main').getByRole('link', { name: 'Setoran hafalan' }).click();
   await ustadz.getByLabel('Cari siswa').fill('ahmad');
   await ustadz.getByRole('button', { name: 'AHMAD FAUZAN · X IPA 1' }).click();
   await ustadz.getByLabel('Surah').selectOption({ label: '67. Al-Mulk (30 ayat)' });

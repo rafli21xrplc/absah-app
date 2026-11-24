@@ -658,6 +658,17 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - Setiap komponen baru: satu story, satu tes aksesibilitas, dan keempat keadaan di atas.
 - Jangan menambah dependensi tanpa menulis alasannya di deskripsi PR.
 
+### Kerangka halaman (U3)
+- Menu staf adalah data di `apps/web/lib/nav-menu.ts` (`STAFF_MENU`): label, rute, ikon, syarat peran dan capability. Menu samping
+  (>= 1024 px), lembar menu di HP, dan kelak bilah bawah membacanya lewat `visibleMenu`. Halaman baru yang perlu menu: tambahkan
+  satu entri di sana, dengan daftar peran dari `lib/*` yang sama dengan halamannya. Entri yang tidak boleh dilihat tidak dirender.
+  Tes memeriksa tiap tautan menunjuk `app/(staf)/<rute>/page.tsx` dan berkas itu tidak menyebut jenjang.
+- `StaffShell` (`app/(staf)/staff-shell.tsx`) membungkus semua halaman staf. Halaman tetap memiliki `<main>` sendiri; kerangka bukan
+  landmark `main`. `/sesi/` tidak memakai bilah atas di HP. Tautan menu tidak di-prefetch.
+- Setiap route group punya `loading.tsx`, `error.tsx`, `not-found.tsx` dari `@absah/ui` (`LoadingPage`, `ErrorPage`, `NotFoundPage`).
+  `error.tsx` tidak pernah menampilkan teks galat itu sendiri. Berkas ini `'use client'` karena barrel `@absah/ui` memakai konteks React.
+- Portal memakai `PortalFrame` (satu kolom, maks 480 px). Kios belum memakai kerangka: header dan layarnya dikerjakan di U7d.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

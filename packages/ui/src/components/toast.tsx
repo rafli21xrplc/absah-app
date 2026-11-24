@@ -1,3 +1,5 @@
+'use client';
+
 import * as RToast from '@radix-ui/react-toast';
 import { X } from 'lucide-react';
 import type { ReactNode } from 'react';

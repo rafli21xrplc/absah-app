@@ -15,14 +15,16 @@ export interface ErrorStateProps {
   retryLabel?: string;
   /** Items waiting to be sent: shows "Menunggu · n". */
   pending?: number;
+  /** Heading level of the title, to fit the page outline (h1 when the state is the whole page). */
+  headingLevel?: 'h1' | 'h2' | 'h3';
   className?: string;
 }
 
 /** The "galat" and "tanpa sinyal" states of a list or form. An error is announced at once, offline politely. */
-export function ErrorState({ kind = 'error', title, children, onRetry, retryLabel = messages.errorState.retry, pending, className }: ErrorStateProps) {
+export function ErrorState({ kind = 'error', title, children, onRetry, retryLabel = messages.errorState.retry, pending, headingLevel: Heading = 'h2', className }: ErrorStateProps) {
   return (
     <section role={kind === 'error' ? 'alert' : 'status'} className={cx('flex flex-col items-start gap-3 rounded-lg border border-garis bg-kapur-raised p-6 text-tinta', className)}>
-      <h2 className="m-0 text-body-strong">{title}</h2>
+      <Heading className="m-0 text-body-strong">{title}</Heading>
       {children && <p className="m-0 text-body text-tinta-muted">{children}</p>}
       {pending !== undefined && pending > 0 && (
         <span className="rounded-sm bg-telat-soft px-2 py-1 text-small font-bold text-telat">

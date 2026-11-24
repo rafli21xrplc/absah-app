@@ -84,9 +84,10 @@ for (const c of cases) {
 
     // Home with the menu filtered by capabilities
     await expect(page.getByRole('heading', { name: 'Halo, Admin E2E' })).toBeVisible();
-    await expect(page.getByText(c.school)).toBeVisible();
-    await expect(page.getByRole('navigation', { name: 'Menu' }).getByText(c.menuOn, { exact: true })).toBeVisible();
-    await expect(page.getByRole('navigation', { name: 'Menu' }).getByText(c.menuOff, { exact: true })).toHaveCount(0);
+    // The side menu repeats the school name, so look inside the page itself.
+    await expect(page.getByRole('main').getByText(c.school)).toBeVisible();
+    await expect(page.getByRole('main').getByRole('navigation', { name: 'Menu', exact: true }).getByText(c.menuOn, { exact: true })).toBeVisible();
+    await expect(page.getByRole('main').getByRole('navigation', { name: 'Menu', exact: true }).getByText(c.menuOff, { exact: true })).toHaveCount(0);
 
     // Every capability equals the level preset, except the MBG answer; nothing is pending.
     const res = await page.request.get('/api/v1/school/capabilities', { headers: { 'x-school-id': schoolId } });

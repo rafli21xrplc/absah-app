@@ -42,6 +42,11 @@ export function useCapability<K extends CapabilityKey>(key: K): CapabilityValues
   return useContext(CapabilitiesContext)[key];
 }
 
+/** All capabilities of the active school at once, for code that decides many things (the menu). */
+export function useCapabilities(): Partial<CapabilityValues> {
+  return useContext(CapabilitiesContext);
+}
+
 /**
  * Renders children only when a boolean capability is on, e.g. menu entries:
  *   <IfCap name="gate.pickup"><NavLink href="/penjemputan">Penjemputan</NavLink></IfCap>
