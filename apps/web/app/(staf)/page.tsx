@@ -176,9 +176,6 @@ export default function StafHome() {
             Penjemputan
           </Link>
         </IfCap>
-        <IfCap name="pkl.enabled">
-          <span className={styles.card}>PKL</span>
-        </IfCap>
         {hasRole(...MBG_READERS) && (
           <IfCap name="mbg.enabled">
             <MbgCard />

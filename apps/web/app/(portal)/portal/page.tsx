@@ -77,6 +77,13 @@ export default function PortalHome() {
           <Link href="/portal/kebiasaan">7 Kebiasaan Anak Indonesia Hebat: isi jurnal hari ini</Link>
         </p>
       )}
+      {hasRole('siswa') && (
+        <IfCap name="pkl.enabled">
+          <p>
+            <Link href="/portal/pkl">PKL: check-in di DUDI dan jurnal harian</Link>
+          </p>
+        </IfCap>
+      )}
       <IfCap name="religious.memorization">
         <p>
           <Link href="/portal/hafalan">Hafalan Al-Qur&apos;an: riwayat setoran</Link>
