@@ -1,0 +1,10 @@
+/* Tailwind v4 without its preflight: the pages written before the design system (CSS modules) keep their own
+   resets until they are moved over, so only the theme and the utilities are loaded. */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import '@absah/ui/tokens.css';
+@import '@absah/ui/base.css';
+@import '@absah/ui/legacy.css';
+
+/* Classes used inside the shared components are found here too. */
+@source '../../../packages/ui/src';

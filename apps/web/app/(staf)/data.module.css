@@ -134,6 +134,12 @@
   padding: 12px 16px;
   margin: 16px 0;
 }
+/* Notices that link somewhere are anchors: without display:block the padding box of an inline anchor spills over the next
+   link when its text wraps (it broke /gerbang on a phone once the page font got wider). */
+a.notice {
+  display: block;
+  color: inherit;
+}
 .dropzone {
   display: grid;
   gap: 8px;

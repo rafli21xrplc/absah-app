@@ -10,7 +10,8 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "update:shared": "pnpm -r update @absah/contracts @absah/capabilities"
+    "update:shared": "pnpm -r update @absah/contracts @absah/capabilities",
+    "tokens:build": "pnpm --filter @absah/ui tokens:build"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

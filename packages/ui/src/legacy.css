@@ -1,0 +1,16 @@
+/* Temporary aliases for the 14 CSS modules written before the design system. Each old name points at the token that
+   replaced it. Delete a line when no file uses the variable any more; delete the file when none is left. */
+:root {
+  --absah-bg: var(--kapur);
+  --absah-surface: var(--kapur-raised);
+  --absah-text: var(--tinta);
+  --absah-muted: var(--tinta-muted);
+  --absah-border: var(--garis);
+  --absah-primary: var(--papan);
+  --absah-primary-text: var(--on-papan);
+  --absah-hadir: var(--hadir);
+  --absah-telat: var(--telat);
+  --absah-alpa: var(--alpa);
+  --absah-radius: var(--radius-md);
+  --absah-font: var(--font-sans);
+}

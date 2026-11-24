@@ -121,6 +121,11 @@ dan tangkapan layar. Batas PR dari CLAUDE.md: sekitar 600 baris berubah.
 
 ## 6. Pertanyaan terbuka
 
+**Terjawab 2026-11-24:** pertanyaan 1 (styling): pindah ke Tailwind v4, tanpa preflight sampai halaman lama dipindah.
+Pertanyaan 8 (warna): disetujui, seluruh aplikasi mengikuti `tokens.json`. Animasi untuk sisi admin lewat pustaka (GSAP) juga
+diminta; dikerjakan di PR terpisah setelah token, hanya untuk web staf di layar lebar, memuat lazy, dan menghormati
+`prefers-reduced-motion` (aturan CLAUDE.md untuk HP guru: tanpa animasi berat). Sisanya masih terbuka.
+
 Pertanyaan ini perlu jawaban pemilik produk sebelum fase yang disebut dimulai. Tidak ada yang menghalangi U1.
 
 1. **Styling (sebelum U1).** Tetap CSS modules dengan token variabel CSS (disarankan, tanpa mengubah 14 berkas CSS dan kios), atau pindah ke Tailwind v4 seperti bawaan prompt? Pindah berarti menulis ulang gaya seluruh aplikasi.

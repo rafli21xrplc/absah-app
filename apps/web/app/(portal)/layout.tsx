@@ -1,3 +1,4 @@
+import { color } from '@absah/ui/tokens';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { PortalServiceWorker } from './service-worker';
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
   icons: { apple: '/icons/apple-touch-icon.png' },
 };
 
-export const viewport: Viewport = { themeColor: '#0f766e' };
+export const viewport: Viewport = { themeColor: color.papan.light };
 
 export default function PortalLayout({ children }: { children: ReactNode }) {
   return (
