@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { anyPending, deliveryError, eventLabel, keyState, parseRate, toggle, webhookInput } from './integration';
+import { anyPending, AUTO_OFF_NOTE, deliveryError, eventLabel, hookState, keyState, parseRate, toggle, webhookInput } from './integration';
 
 describe('integration helpers (PLT-09)', () => {
   it('names a key by what happened to it, revoked first', () => {
@@ -51,5 +51,12 @@ describe('integration helpers (PLT-09)', () => {
     expect(anyPending([{ status: 'delivered' }, { status: 'failed' }])).toBe(false);
     expect(anyPending([{ status: 'delivered' }, { status: 'pending' }])).toBe(true);
     expect(anyPending([])).toBe(false);
+  });
+
+  it('tells an address the admin switched off from one Absah switched off, and says what to do', () => {
+    expect(hookState({ active: true, disabledReason: null })).toBe('on');
+    expect(hookState({ active: false, disabledReason: null })).toBe('off');
+    expect(hookState({ active: false, disabledReason: 'too_many_failures' })).toBe('auto_off');
+    expect(AUTO_OFF_NOTE).toBe('Absah berhenti mengirim karena 10 pengiriman terakhir gagal berturut-turut. Perbaiki penerimanya, lalu nyalakan lagi dan kirim tes.');
   });
 });
