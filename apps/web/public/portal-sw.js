@@ -2,11 +2,15 @@
 // login and static assets are handled: network first, the cache when offline, so the installed app
 // opens without signal and shows the card from the keys kept on the phone. /api is never cached
 // (personal data stays out of the cache); staff pages pass through untouched.
+// Staff session screens (PRS-08): the page shells of /hari-ini and /sesi/<id> are kept too (navigations only, plus the
+// warm-up requests /hari-ini sends with x-absah-warm), so a teacher without signal can open the session and fill it; the
+// roster itself comes from IndexedDB, never from this cache. Everything else of staff stays uncached.
 // The same worker also shows staff Web Push (NTF-06): an origin has ONE worker per scope, and a second
 // script at "/" would replace this one, so push lives here. Parents never subscribe, so for them the
 // push handlers simply never fire.
-const CACHE = 'absah-portal-v1';
+const CACHE = 'absah-portal-v2';
 const SHELL = ['/portal', '/masuk/hp'];
+const STAFF_SHELLS = [/^\/hari-ini$/, /^\/sesi\/[^/]+$/];
 const HANDLED = [/^\/portal(\/|$)/, /^\/t$/, /^\/masuk\/hp$/, /^\/_next\/static\//, /^\/icons\//, /^\/manifest\.webmanifest$/];
 
 self.addEventListener('install', (event) => {
@@ -31,7 +35,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET' || url.origin !== self.location.origin) return;
-  if (!HANDLED.some((re) => re.test(url.pathname))) return;
+  const staffShell = STAFF_SHELLS.some((re) => re.test(url.pathname)) && (event.request.mode === 'navigate' || event.request.headers.get('x-absah-warm') === '1');
+  if (!staffShell && !HANDLED.some((re) => re.test(url.pathname))) return;
   event.respondWith(
     fetch(event.request)
       .then((res) => {

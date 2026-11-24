@@ -3,9 +3,11 @@
 import { CorrectionList, SessionDetail, type AttendanceStatus } from '@absah/contracts';
 import { Button } from '@absah/ui';
 import Link from 'next/link';
-import { use, useEffect, useMemo, useRef, useState } from 'react';
+import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
-import { SOURCE_LABELS, STATUS_LABELS } from '@/lib/attendance';
+import { SOURCE_LABELS, STATUS_LABELS, type ExceptionStatus } from '@/lib/attendance';
+import { isTransient, offlineStore, queuedId, queueSession, savedLabel, sessionCacheKey } from '@/lib/offline-queue';
+import { SESSIONS_SYNCED_EVENT } from '@/lib/sync-sessions';
 import { useWorkspace } from '@/lib/workspace';
 import forms from '../../../forms.module.css';
 import styles from '../../data.module.css';
@@ -20,7 +22,9 @@ const initialMarks = (d: SessionDetail): Marks => Object.fromEntries(d.students.
 /** Fill one session with one thumb: everyone starts Hadir, tap the exceptions, send (PRS-03). */
 export default function SesiPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { schoolId } = useWorkspace();
+  const { schoolId, me } = useWorkspace();
+  const userId = me.user.id;
+  const timezone = me.schools.find((x) => x.id === schoolId)?.timezone ?? 'Asia/Jakarta';
   const [detail, setDetail] = useState<SessionDetail | null>(null);
   const [marks, setMarks] = useState<Marks>({});
   const [correcting, setCorrecting] = useState(false);
@@ -28,18 +32,50 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
   const [topic, setTopic] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  /** Set while the roster comes from the phone's copy (no signal), and while this session waits in the queue. */
+  const [copyFrom, setCopyFrom] = useState<string | null>(null);
+  const [waiting, setWaiting] = useState(false);
   const actionKey = useRef<string | null>(null);
+
+  /** Reads the session: the API, else (no signal) the phone's copy; and what already waits in the queue. */
+  const read = useCallback(async () => {
+    const store = offlineStore();
+    const queued = (await store.queue(userId)).find((q) => q.sessionId === id) ?? null;
+    try {
+      const d = await api(`/sessions/${id}`, SessionDetail, { schoolId });
+      void store.keep(sessionCacheKey(schoolId ?? '', id), d);
+      return { d, queued, copyFrom: null as string | null, error: null as string | null };
+    } catch (err) {
+      const copy = isTransient(err) ? await store.cached(sessionCacheKey(schoolId ?? '', id)) : null;
+      const parsed = SessionDetail.safeParse(copy?.value);
+      if (copy && parsed.success) return { d: parsed.data, queued, copyFrom: savedLabel(copy.savedAt, timezone), error: null };
+      const text = err instanceof ApiError ? err.message : 'Tidak ada sinyal dan sesi ini belum tersimpan di HP. Buka lewat Hari ini saat ada sinyal.';
+      return { d: null, queued, copyFrom: null, error: text };
+    }
+  }, [schoolId, id, userId, timezone]);
+
+  const apply = useCallback((r: Awaited<ReturnType<typeof read>>) => {
+    if (!r.d) {
+      setMessage({ ok: false, text: r.error ?? 'Tidak bisa memuat sesi.' });
+      return;
+    }
+    setCopyFrom(r.copyFrom);
+    setDetail(r.d);
+    // A session waiting to be sent shows the answers that were given, not the roster's older ones.
+    const base = initialMarks(r.d);
+    for (const e of r.queued?.exceptions ?? []) base[e.enrollmentId] = e.status;
+    setMarks(base);
+    setTopic(r.queued?.topic ?? r.d.topic ?? '');
+    setWaiting(r.queued !== null);
+  }, []);
 
   useEffect(() => {
     if (!schoolId) return;
-    api(`/sessions/${id}`, SessionDetail, { schoolId })
-      .then((d) => {
-        setDetail(d);
-        setMarks(initialMarks(d));
-        setTopic(d.topic ?? '');
-      })
-      .catch((err: unknown) => setMessage({ ok: false, text: err instanceof ApiError ? err.message : 'Tidak bisa memuat sesi.' }));
-  }, [schoolId, id]);
+    const reload = () => void read().then(apply);
+    reload();
+    window.addEventListener(SESSIONS_SYNCED_EVENT, reload);
+    return () => window.removeEventListener(SESSIONS_SYNCED_EVENT, reload);
+  }, [schoolId, read, apply]);
 
   const locked = detail ? detail.status === 'locked' || detail.status === 'missed' : false;
   const editable = detail ? (detail.canFill && !locked) || correcting : false;
@@ -77,7 +113,28 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
       const exceptions = detail.students
         .filter((s) => !s.fixed && marks[s.enrollmentId] !== 'H')
         .map((s) => ({ enrollmentId: s.enrollmentId, status: marks[s.enrollmentId] }));
-      const saved = await api(`/sessions/${id}/submit`, SessionDetail, { method: 'POST', body: lesson ? { exceptions, topic: topic.trim() } : { exceptions }, schoolId, idempotencyKey });
+      let saved: SessionDetail;
+      try {
+        saved = await api(`/sessions/${id}/submit`, SessionDetail, { method: 'POST', body: lesson ? { exceptions, topic: topic.trim() } : { exceptions }, schoolId, idempotencyKey });
+      } catch (err) {
+        if (!isTransient(err) || !schoolId) throw err;
+        // No signal (PRS-08): keep it on the phone; it goes out by itself, and a lock meanwhile becomes a correction request.
+        await queueSession({
+          id: queuedId(userId, id),
+          userId,
+          schoolId,
+          sessionId: id,
+          title: detail.owner.name + (detail.subject ? ` · ${detail.subject.name}` : ''),
+          exceptions: exceptions.map((e) => ({ enrollmentId: e.enrollmentId, status: e.status as ExceptionStatus })),
+          ...(lesson ? { topic: topic.trim() } : {}),
+          capturedAt: new Date().toISOString(),
+          idempotencyKey: newIdempotencyKey(),
+        });
+        setWaiting(true);
+        setMessage({ ok: true, text: 'Tidak ada sinyal. Presensi disimpan di HP dan dikirim otomatis saat sinyal kembali.' });
+        return;
+      }
+      setWaiting(false);
       setDetail(saved);
       setMarks(initialMarks(saved));
       setTopic(saved.topic ?? '');
@@ -117,6 +174,8 @@ export default function SesiPage({ params }: { params: Promise<{ id: string }> }
       <p className={styles.muted}>
         {detail.period ? `Jam ke-${detail.period.number}, ${detail.period.startsAt}–${detail.period.endsAt}` : 'Presensi harian'} · {detail.students.length} siswa
       </p>
+      {copyFrom && <p className={forms.hint}>Tanpa sinyal: daftar siswa dari salinan di HP (pukul {copyFrom}).</p>}
+      {waiting && <p className={forms.hint}>Menunggu dikirim. Anda bisa mengubah jawaban lalu mengirim lagi; yang terakhir yang dikirim.</p>}
       {locked && !correcting && (
         <div className={styles.notice}>
           <p>Sesi ini sudah dikunci. Perubahan diajukan sebagai koreksi dan disetujui wakasek.</p>

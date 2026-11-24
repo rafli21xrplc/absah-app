@@ -535,6 +535,24 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   and exam today -> rooms -> seat VII A -> manual check-in. They do not pay or scan: paying needs the gateway worker and a
   parent login, scanning needs a card phone, both covered by the API tests and the pure helpers. CI judges these specs.
 
+## Sesi offline (PRS-08; lib/offline-queue.ts, lib/sync-sessions.ts, (staf)/offline-sync.tsx)
+- Pins api e11b771 (POST /sessions/{id}/sync, GET /gate/board, /workspace/exports). The staff layout mounts <OfflineSync>:
+  it sends the queue on load, on `online`, when the tab is visible and every 15 s while something waits, and shows what
+  happened per session (terkirim / koreksi diajukan because the session was locked meanwhile / tidak ada perubahan /
+  tidak terkirim + the API's reason). Nothing is dropped silently: only an API answer (even a refusal) removes an item;
+  no answer (TypeError, 408/429/502/503/504) keeps it, 401 keeps it for the same user.
+- Store (IndexedDB `absah-staff-offline`: `queue`, `cache`; memoryStore in tests and as fallback): the queue is keyed
+  `${userId}:${sessionId}` (filling again replaces the entry) and each item keeps its own Idempotency-Key, so a resend after
+  a lost reply gets the same answer. capturedAt is the moment of "Kirim". The cache holds copies of /me/context, the Hari ini
+  list and the details of the open sessions (prefetched by /hari-ini), shown with "Tanpa sinyal ... pukul HH.MM". Sign-out
+  clears the copies (rosters) but not the queue.
+- /sesi/[id]: on a transient failure the submit is queued instead of failing ("Disimpan di HP"); a session waiting in the queue
+  shows the answers that were given. Corrections of locked sessions are NOT queued (they need a reason and a decision).
+- public/portal-sw.js (cache v2) also keeps the page shells of /hari-ini and /sesi/<id> (navigations, plus the x-absah-warm
+  requests /hari-ini sends), never API responses; registered by the staff layout in production only.
+- e2e presensi-offline.spec.ts: `next dev` has no service worker, so "no signal" is `page.route('**/api/v1/**', abort)`;
+  two sessions of one wali kelas are filled that way, then the route is removed and the 15 s retry sends both.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
