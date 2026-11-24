@@ -307,6 +307,18 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - HafalanHistory (app/_hafalan/history.tsx, GET /memorization-logs?studentId) is shared by the staff page
   and /portal/hafalan (student, and each child of a parent from GET /portal/attendance).
 
+## PKL staff pages (apps/web/app/(staf)/pkl, PKL-01)
+- Home card "PKL" for every staff member when pkl.enabled (any staff can be guru pembimbing; GET
+  /pkl/placements answers all for managers and kepsek, own students for others). lib/pkl.ts mirrors
+  canManagePkl (PKL_MANAGERS: admin, wakasek, humas_pkl) and canSeeAllPkl (PKL_OVERSEERS, + kepsek).
+- /pkl: placements (scope current|all), managers "Ubah" (PATCH endsOn + pembimbing industri; an empty
+  number keeps the stored one, the tick sends null) and "Batalkan" (POST .../cancel after a confirm).
+- /pkl/dudi: partners with workHoursLabel; managers add/edit (point pasted from Google Maps, parsed by
+  parseCoordinates; radius 25-2000; hours per weekday, Mon-Fri 08-16 by default; active tick on edit).
+- /pkl/penempatan: batch placement: DUDI, students picked from GET /pkl/students?q=, period, guru
+  pembimbing (GET /pkl/school-mentors), optional pembimbing industri (name + WhatsApp, normalizePhone).
+  409 overlap lists the picked students named in details.enrollmentIds.
+
 ## Golden e2e (5.4)
 - golden-sd.spec.ts: daily session + WA alpa, parent portal login (helpers.otpLogin reads the code with
   absah-api `auth:last-otp`), penjemput with photo (helpers.TINY_PNG) approved on /penjemputan, kiosk

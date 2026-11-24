@@ -93,6 +93,11 @@ export default function StafHome() {
         <Link className={styles.card} href="/kegiatan">
           Kegiatan
         </Link>
+        <IfCap name="pkl.enabled">
+          <Link className={styles.card} href="/pkl">
+            PKL
+          </Link>
+        </IfCap>
         <IfCap name="portal.liaison">
           <Link className={styles.card} href="/penghubung">
             Buku penghubung
