@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Absah · Setup profil jenjang</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F7F5EF}
+a{color:#1E5B4B}a:hover{color:#143F34}
+</style>
+</helmet>
+<div style="min-height: 900px; background: #F7F5EF; color: #1B2421; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 15px; line-height: 22px; display: flex; flex-direction: column">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 32px; background: #FFFFFF; border-bottom: 1px solid #E2DED3">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#1E5B4B"></rect><path d="M17 34 L28 45 L47 22" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="47" cy="14" r="6" fill="#F2C14E"></circle></svg>
+      <span style="display: flex; flex-direction: column">
+        <span style="font-weight: 700">Siapkan workspace</span>
+        <span style="font-size: 13px; line-height: 18px; color: #5B6661">SMA Absah Uji 1 · progres tersimpan otomatis</span>
+      </span>
+    </div>
+    <a href="#" style="font-weight: 600">Lanjutkan nanti</a>
+  </header>
+
+  <div style="flex: 1; width: 100%; max-width: 1180px; margin: 0 auto; box-sizing: border-box; padding: 32px; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+    <nav aria-label="Langkah setup" style="flex: 1 1 200px; max-width: 100%">
+      <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px">
+        <li style="display: flex; align-items: center; gap: 12px; min-height: 40px; color: #5B6661"><span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 9999px; background: #1E5B4B; color: #FFFFFF"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>Profil sekolah</li>
+        <li aria-current="step" style="display: flex; align-items: center; gap: 12px; min-height: 40px; font-weight: 700"><span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 9999px; border: 2px solid #1E5B4B; box-sizing: border-box; color: #1E5B4B; font-size: 13px">2</span>Jenjang</li>
+        <li style="display: flex; align-items: center; gap: 12px; min-height: 40px; color: #5B6661"><span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 9999px; border: 1px solid #848C84; box-sizing: border-box; font-size: 13px">3</span>Makan Bergizi Gratis</li>
+        <li style="display: flex; align-items: center; gap: 12px; min-height: 40px; color: #5B6661"><span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 9999px; border: 1px solid #848C84; box-sizing: border-box; font-size: 13px">4</span>Import data siswa</li>
+        <li style="display: flex; align-items: center; gap: 12px; min-height: 40px; color: #5B6661"><span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 9999px; border: 1px solid #848C84; box-sizing: border-box; font-size: 13px">5</span>Presensi gerbang</li>
+        <li style="display: flex; align-items: center; gap: 12px; min-height: 40px; color: #5B6661"><span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 9999px; border: 1px solid #848C84; box-sizing: border-box; font-size: 13px">6</span>Undang staf</li>
+      </ol>
+    </nav>
+
+    <main style="flex: 999 1 560px; min-width: 0; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+      <section style="flex: 3 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 13px; font-weight: 600; color: #5B6661">Langkah 2 dari 6</span>
+          <h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.01em">Jenjang sekolah ini</h1>
+          <p style="margin: 0; color: #5B6661">Absah menyesuaikan cara presensi dan menu dengan jenjang. Satu yayasan boleh punya beberapa sekolah dengan jenjang berbeda.</p>
+        </div>
+        <fieldset style="margin: 0; padding: 0; border: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+          <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Pilih jenjang</legend>
+          <sc-for list="{{levels}}" as="lv" hint-placeholder-count="4">
+            <button type="button" aria-pressed="{{lv.pressed}}" onClick="{{lv.pick}}" style="{{lv.cardStyle}}">
+              <span style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+                <span style="font-size: 20px; line-height: 28px; font-weight: 700">{{lv.title}}</span>
+                <span style="{{lv.radioStyle}}"></span>
+              </span>
+              <span style="font-size: 13px; line-height: 18px; color: #5B6661">{{lv.hint}}</span>
+            </button>
+          </sc-for>
+        </fieldset>
+        <label style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: #FFFFFF; border: 1px solid #E2DED3; border-radius: 10px; cursor: pointer">
+          <input type="checkbox" checked="{{madrasah}}" onChange="{{toggleMadrasah}}" style="width: 20px; height: 20px; margin: 1px 0 0; accent-color: #1E5B4B">
+          <span style="display: flex; flex-direction: column">
+            <span style="font-weight: 600">Sekolah ini madrasah (di bawah Kemenag)</span>
+            <span style="font-size: 13px; line-height: 18px; color: #5B6661">Data siswa dari EMIS, rekap ke RDM, dan pembiasaan ibadah ikut aktif.</span>
+          </span>
+        </label>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-top: 8px">
+          <button type="button" style="min-height: 44px; padding: 0 18px; border: 1px solid #848C84; border-radius: 10px; background: #FFFFFF; color: #1B2421; font: inherit; font-weight: 600; cursor: pointer">Kembali</button>
+          <button type="button" style="min-height: 44px; padding: 0 20px; border: 0; border-radius: 10px; background: #1E5B4B; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Simpan dan lanjut</button>
+        </div>
+      </section>
+
+      <aside aria-labelledby="ringkas-judul" style="flex: 2 1 340px; min-width: 0; background: #FFFFFF; border: 1px solid #E2DED3; border-radius: 16px">
+        <div style="padding: 16px 16px 12px; display: flex; flex-direction: column; gap: 2px">
+          <h2 id="ringkas-judul" style="margin: 0; font-size: 20px; line-height: 28px; font-weight: 600">Yang disiapkan untuk {{summaryName}}</h2>
+          <span style="font-size: 13px; line-height: 18px; color: #5B6661">Bisa diubah nanti di Pengaturan. Mematikan fitur tidak menghapus datanya.</span>
+        </div>
+        <ul style="margin: 0; padding: 0; list-style: none">
+          <sc-for list="{{caps}}" as="c" hint-placeholder-count="10">
+            <li style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 16px; border-top: 1px solid #E2DED3">
+              <sc-if value="{{c.on}}" hint-placeholder-val="{{true}}">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; flex: none; border-radius: 6px; background: #E3EFEA; color: #1E5B4B"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+              </sc-if>
+              <sc-if value="{{c.off}}" hint-placeholder-val="{{false}}">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; flex: none; border-radius: 6px; border: 1px solid #E2DED3; box-sizing: border-box; color: #848C84"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"></path></svg></span>
+              </sc-if>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+                <span style="{{c.labelStyle}}">{{c.label}}</span>
+                <span style="font-size: 13px; line-height: 18px; color: #5B6661">{{c.value}}</span>
+              </span>
+            </li>
+          </sc-for>
+        </ul>
+        <div style="padding: 12px 16px 16px; border-top: 1px solid #E2DED3; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 13px; font-weight: 600">Selalu aktif di semua jenjang</span>
+          <span style="font-size: 13px; line-height: 18px; color: #5B6661">Lapor ke TPPK, UKS, buku tamu, jurnal mengajar, buku penghubung</span>
+        </div>
+      </aside>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { level: 'sma', madrasah: false };
+  }
+  renderVals() {
+    var self = this;
+    var level = this.state.level;
+    var m = this.state.madrasah;
+    var defs = [
+      { id: 'sd', title: m ? 'MI' : 'SD', alt: 'SD / MI', hint: 'Guru kelas mencatat sekali sehari; kartu di HP orang tua' },
+      { id: 'smp', title: m ? 'MTs' : 'SMP', alt: 'SMP / MTs', hint: 'Presensi per jam pelajaran; jurnal kebiasaan diisi siswa' },
+      { id: 'sma', title: m ? 'MA' : 'SMA', alt: 'SMA / MA', hint: 'Per jam, termasuk kelompok mapel pilihan dan jurusan' },
+      { id: 'smk', title: m ? 'MAK' : 'SMK', alt: 'SMK / MAK', hint: 'Per jam, ditambah presensi dan jurnal PKL di DUDI' }
+    ];
+    var levels = defs.map(function (d) {
+      var sel = d.id === level;
+      return {
+        title: d.title,
+        hint: d.hint,
+        pressed: sel ? 'true' : 'false',
+        pick: function () { self.setState({ level: d.id }); },
+        cardStyle: 'display: flex; flex-direction: column; gap: 6px; min-height: 108px; padding: 16px; text-align: left; font: inherit; color: #1B2421; cursor: pointer; border-radius: 16px; ' +
+          (sel ? 'background: #E3EFEA; border: 2px solid #1E5B4B' : 'background: #FFFFFF; border: 1px solid #E2DED3; margin: 1px'),
+        radioStyle: 'width: 20px; height: 20px; flex: none; box-sizing: border-box; border-radius: 9999px; ' +
+          (sel ? 'border: 6px solid #1E5B4B; background: #FFFFFF' : 'border: 1.5px solid #848C84; background: #FFFFFF')
+      };
+    });
+    var sd = level === 'sd', smp = level === 'smp', sma = level === 'sma', smk = level === 'smk';
+    var kaih = sd ? 'Diisi orang tua, dipantau guru kelas' : (smp ? 'Diisi siswa, dipantau orang tua dan wali kelas' : 'Opsional, bisa dinyalakan nanti');
+    var rows = [
+      { label: 'Cara presensi kelas', value: sd ? 'Harian, sekali oleh guru kelas di jam pertama' : 'Per jam pelajaran oleh guru mapel', on: true },
+      { label: 'Kartu digital', value: sd ? 'Di HP orang tua; piket bisa input manual' : 'Di HP siswa; cadangan HP orang tua', on: true },
+      { label: 'Penjemput resmi saat pulang', value: sd ? 'Kios mencocokkan penjemput, orang tua diberi tahu' : 'Untuk SD/MI', on: sd },
+      { label: 'Jurnal 7 Kebiasaan Anak Indonesia Hebat', value: kaih, on: sd || smp },
+      { label: 'Kelompok mapel pilihan (moving class)', value: (sma || smk) ? 'Presensi per kelompok, rekap kembali ke rombel' : 'Untuk SMA/MA dan SMK/MAK', on: sma || smk },
+      { label: 'Jurusan IPA, IPS, dan Bahasa', value: sma ? 'Siap untuk TA 2027/2028' : 'Untuk SMA/MA', on: sma },
+      { label: 'PKL dan tracer study', value: smk ? 'Presensi di DUDI, jurnal harian, data lulusan BMW' : 'Untuk SMK/MAK', on: smk },
+      { label: 'Sumber data siswa', value: m ? 'Import dari EMIS' : 'Import dari Dapodik', on: true },
+      { label: 'Ekspor rekap S/I/A', value: m ? 'RDM, dalam Excel dan PDF' : 'e-Rapor, dalam Excel dan PDF', on: true },
+      { label: 'Pembiasaan ibadah dan setoran hafalan', value: m ? 'Sesi ibadah berjamaah dan catatan hafalan' : 'Untuk madrasah; bisa dinyalakan manual', on: m }
+    ];
+    var caps = rows.map(function (r) {
+      return {
+        label: r.label, value: r.value, on: r.on, off: !r.on,
+        labelStyle: r.on ? 'font-weight: 600; color: #1B2421' : 'font-weight: 600; color: #5B6661'
+      };
+    });
+    var current = defs.filter(function (d) { return d.id === level; })[0];
+    return {
+      levels: levels,
+      caps: caps,
+      madrasah: m,
+      summaryName: current.title,
+      toggleMadrasah: function () { self.setState({ madrasah: !self.state.madrasah }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
