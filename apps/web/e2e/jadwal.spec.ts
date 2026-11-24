@@ -44,6 +44,10 @@ test('Jadwal: jam pelajaran, wali kelas, lesson with clash check, Excel template
   await page.getByRole('button', { name: 'Simpan' }).click();
   await expect(page.getByRole('alert').filter({ hasText: 'Jadwal bentrok' })).toContainText('Admin E2E sudah mengajar VII A di jam ini.');
 
+  // The clash is said inside the drawer; closing it leaves VII B's Senin jam 1 empty.
+  await page.getByRole('button', { name: 'Batal' }).click();
+  await expect(page.getByRole('button', { name: 'Senin jam 1: kosong' })).toBeVisible();
+
   // Download the template (it holds the current lessons) and import it back.
   await page.getByRole('tab', { name: 'Import Excel' }).click();
   const download = page.waitForEvent('download');

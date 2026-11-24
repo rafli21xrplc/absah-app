@@ -36,3 +36,4 @@ export * as presensi from './features/presensi/reducer';
 export { AlertRow, BarList, BoardSection, StatusBoard, type AlertRowProps, type BarItem, type BoardSectionProps, type SectionState, type StatusBoxData } from './features/papan/board';
 export { DataHeader, type DataHeaderProps } from './features/data/data-page';
 export { ExitDialog, type ExitDialogProps, type ExitReason } from './features/data/exit-dialog';
+export { WeekGrid, type WeekGridCell, type WeekGridProps, type WeekGridRow } from './features/jadwal/week-grid';

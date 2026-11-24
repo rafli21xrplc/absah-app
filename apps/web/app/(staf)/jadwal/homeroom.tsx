@@ -1,12 +1,14 @@
 'use client';
 
 import { ClassListItem } from '@absah/contracts';
+import { Banner, Select, Table, TableBody, TableHead, TableRow, Td, Th, messages } from '@absah/ui';
 import { useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { useWorkspace } from '@/lib/workspace';
-import forms from '../../forms.module.css';
-import styles from '../data.module.css';
 import type { ScheduleData } from './page';
+
+const t = messages.schedule;
+const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ''));
 
 /** Wali kelas per rombel; each change is saved at once. */
 export function HomeroomTable({ data, canEdit, onSaved }: { data: ScheduleData; canEdit: boolean; onSaved: () => Promise<void> }) {
@@ -24,10 +26,10 @@ export function HomeroomTable({ data, canEdit, onSaved }: { data: ScheduleData; 
         schoolId,
         idempotencyKey: newIdempotencyKey(),
       });
-      setStatus({ ok: true, text: `Wali kelas ${className}: ${updated.homeroomTeacher?.name ?? 'belum ditentukan'}.` });
+      setStatus({ ok: true, text: fill(t.homeroomDone, { name: className, teacher: updated.homeroomTeacher?.name ?? 'belum ditentukan' }) });
       await onSaved();
     } catch (err) {
-      setStatus({ ok: false, text: err instanceof ApiError ? err.message : 'Tidak bisa menyimpan. Coba lagi.' });
+      setStatus({ ok: false, text: err instanceof ApiError ? err.message : t.saveFailed });
     } finally {
       setSaving(null);
     }
@@ -36,50 +38,38 @@ export function HomeroomTable({ data, canEdit, onSaved }: { data: ScheduleData; 
   const missing = data.classes.items.filter((c) => !c.homeroomTeacher).length;
 
   return (
-    <section>
-      {missing > 0 && <p className={forms.hint}>{missing} rombel belum punya wali kelas.</p>}
-      <div className={styles.tableWrap}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Rombel</th>
-              <th>Wali kelas</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.classes.items.map((c) => (
-              <tr key={c.id}>
-                <td>{c.name}</td>
-                <td>
-                  {canEdit ? (
-                    <select
-                      className={forms.input}
-                      aria-label={`Wali kelas ${c.name}`}
-                      value={c.homeroomTeacher?.id ?? ''}
-                      disabled={saving === c.id}
-                      onChange={(e) => void assign(c.id, c.name, e.target.value || null)}
-                    >
-                      <option value="">Belum ditentukan</option>
-                      {data.teachers.map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {t.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <span className={c.homeroomTeacher ? undefined : styles.muted}>{c.homeroomTeacher?.name ?? 'Belum ditentukan'}</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {status && (
-        <p className={status.ok ? styles.notice : forms.error} role={status.ok ? 'status' : 'alert'}>
-          {status.text}
-        </p>
-      )}
+    <section className="flex flex-col gap-4">
+      {missing > 0 && <p className="m-0 text-body text-tinta-muted">{fill(t.homeroomMissing, { n: missing })}</p>}
+      <Table caption={t.homeroomTable} className="min-w-96">
+        <TableHead>
+          <TableRow>
+            <Th>{t.homeroomClass}</Th>
+            <Th>{t.homeroomTeacher}</Th>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.classes.items.map((c) => (
+            <TableRow key={c.id}>
+              <Th scope="row">{c.name}</Th>
+              <Td>
+                {canEdit ? (
+                  <Select aria-label={fill(t.homeroomOf, { name: c.name })} value={c.homeroomTeacher?.id ?? ''} disabled={saving === c.id} onChange={(e) => void assign(c.id, c.name, e.target.value || null)} className="max-w-xs">
+                    <option value="">{t.noTeacher}</option>
+                    {data.teachers.map((tc) => (
+                      <option key={tc.id} value={tc.id}>
+                        {tc.name}
+                      </option>
+                    ))}
+                  </Select>
+                ) : (
+                  <span className={c.homeroomTeacher ? undefined : 'text-tinta-muted'}>{c.homeroomTeacher?.name ?? t.noTeacher}</span>
+                )}
+              </Td>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {status && (status.ok ? <p role="status" className="m-0 text-small text-papan">{status.text}</p> : <Banner kind="error">{status.text}</Banner>)}
     </section>
   );
 }

@@ -1,15 +1,16 @@
 'use client';
 
 import { DAY_NAMES, ScheduleConflictDetail, ScheduleResponse, ScheduleSlot, Subject } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Drawer, Field, Input, Select, WeekGrid, messages, type WeekGridRow } from '@absah/ui';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { z } from 'zod';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { useWorkspace } from '@/lib/workspace';
-import forms from '../../forms.module.css';
-import styles from '../data.module.css';
-import page from './jadwal.module.css';
 import type { ScheduleData } from './page';
+
+const t = messages.schedule;
+const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ''));
+const dotted = (hhmm: string) => hhmm.replace(':', '.');
 
 const Conflicts = z.object({ conflicts: z.array(ScheduleConflictDetail) });
 const NEW_SUBJECT = '__new__';
@@ -35,8 +36,9 @@ const ownerOf = (value: Owner) => {
 };
 
 /**
- * Weekly grid of one rombel or learning group (AKD-10): days across, jam pelajaran down. Click a cell
- * to set its lesson.
+ * Weekly grid of one rombel or learning group (AKD-10): days across, jam down. A cell opens the lesson in a drawer; a clash is
+ * said in the drawer, in words, with who is already teaching. Not here because the server has no endpoint: Terbitkan jadwal,
+ * Per guru, Per ruang, beban JP per mapel.
  */
 export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData; canEdit: boolean; onChanged: () => Promise<void> }) {
   const { schoolId } = useWorkspace();
@@ -53,7 +55,7 @@ export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData;
     if (!schoolId || !ownerId) return;
     api(`/schedule?${ownerType === 'class' ? 'classId' : 'groupId'}=${ownerId}`, ScheduleResponse, { schoolId })
       .then((r) => setSlots(r.slots))
-      .catch(() => setError('Tidak bisa memuat jadwal.'));
+      .catch(() => setError(t.slotsFailed));
   }, [schoolId, ownerType, ownerId]);
 
   const days = data.periods.days.filter((d) => d.periods.length > 0);
@@ -62,12 +64,30 @@ export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData;
   const lesson = selected ? at(selected) : undefined;
 
   if (days.length === 0) {
-    return <p className={styles.notice}>Atur jam pelajaran dulu di tab Jam pelajaran, lalu isi jadwal di sini.</p>;
+    return <p className="m-0 text-body text-tinta-muted">{t.noPeriods}</p>;
   }
 
-  function pick(cell: Cell) {
+  const rows: WeekGridRow[] = numbers.map((n) => ({
+    number: n,
+    cells: days.map((d) => {
+      const period = d.periods.find((p) => p.number === n);
+      if (!period) return null;
+      const s = at({ day: d.day, period: n });
+      return {
+        time: `${dotted(period.startsAt)}–${dotted(period.endsAt)}`,
+        subject: s?.subject.name,
+        teacher: s?.teacher?.name,
+        label: fill(t.cellOf, { day: DAY_NAMES[d.day] ?? '', n, subject: s ? s.subject.name : t.emptyCell }),
+        selected: selected?.day === d.day && selected.period === n,
+      };
+    }),
+  }));
+
+  function pick(dayIndex: number, period: number) {
+    const day = days[dayIndex];
+    if (!day) return;
     actionKey.current = null;
-    setSelected(cell);
+    setSelected({ day: day.day, period });
     setError(null);
     setConflicts([]);
   }
@@ -83,7 +103,7 @@ export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData;
     } catch (err) {
       const details = err instanceof ApiError && err.code === 'SCHEDULE_CONFLICT' ? Conflicts.safeParse(err.body.details) : null;
       if (details?.success) setConflicts(details.data.conflicts);
-      else setError(err instanceof ApiError ? err.message : 'Tidak bisa menyimpan. Coba lagi.');
+      else setError(err instanceof ApiError ? err.message : t.saveFailed);
     } finally {
       setBusy(false);
     }
@@ -120,20 +140,22 @@ export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData;
   };
 
   return (
-    <section>
-      <label className={forms.field}>
-        <span className={forms.label}>{data.groups.length > 0 ? 'Rombel atau kelompok' : 'Rombel'}</span>
-        <select className={forms.input} value={owner} onChange={(e) => {
+    <section className="flex flex-col gap-4">
+      <Field label={data.groups.length > 0 ? t.ownerOrGroupLabel : t.ownerLabel} className="max-w-xs">
+        <Select
+          value={owner}
+          onChange={(e) => {
             setOwner(e.target.value as Owner);
             setSelected(null);
-          }}>
+          }}
+        >
           {data.classes.items.map((c) => (
             <option key={c.id} value={`class:${c.id}`}>
               {c.name}
             </option>
           ))}
           {data.groups.length > 0 && (
-            <optgroup label="Kelompok belajar">
+            <optgroup label={t.groupsOptgroup}>
               {data.groups.map((g) => (
                 <option key={g.id} value={`group:${g.id}`}>
                   {g.name}
@@ -141,141 +163,85 @@ export function ScheduleGrid({ data, canEdit, onChanged }: { data: ScheduleData;
               ))}
             </optgroup>
           )}
-        </select>
-      </label>
-
-      <div className={`${styles.tableWrap} ${page.spaced}`}>
-        <table className={page.grid} aria-label="Jadwal mingguan">
-          <thead>
-            <tr>
-              <th>Jam</th>
-              {days.map((d) => (
-                <th key={d.day}>{DAY_NAMES[d.day]}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {numbers.map((n) => (
-              <tr key={n}>
-                <th>{n}</th>
-                {days.map((d) => {
-                  const period = d.periods.find((p) => p.number === n);
-                  if (!period) return <td key={d.day} className={page.noPeriod} />;
-                  const s = at({ day: d.day, period: n });
-                  const isSelected = selected?.day === d.day && selected.period === n;
-                  return (
-                    <td key={d.day}>
-                      <button
-                        type="button"
-                        className={s ? page.cell : page.cellEmpty}
-                        disabled={!canEdit}
-                        aria-pressed={isSelected}
-                        aria-label={`${DAY_NAMES[d.day]} jam ${n}: ${s ? s.subject.name : 'kosong'}`}
-                        onClick={() => pick({ day: d.day, period: n })}
-                      >
-                        <span className={page.time}>
-                          {period.startsAt}–{period.endsAt}
-                        </span>
-                        {s ? s.subject.name : '—'}
-                        {s?.teacher && <span className={page.teacher}>{s.teacher.name}</span>}
-                      </button>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {selected && canEdit && (
-        <SlotEditor
-          key={`${owner}-${selected.day}-${selected.period}`}
-          title={`${DAY_NAMES[selected.day]}, jam ke-${selected.period}`}
-          data={data}
-          lesson={lesson}
-          busy={busy}
-          onSubmit={save}
-          onRemove={remove}
-          onCancel={() => setSelected(null)}
-        />
-      )}
-      {conflicts.length > 0 && (
-        <div role="alert" className={styles.notice}>
-          <p>Jadwal bentrok:</p>
-          <ul className={page.conflicts}>
-            {conflicts.map((c, i) => (
-              <li key={i}>{conflictText(c)}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {error && (
-        <p className={forms.error} role="alert">
+        </Select>
+      </Field>
+      <WeekGrid label={t.gridLabel} days={days.map((d) => DAY_NAMES[d.day] ?? '')} rows={rows} disabled={!canEdit} onPick={pick} />
+      {error && !selected && (
+        <p role="alert" className="m-0 text-body text-alpa">
           {error}
         </p>
+      )}
+      {canEdit && (
+        <Drawer
+          open={selected !== null}
+          onOpenChange={(open) => !open && !busy && setSelected(null)}
+          title={selected ? fill(t.drawerTitle, { day: DAY_NAMES[selected.day] ?? '', n: selected.period }) : t.drawerTitle}
+          onSubmit={save}
+          actions={
+            <>
+              {lesson && (
+                <Button type="button" variant="secondary" disabled={busy} onClick={remove}>
+                  {t.clear}
+                </Button>
+              )}
+              <Button type="submit" loading={busy}>
+                {t.save}
+              </Button>
+            </>
+          }
+        >
+          {selected && <SlotFields key={`${owner}-${selected.day}-${selected.period}`} data={data} lesson={lesson} />}
+          {conflicts.length > 0 && (
+            <div role="alert" className="flex flex-col gap-1 rounded-md border border-alpa bg-alpa-soft p-3 text-body text-tinta">
+              <p className="m-0 text-body-strong">{t.conflictTitle}</p>
+              <ul className="m-0 pl-5">
+                {conflicts.map((c, i) => (
+                  <li key={i}>{conflictText(c)}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {error && (
+            <p role="alert" className="m-0 text-body text-alpa">
+              {error}
+            </p>
+          )}
+        </Drawer>
       )}
     </section>
   );
 }
 
-function SlotEditor(props: {
-  title: string;
-  data: ScheduleData;
-  lesson: ScheduleSlot | undefined;
-  busy: boolean;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  onRemove: () => void;
-  onCancel: () => void;
-}) {
-  const { data, lesson } = props;
+/** The fields of one slot. Read from the surrounding form on save (named inputs), so the drawer owns submit and busy. */
+function SlotFields({ data, lesson }: { data: ScheduleData; lesson: ScheduleSlot | undefined }) {
   const [subject, setSubject] = useState(lesson?.subject.id ?? data.subjects[0]?.id ?? NEW_SUBJECT);
   return (
-    <form className={page.editor} onSubmit={props.onSubmit} aria-label="Ubah pelajaran">
-      <strong>{props.title}</strong>
-      <div className={page.row}>
-        <label className={forms.field}>
-          <span className={forms.label}>Mapel</span>
-          <select className={forms.input} name="subject" value={subject} onChange={(e) => setSubject(e.target.value)}>
-            {data.subjects.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-            <option value={NEW_SUBJECT}>+ Mapel baru…</option>
-          </select>
-        </label>
-        {subject === NEW_SUBJECT && (
-          <label className={forms.field}>
-            <span className={forms.label}>Nama mapel baru</span>
-            <input className={forms.input} name="newSubject" required minLength={2} maxLength={80} />
-          </label>
-        )}
-        <label className={forms.field}>
-          <span className={forms.label}>Guru</span>
-          <select className={forms.input} name="teacher" defaultValue={lesson?.teacher?.id ?? ''}>
-            <option value="">Belum ditentukan</option>
-            {data.teachers.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <div className={page.row}>
-        <Button type="submit" disabled={props.busy}>
-          Simpan
-        </Button>
-        {lesson && (
-          <Button type="button" variant="secondary" disabled={props.busy} onClick={props.onRemove}>
-            Kosongkan
-          </Button>
-        )}
-        <Button type="button" variant="secondary" disabled={props.busy} onClick={props.onCancel}>
-          Batal
-        </Button>
-      </div>
-    </form>
+    <>
+      <Field label={t.subjectLabel}>
+        <Select name="subject" value={subject} onChange={(e) => setSubject(e.target.value)}>
+          {data.subjects.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+          <option value={NEW_SUBJECT}>{t.newSubjectOption}</option>
+        </Select>
+      </Field>
+      {subject === NEW_SUBJECT && (
+        <Field label={t.newSubjectLabel}>
+          <Input name="newSubject" required minLength={2} maxLength={80} autoComplete="off" />
+        </Field>
+      )}
+      <Field label={t.teacherLabel}>
+        <Select name="teacher" defaultValue={lesson?.teacher?.id ?? ''}>
+          <option value="">{t.noTeacher}</option>
+          {data.teachers.map((tc) => (
+            <option key={tc.id} value={tc.id}>
+              {tc.name}
+            </option>
+          ))}
+        </Select>
+      </Field>
+    </>
   );
 }
