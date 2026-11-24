@@ -26,7 +26,7 @@ export const noHexColors = {
   },
 };
 
-export const ignores = ['**/dist/**', '**/node_modules/**', '**/.turbo/**', '**/.next/**', '**/out/**', '**/coverage/**', '**/next-env.d.ts'];
+export const ignores = ['**/dist/**', '**/node_modules/**', '**/.turbo/**', '**/.next/**', '**/out/**', '**/coverage/**', '**/next-env.d.ts', '**/storybook-static/**', '**/test-results/**', '**/playwright-report/**'];
 
 export default tseslint.config(
   { ignores },

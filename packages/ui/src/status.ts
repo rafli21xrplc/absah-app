@@ -1,3 +1,4 @@
+import { messages } from '../messages/id';
 import { color, type ThemeName } from './tokens';
 
 /** H Hadir, T Telat, I Izin, S Sakit, A Alpa, ? Belum diisi. The order is fixed everywhere (Sistem-UI). */
@@ -11,13 +12,13 @@ interface StatusDef {
 }
 
 const DEFS: Record<StatusCode, StatusDef> = {
-  H: { kata: 'Hadir', fg: 'hadir', bg: 'hadir-soft' },
-  T: { kata: 'Telat', fg: 'telat', bg: 'telat-soft' },
-  I: { kata: 'Izin', fg: 'izin', bg: 'izin-soft' },
-  S: { kata: 'Sakit', fg: 'sakit', bg: 'sakit-soft' },
-  A: { kata: 'Alpa', fg: 'alpa', bg: 'alpa-soft' },
+  H: { kata: messages.status.H, fg: 'hadir', bg: 'hadir-soft' },
+  T: { kata: messages.status.T, fg: 'telat', bg: 'telat-soft' },
+  I: { kata: messages.status.I, fg: 'izin', bg: 'izin-soft' },
+  S: { kata: messages.status.S, fg: 'sakit', bg: 'sakit-soft' },
+  A: { kata: messages.status.A, fg: 'alpa', bg: 'alpa-soft' },
   // Nobody filled it yet. The dashed border that tells it apart from the others without colour is the component's job.
-  '?': { kata: 'Belum diisi', fg: 'tinta-muted', bg: 'kapur-raised' },
+  '?': { kata: messages.status['?'], fg: 'tinta-muted', bg: 'kapur-raised' },
 };
 
 export interface StatusTokens {

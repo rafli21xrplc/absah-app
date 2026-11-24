@@ -33,6 +33,25 @@ jobs:
       - name: Build web and kiosk
         run: pnpm build
 
+  # Design system: builds Storybook and runs axe (WCAG 2.2 AA, colour contrast included) over every story in the light and
+  # dark theme at phone width. Needs no absah-api.
+  ui-a11y:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      STORYBOOK_DISABLE_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @absah/ui exec playwright install --with-deps chromium
+      - run: pnpm --filter @absah/ui storybook:build
+      - run: pnpm --filter @absah/ui test:a11y
+
   # End-to-end: the real absah-api (same commit the shared packages are pinned to) on a throwaway
   # Postgres, plus the web app, driven by Playwright on laptop and phone viewports.
   e2e:
