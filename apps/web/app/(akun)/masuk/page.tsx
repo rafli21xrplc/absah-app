@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@absah/ui';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, type FormEvent } from 'react';
 import { AuthError, signInWithPassword, verifyTotp } from '@/lib/auth';
@@ -79,6 +80,9 @@ function SignIn() {
           {step === 'password' ? 'Masuk' : 'Verifikasi'}
         </Button>
       </form>
+      <p>
+        Siswa: <Link href="/masuk/hp">masuk dengan WhatsApp</Link>.
+      </p>
     </main>
   );
 }
