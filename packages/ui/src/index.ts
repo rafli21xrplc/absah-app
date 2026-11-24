@@ -30,3 +30,6 @@ export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/tabs';
 export { AppShell, AppTopBar, ErrorPage, LoadingPage, NotFoundPage, PageMain, PortalFrame, WorkspaceLabel, type AppShellProps } from './components/frames';
 export { SideNav, type SideNavGroup, type SideNavItem, type SideNavProps } from './components/side-nav';
 export { GreetingHeader, SessionGroup, SessionHero, SessionItem, type SessionHeroProps, type SessionItemProps, type SessionItemVariant } from './components/today';
+export { AttendanceFlow, type AttendanceFlowProps, type FlowStudent, type SendResult } from './features/presensi/attendance-flow';
+export { AttendanceRow, type AttendanceRowProps } from './features/presensi/attendance-row';
+export * as presensi from './features/presensi/reducer';

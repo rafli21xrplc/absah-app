@@ -7,7 +7,10 @@ import { messages } from '../../messages/id';
 import { cx } from '../cx';
 
 /** Mount once near the root. Radix pauses the countdown while a toast is hovered or has focus. */
-export function ToastProvider({ children, duration = 8000 }: { children: ReactNode; duration?: number }) {
+// pointer-events-none: the stack is as wide as the screen, and an empty one must not catch taps meant for what is under it.
+const VIEWPORT = 'pointer-events-none fixed inset-x-0 bottom-0 z-50 m-0 flex list-none flex-col gap-2 p-4 sm:left-auto sm:right-4 sm:w-96';
+
+export function ToastProvider({ children, duration = 8000, viewportClassName = VIEWPORT }: { children: ReactNode; duration?: number; /** Where the toasts stack: raise it above a footer that stays at the bottom. */ viewportClassName?: string }) {
   return (
     <RToast.Provider
       label={messages.toast.region}
@@ -17,7 +20,7 @@ export function ToastProvider({ children, duration = 8000 }: { children: ReactNo
       swipeThreshold={100000}
     >
       {children}
-      <RToast.Viewport className="fixed inset-x-0 bottom-0 z-50 m-0 flex list-none flex-col gap-2 p-4 sm:left-auto sm:right-4 sm:w-96" />
+      <RToast.Viewport className={viewportClassName} />
     </RToast.Provider>
   );
 }
@@ -47,7 +50,7 @@ export function Toast({ open, onOpenChange, message, onUndo, undoLabel = message
       type="background"
       className={cx(
         // Light: dark toast with a yellow action. Dark: the card colour with a border, so the yellow action keeps its contrast.
-        'flex items-center gap-2 rounded-md bg-tinta py-1 pl-4 pr-1 text-kapur-raised dark:border dark:border-garis-kuat dark:bg-kapur-raised dark:text-tinta',
+        'pointer-events-auto flex items-center gap-2 rounded-md bg-tinta py-1 pl-4 pr-1 text-kapur-raised dark:border dark:border-garis-kuat dark:bg-kapur-raised dark:text-tinta',
         className,
       )}
     >

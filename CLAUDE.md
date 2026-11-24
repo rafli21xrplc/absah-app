@@ -681,6 +681,19 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
   `incomplete`, bukan `violation`.
 - Tombol selebar penuh butuh `box-border` (sudah di `button-styles.ts`); `PageMain` (`@absah/ui`) adalah `<main>` halaman dan tempat padding-nya.
 
+### Layar isi presensi (U4b)
+- Aturannya ada di satu tempat murni: `packages/ui/src/features/presensi/reducer.ts` (dites tanpa React). Layar (`AttendanceFlow`) hanya menggambar
+  state dan mengirim aksi. Jangan menaruh aturan presensi di halaman atau komponen.
+- Semua siswa mulai "Belum diisi" (`?`), kecuali yang sudah diisi sumber resmi (izin, gerbang). "Semua hadir" adalah tombol yang terlihat dengan
+  Urungkan, bukan nilai bawaan; hanya mengubah yang `?`, dan tombolnya hilang saat tidak ada yang `?` atau filter Tidak hadir aktif.
+  Memilih apa pun sesudahnya menghapus Urungkan: Urungkan tidak pernah membatalkan pilihan yang dibuat sesudah "Semua hadir".
+- Tombol utama: masih ada `?` -> "Lihat n siswa yang belum diisi"; lengkap -> "Periksa dan kirim". Tidak ada jalan mengirim kelas yang belum lengkap.
+- Yang dikirim tetap hanya pengecualian (bukan Hadir, bukan `?`, bukan yang terkunci sumber resmi); API tidak berubah.
+- Kunci idempoten dipegang halaman per isi kiriman (`JSON.stringify(body)`): kiriman yang sama memakai kunci yang sama, isi berbeda memakai kunci baru.
+- `Sheet` memfokuskan dirinya sendiri saat terbuka, bukan kolom pertama (di HP kolom terfokus membuka keyboard). Eyebrow `Sheet` ikut nama dialog
+  untuk pembaca layar dan digambar sekali. `AttendanceFlow` memegang area gulir daftar sendiri (header, filter, footer ada dalam alur, tidak menimpa baris).
+- E2E mengisi sesi lewat `fillSession` / `markStudents` / `pickStatus` / `sendReview` di `apps/web/e2e/helpers.ts`; jangan menulis ulang urutan kliknya.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

@@ -61,7 +61,8 @@ export function Button({ variant = 'primary', size = '44', type = 'button', disa
 
   if (!soft) return control;
   return (
-    <span className="inline-flex flex-col items-start gap-1">
+    // A button that fills its row must fill the wrapper too, or the reason would shrink it to the width of its words.
+    <span className={cx('inline-flex flex-col items-start gap-1', className?.includes('w-full') && 'w-full')}>
       {control}
       <span id={reasonId} className="text-small text-tinta-muted">
         {disabledReason}

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, generateSessions, onboardAdmin } from './helpers';
+import { createSchool, generateSessions, markStudents, onboardAdmin, pickStatus, sendReview } from './helpers';
 
 // The app's own server stays reachable here (the service worker that keeps the page shells is production-only);
 // what drops is the API, which is what "no signal" means for the session screens (PRS-08).
@@ -47,18 +47,21 @@ test('Guru mengisi dua sesi tanpa sinyal, lalu terkirim otomatis saat sinyal kem
 
   await page.getByRole('link', { name: /VII A/ }).click();
   await expect(page.getByRole('heading', { name: 'VII A' })).toBeVisible();
-  await expect(page.getByText(/Tanpa sinyal: daftar siswa dari salinan di HP/)).toBeVisible();
-  await page.getByRole('button', { name: 'ADITYA PRATAMA: Alpa' }).click();
-  await page.getByRole('button', { name: /^Kirim: \d+ hadir, 1 tidak hadir$/ }).click();
-  await expect(page.getByText('Tidak ada sinyal. Presensi disimpan di HP')).toBeVisible();
+  await expect(page.getByText(/Daftar siswa dari salinan di HP/)).toBeVisible();
+  await markStudents(page, [{ name: 'ADITYA PRATAMA', status: 'Alpa' }]);
+  await sendReview(page);
+  await expect(page.getByText(/Presensi disimpan di HP dan dikirim otomatis saat sinyal kembali/)).toBeVisible();
   await expect(page.getByText('1 sesi menunggu dikirim.')).toBeVisible();
 
-  await page.getByRole('link', { name: '← Hari ini' }).click();
+  await page.getByRole('link', { name: 'Kembali ke Hari ini' }).click();
   await expect(page.getByText(/Tanpa sinyal\. Daftar dari salinan di HP/)).toBeVisible();
   await page.getByRole('link', { name: /VII B/ }).click();
   await expect(page.getByRole('heading', { name: 'VII B' })).toBeVisible();
-  await page.getByRole('button', { name: /: Sakit$/ }).first().click();
-  await page.getByRole('button', { name: /^Kirim: \d+ hadir, 1 tidak hadir$/ }).click();
+  await page.getByRole('button', { name: /: Belum diisi\. Ketuk untuk mengubah\.$/ }).first().waitFor();
+  await page.getByRole('button', { name: /^(Semua hadir|Sisanya hadir)/ }).click();
+  const first = await page.getByRole('button', { name: /: Hadir\. Ketuk untuk mengubah\.$/ }).first().getAttribute('aria-label');
+  await pickStatus(page, (first ?? '').split(':')[0] ?? '', 'Sakit');
+  await sendReview(page);
   await expect(page.getByText('2 sesi menunggu dikirim.')).toBeVisible();
 
   // Signal is back: nothing to press, the retry (every 15 s) sends both ("Kirim sekarang" only hurries it).
@@ -67,7 +70,7 @@ test('Guru mengisi dua sesi tanpa sinyal, lalu terkirim otomatis saat sinyal kem
   await expect(page.getByText('VII B: presensi terkirim.')).toBeVisible();
   await expect(page.getByText(/sesi menunggu dikirim/)).toHaveCount(0);
 
-  await page.getByRole('link', { name: '← Hari ini' }).click();
+  await page.getByRole('link', { name: 'Kembali ke Hari ini' }).click();
   await expect(page.getByRole('link', { name: /VII A/ })).toContainText('Terkirim');
   await expect(page.getByRole('link', { name: /VII A/ })).toContainText('1 tidak hadir');
   await expect(page.getByRole('link', { name: /VII B/ })).toContainText('Terkirim');

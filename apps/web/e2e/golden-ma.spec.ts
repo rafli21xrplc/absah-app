@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { EMIS_FIXTURES } from './env';
-import { acceptInvite, createSchool, onboardAdmin, otpLogin, randomDigits, releaseFlag } from './helpers';
+import { acceptInvite, createSchool, fillSession, onboardAdmin, otpLogin, randomDigits, releaseFlag } from './helpers';
 
 test('MA: import EMIS, ibadah berjamaah, setoran hafalan dilihat siswa, rekap per jurusan dan ekspor RDM setelah flag dibuka', async ({ page, browser }) => {
   test.slow();
@@ -34,8 +34,7 @@ test('MA: import EMIS, ibadah berjamaah, setoran hafalan dilihat siswa, rekap pe
   await expect(page.getByText('Peserta tersimpan.')).toBeVisible();
   await page.getByRole('button', { name: 'Presensi kegiatan hari ini' }).click();
   await expect(page).toHaveURL(/\/sesi\//);
-  await page.getByRole('button', { name: 'Kirim: 1 hadir, 0 tidak hadir' }).click();
-  await expect(page.getByText('Presensi tersimpan.')).toBeVisible();
+  await fillSession(page, []);
 
   // The guru tahfidz records Ahmad's setoran.
   const ustadzEmail = `e2e-tahfidz-${randomUUID()}@test.local`;

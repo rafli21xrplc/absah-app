@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, generateSessions, onboardAdmin, otpLogin, randomDigits } from './helpers';
+import { createSchool, fillSession, generateSessions, onboardAdmin, otpLogin, randomDigits } from './helpers';
 
 /** ISO weekday (1 = Senin) of today in Jakarta: the lessons are put on today, whatever day CI runs. */
 const todayIsoDay = () => {
@@ -42,9 +42,7 @@ test('SMP: presensi per jam pelajaran, lalu siswa mengisi jurnal 7 kebiasaan dan
   await page.goto('/hari-ini');
   await expect(page.getByRole('link', { name: /VII A · IPA/ })).toBeVisible();
   await page.getByRole('link', { name: /VII A · Matematika/ }).click();
-  await page.getByRole('button', { name: 'DIMAS ANGGARA: Alpa' }).click();
-  await page.getByRole('button', { name: 'Kirim: 3 hadir, 1 tidak hadir' }).click();
-  await expect(page.getByText('Presensi tersimpan.')).toBeVisible();
+  await fillSession(page, [{ name: 'DIMAS ANGGARA', status: 'Alpa' }]);
 
   // Aditya gets his own login; in SMP he keeps the habits journal himself.
   const studentPhone = `0812${randomDigits(8)}`;

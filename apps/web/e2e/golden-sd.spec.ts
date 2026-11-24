@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES, KIOSK_URL } from './env';
-import { cardToken, createSchool, gateFixture, generateSessions, lastMessage, onboardAdmin, otpLogin, randomDigits, TINY_PNG, type GateFixture } from './helpers';
+import { TINY_PNG, cardToken, createSchool, fillSession, gateFixture, generateSessions, lastMessage, onboardAdmin, otpLogin, randomDigits, type GateFixture } from './helpers';
 
 /** A USB scanner types the QR text and Enter, once the Pulang screen waits for a card again. */
 async function scan(kiosk: Page, card: GateFixture['cards'][number]) {
@@ -51,10 +51,7 @@ test('SD: sesi harian dan WA alpa, orang tua mendaftarkan penjemput, kios Pulang
   generateSessions(schoolId);
   await page.goto('/hari-ini');
   await page.getByRole('link', { name: /VII A/ }).click();
-  await page.getByRole('button', { name: 'DIMAS ANGGARA: Alpa' }).click();
-  await page.getByRole('button', { name: 'BUNGA LESTARI: Alpa' }).click();
-  await page.getByRole('button', { name: 'Kirim: 2 hadir, 2 tidak hadir' }).click();
-  await expect(page.getByText('Presensi tersimpan.')).toBeVisible();
+  await fillSession(page, [{ name: 'DIMAS ANGGARA', status: 'Alpa' }, { name: 'BUNGA LESTARI', status: 'Alpa' }]);
   await expect.poll(() => lastMessage(schoolId)?.templateCode, { timeout: 30_000 }).toBe('absent_marked');
 
   // Aditya's mother logs in with WhatsApp and names the family driver, with a photo.

@@ -49,7 +49,8 @@ const cases = [
     ),
     cancel: 'Batal',
     role: 'dialog',
-    title: 'Gilang Ramadhan',
+    // The eyebrow is part of the name for a screen reader.
+    title: 'Pilih kehadiran untuk Gilang Ramadhan',
   },
   {
     name: 'Drawer',
@@ -147,8 +148,11 @@ describe('Dialog', () => {
 describe('Sheet', () => {
   it('shows the eyebrow above the title and offers no drag handle control', async () => {
     render(<Sheet open onOpenChange={() => undefined} title="Gilang Ramadhan" eyebrow="Pilih kehadiran untuk"><p>x</p></Sheet>);
-    await screen.findByRole('dialog', { name: 'Gilang Ramadhan' });
-    expect(screen.getByText('Pilih kehadiran untuk')).toBeTruthy();
+    await screen.findByRole('dialog', { name: 'Pilih kehadiran untuk Gilang Ramadhan' });
+    // Drawn once for the eye (the sr-only copy inside the title is for the name only).
+    const drawn = screen.getAllByText('Pilih kehadiran untuk').filter((el) => el.tagName === 'P');
+    expect(drawn).toHaveLength(1);
+    expect(drawn[0]?.getAttribute('aria-hidden')).toBe('true');
     // The bar on top is a picture: no button, slider or other control is named for it.
     expect(screen.queryByRole('slider')).toBeNull();
     expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Batal']);

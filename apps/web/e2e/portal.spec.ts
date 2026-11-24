@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, generateSessions, lastActionLink, onboardAdmin, randomDigits } from './helpers';
+import { createSchool, fillSession, generateSessions, lastActionLink, onboardAdmin, randomDigits } from './helpers';
 
 test('Orang tua membuka tautan aksi, mengajukan izin, wali kelas menyetujui, status sesi berubah', async ({ page, browser }) => {
   test.slow(); // onboarding, import, session, link, approval and the worker in one flow
@@ -29,9 +29,7 @@ test('Orang tua membuka tautan aksi, mengajukan izin, wali kelas menyetujui, sta
   generateSessions(schoolId);
   await page.goto('/hari-ini');
   await page.getByRole('link', { name: /VII A/ }).click();
-  await page.getByRole('button', { name: 'ADITYA PRATAMA: Alpa' }).click();
-  await page.getByRole('button', { name: 'Kirim: 3 hadir, 1 tidak hadir' }).click();
-  await expect(page.getByText('Presensi tersimpan.')).toBeVisible();
+  await fillSession(page, [{ name: 'ADITYA PRATAMA', status: 'Alpa' }]);
   const sessionUrl = page.url();
   let link: string | null = null;
   await expect(async () => {
