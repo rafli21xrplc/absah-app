@@ -58,6 +58,11 @@ export default function PklPage() {
           <Link href="/pkl/tinjauan">Tinjauan kehadiran</Link>
           <Link href="/pkl/jurnal">Jurnal siswa</Link>
           <Link href="/pkl/penilaian">Penilaian DUDI</Link>
+          {hasRole(...PKL_OVERSEERS) && (
+            <IfCap name="pkl.tracer">
+              <Link href="/pkl/tracer">Tracer study alumni</Link>
+            </IfCap>
+          )}
           {hasRole(...PKL_OVERSEERS) && <Link href="/pkl/dudi">Mitra DUDI</Link>}
           {manager && <Link href="/pkl/penempatan">Tempatkan siswa</Link>}
         </nav>
