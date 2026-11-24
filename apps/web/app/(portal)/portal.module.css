@@ -121,3 +121,25 @@
   gap: 8px;
   margin: 0 0 12px;
 }
+
+/* Preference form (ORT-06). */
+.fieldset {
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+}
+.fieldset legend {
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+}
+.choice input {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}

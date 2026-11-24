@@ -185,6 +185,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   cards (filtered to the child) and ChildLeave (GET /leave-requests?status=all matched on enrollmentId). A siswa
   is unchanged. Poin and tagihan history will come with 5.8 / 5.10 behind their capabilities.
 
+## Message preferences (ORT-06; (portal)/portal/preferensi, lib/preferences.ts)
+- /portal/preferensi (orang_tua; link on /portal): GET|PUT /portal/notification-preferences for the ACTIVE school (a
+  school has its own guardian record, so choices are per school; the child picker switches school). The boxes say
+  "receive" (ticked = not muted; mutedFrom/receivedFrom convert), plus "Jangan kirim setelah pukul 19.00" (held
+  until 06.00, LATE_CUTOFF_LABEL from the contract's NOTIFICATION_LATE_CUTOFF_MINUTES). Only MUTABLE_TEMPLATE_CODES
+  are listed; the page says safety messages always arrive. One Idempotency-Key per save, renewed on any change.
+  The number is shown masked and changed by the school, not here.
+
 ## Kiosk app (apps/kiosk, GRB-02/03)
 - One page, three phases (lib/use-kiosk.ts): loading -> unpaired (PairScreen: one-time code typed,
   scanned with the camera or a USB scanner; one Idempotency-Key per code) -> ready (ScanScreen).
