@@ -43,3 +43,10 @@ a {
     scroll-behavior: auto !important;
   }
 }
+
+/* useReveal (motion.ts) marks its container data-motion="pending" in the same frame it starts, so blocks that are about to
+   fade in are hidden before the first paint. Anywhere else, data-reveal and data-grow do nothing. */
+[data-motion='pending'] [data-reveal],
+[data-motion='pending'] [data-grow] {
+  opacity: 0;
+}
