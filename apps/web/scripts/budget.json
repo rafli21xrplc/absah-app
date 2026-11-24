@@ -1,0 +1,10 @@
+{
+  "defaultKb": 330,
+  "routes": {
+    "/masuk": 260,
+    "/masuk/hp": 260,
+    "/keamanan/dua-langkah": 260,
+    "/lapor": 310,
+    "/lapor/lacak": 310
+  }
+}

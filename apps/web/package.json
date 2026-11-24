@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "budget": "node scripts/bundle-budget.mjs"
   },
   "dependencies": {
     "@absah/capabilities": "github:rafli21xrplc/absah-api#0ff5db9a073c540cb7132bc467cd11b80e280b74&path:/packages/capabilities",
