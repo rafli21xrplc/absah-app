@@ -413,6 +413,16 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   net totals, entries newest first, evidence link on request (an <a> after the link is fetched, a popup would be
   blocked), "Batalkan" with a reason for admin and wakasek (a reversal never edits history).
 
+## Aturan, tugas tindak lanjut, peringatan dini (KSW-01, 03, 04)
+- /poin/aturan: rules (GET /point-rules?all=<manage>) and thresholds (GET /point-thresholds?all=<manage>), readable by
+  everyone who reaches /poin, written by POINT_MANAGERS (admin, wakasek). The form asks for a plain amount (1..100); the
+  kind gives the sign (signedForKind), so a minus typed by habit never flips a pelanggaran. Rules and tiers are only
+  switched off, never deleted (entries and tasks cite them).
+- /tindak-lanjut (FOLLOWUP_READERS, student.points): open/done filter; FOLLOWUP_CLOSERS (not kepsek) close a task with an
+  optional note. A 409 reloads the list ("sudah selesai").
+- /peringatan-dini (student.early_warning, the URL the push opens): 7/14/30 days; the API scopes wali kelas to the class.
+  Student names link to /poin/[enrollmentId] only for POINT_PROFILE_READERS (guru_bk has no profile access).
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and

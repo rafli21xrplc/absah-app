@@ -1,6 +1,17 @@
 import { EARLY_WARNING_KINDS, POINT_ENTRY_MAX_BACKDATE_DAYS, POINT_EVIDENCE_MAX_BYTES } from '@absah/contracts';
 import { describe, expect, it } from 'vitest';
-import { checkEvidence, earliestEntryDate, EARLY_WARNING_LABELS, FOLLOW_UP_LABELS, POINT_KIND_LABELS, signedPoints, totalsLine } from './ksw';
+import {
+  amountOf,
+  checkEvidence,
+  earliestEntryDate,
+  EARLY_WARNING_LABELS,
+  FOLLOW_UP_LABELS,
+  isValidAmount,
+  POINT_KIND_LABELS,
+  signedForKind,
+  signedPoints,
+  totalsLine,
+} from './ksw';
 
 describe('kesiswaan labels', () => {
   it('name every early-warning kind the API knows', () => {
@@ -47,5 +58,21 @@ describe('checkEvidence', () => {
   it('says what is wrong in plain words', () => {
     expect(checkEvidence({ size: POINT_EVIDENCE_MAX_BYTES + 1, type: 'image/png' })).toEqual({ ok: false, message: 'Bukti maksimal 5 MB.' });
     expect(checkEvidence({ size: 5, type: 'video/mp4' })).toMatchObject({ ok: false, message: expect.stringContaining('foto') as string });
+  });
+});
+
+describe('rule amounts', () => {
+  it('gives the sign of the kind to what is typed', () => {
+    expect(signedForKind('violation', 5)).toBe(-5);
+    expect(signedForKind('achievement', 20)).toBe(20);
+    expect(signedForKind('violation', -5)).toBe(-5); // a minus typed by habit does not flip it
+    expect(signedForKind('achievement', 7.9)).toBe(7);
+  });
+
+  it('shows the amount without the sign and accepts only 1..100', () => {
+    expect(amountOf(-35)).toBe(35);
+    expect(amountOf(10)).toBe(10);
+    for (const n of [1, 50, 100]) expect(isValidAmount(n)).toBe(true);
+    for (const n of [0, 101, -3, 2.5, Number.NaN]) expect(isValidAmount(n)).toBe(false);
   });
 });
