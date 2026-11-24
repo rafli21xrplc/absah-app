@@ -98,7 +98,7 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - /izin/baru: students from GET /leave-requests/students, Sakit/Izin, dates (default today in the
   school timezone, lib/leave.ts todayIn), reason, optional photo/PDF (presign -> PUT -> id).
   Entered by the wali kelas = approved at once; the session screen shows the student fixed.
-- Parents get the same flow in the portal and action links (prompt 3.3).
+- Parents ask izin through action links (/t, prompt 3.3); the full parent portal is prompt 5.7.
 
 ## Gate pages (apps/web/app/(staf)/gerbang, gerbang/kios)
 - Menu "Gerbang" for GATE_VIEWERS (lib/gate.ts) when gate.enabled. /gerbang: GET /gate/today
@@ -113,6 +113,18 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
   /notifications/overview: today's counts per status, failures of the last 7 days with the masked
   number, first name, attempts and a plain-words reason (errorLabel; the raw code stays visible).
 - Never show or log full phone numbers; the API already masks them.
+
+## Action links (apps/web/app/(portal)/t, ORT-01)
+- /t: the action link page from a WhatsApp message, no login. The token arrives in the #fragment, is
+  kept in sessionStorage for reloads (tab only) and removed from the address bar; calls send it as
+  api(..., { linkToken }) -> `Authorization: Link <token>`, cookies omitted. 401 unknown, 410
+  LINK_EXPIRED. Shows first name only; one izin per link (409 link_used); "Tampilkan kartu" ->
+  POST /links/card, 409 bound_elsewhere -> "Pindahkan kartu ke HP ini" (replace, after a confirm).
+- CardQr redraws the QR once per 30-second window from the keys (makeCardToken); no animation.
+- Staff set WhatsApp numbers on /siswa/kontak?id=<studentId> (PUT /students/{id}/contacts; admin,
+  operator, the wali kelas): guardians (messages, links) and the student's login. Numbers masked;
+  an empty field keeps the number.
+- E2E gets the link with absah-api `notify:last-link` (helpers.lastActionLink, dev only).
 
 ## Kiosk app (apps/kiosk, GRB-02/03)
 - One page, three phases (lib/use-kiosk.ts): loading -> unpaired (PairScreen: one-time code typed,

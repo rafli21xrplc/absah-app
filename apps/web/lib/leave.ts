@@ -7,8 +7,11 @@ export const LEAVE_STATUS_LABELS: Record<LeaveStatus, string> = {
   rejected: 'Ditolak',
   cancelled: 'Dibatalkan',
 };
-/** Staff who can enter and decide izin (the API checks the wali kelas of each student). */
-export const LEAVE_STAFF: Role[] = ['guru', 'wali_kelas', 'wakasek', 'kepsek'];
+/**
+ * Staff who can enter and decide izin. The API checks the wali kelas of each student, and in a small
+ * school the admin is often a wali kelas too, so the admin role is included.
+ */
+export const LEAVE_STAFF: Role[] = ['guru', 'wali_kelas', 'wakasek', 'kepsek', 'admin'];
 
 /** YYYY-MM-DD in the school timezone (CLAUDE.md rule 6). */
 export const todayIn = (timezone: string) => new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(new Date());
