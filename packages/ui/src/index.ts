@@ -1,4 +1,5 @@
 export { Banner, type BannerKind, type BannerProps } from './components/banner';
+export { buttonStyles } from './components/button-styles';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './components/button';
 export { Field, Input, Select, Textarea, type FieldProps } from './components/field';
 export { FilterChip, type FilterChipProps } from './components/filter-chip';
@@ -26,3 +27,5 @@ export { Sheet, type SheetProps } from './components/sheet';
 export { Skeleton, SkeletonRows } from './components/skeleton';
 export { Table, TableBody, TableHead, TableRow, Td, Th, type TableProps } from './components/table';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/tabs';
+export { AppShell, AppTopBar, ErrorPage, LoadingPage, NotFoundPage, PortalFrame, WorkspaceLabel, type AppShellProps } from './components/frames';
+export { SideNav, type SideNavGroup, type SideNavItem, type SideNavProps } from './components/side-nav';

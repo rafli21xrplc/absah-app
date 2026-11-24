@@ -9,12 +9,16 @@ const preview: Preview = {
   decorators: [
     // Components are shown the way a page holds them: one main landmark and one heading. Without this, axe reports
     // page-level problems that belong to the harness, not to the component.
-    (Story, { title }) => (
-      <main>
-        <h1 className="sr-only">{title}</h1>
-        <Story />
-      </main>
-    ),
+    // A story that is a whole page and brings its own <main> (parameters.ownsMain) is shown as it is: it already has the landmark and its own h1.
+    (Story, { title, parameters }) => {
+      if (parameters['ownsMain']) return <Story />;
+      return (
+        <main>
+          <h1 className="sr-only">{title}</h1>
+          <Story />
+        </main>
+      );
+    },
   ],
   parameters: {
     layout: 'padded',

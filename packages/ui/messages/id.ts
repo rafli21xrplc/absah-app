@@ -52,6 +52,21 @@ export const messages = {
   bottomNav: {
     label: 'Menu utama',
   },
+  sideNav: {
+    label: 'Menu utama',
+  },
+  appShell: {
+    skip: 'Lewati ke isi halaman',
+    menu: 'Menu',
+    closeMenu: 'Tutup menu',
+  },
+  pageState: {
+    errorTitle: 'Halaman belum bisa dibuka',
+    errorBody: 'Data Anda aman. Coba lagi, atau kembali ke beranda.',
+    notFoundTitle: 'Halaman tidak ditemukan',
+    notFoundBody: 'Alamat ini tidak ada atau sudah dipindah.',
+    home: 'Ke beranda',
+  },
 } as const;
 
 export type Messages = typeof messages;

@@ -1,3 +1,4 @@
+import { PortalFrame } from '@absah/ui';
 import { color } from '@absah/ui/tokens';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
@@ -15,7 +16,7 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <PortalServiceWorker />
-      {children}
+      <PortalFrame>{children}</PortalFrame>
     </>
   );
 }

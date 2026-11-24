@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect, useRef } from 'react';
 
 /** The scrim behind Dialog, Sheet and Drawer. The dark theme darkens the page; `tinta` is near white there, so it is not used. */

@@ -1,3 +1,5 @@
+'use client';
+
 import { ChevronDown, CircleAlert } from 'lucide-react';
 import { createContext, useContext, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { messages } from '../../messages/id';

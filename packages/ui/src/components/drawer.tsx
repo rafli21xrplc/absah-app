@@ -1,3 +1,5 @@
+'use client';
+
 import * as RDialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import type { FormEvent, ReactNode } from 'react';

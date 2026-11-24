@@ -9,7 +9,7 @@ export interface EmptyStateProps {
   /** One button that fixes it (the page's primary action). */
   action?: ReactNode;
   /** Heading level of the title, to fit the page outline. */
-  headingLevel?: 'h2' | 'h3';
+  headingLevel?: 'h1' | 'h2' | 'h3';
   className?: string;
 }
 
