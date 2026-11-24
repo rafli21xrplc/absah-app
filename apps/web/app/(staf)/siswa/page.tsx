@@ -1,18 +1,32 @@
 'use client';
 
 import { ClassList, StudentList, StudentListItem } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Banner, Button, buttonStyles, DataHeader, DataToolbar, EmptyState, ErrorState, ExitDialog, Field, PageMain, SegmentedControl, Select, SkeletonRows, Table, TableBody, TableHead, TableRow, Td, Th, cx, messages } from '@absah/ui';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
+import { isTransient } from '@/lib/offline-queue';
 import { STUDENT_MANAGERS, STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
-import forms from '../../forms.module.css';
-import styles from '../data.module.css';
+
+const t = messages.students;
+const d = messages.data;
+const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ''));
 
 type Status = 'active' | 'missing' | 'all';
-const STATUS_LABELS: Record<Status, string> = { active: 'Aktif', missing: 'Calon keluar', all: 'Semua' };
+type Exit = 'moved' | 'left';
+type LoadState = 'loading' | 'ready' | 'error' | 'offline';
+
+const STATUSES = [
+  { value: 'active', label: t.statusActive },
+  { value: 'missing', label: t.statusMissing },
+  { value: 'all', label: t.statusAll },
+] as const;
+const REASONS = [
+  { value: 'moved', label: t.reasonMoved },
+  { value: 'left', label: t.reasonLeft },
+] as const;
 
 function useDebounced<T>(value: T, ms = 300): T {
   const [debounced, setDebounced] = useState(value);
@@ -23,7 +37,10 @@ function useDebounced<T>(value: T, ms = 300): T {
   return debounced;
 }
 
-/** Student registry (AKD-01): search, rombel filter, and settling calon keluar students. */
+/**
+ * Data siswa (AKD-01; U6b, the pattern the other Data pages follow): header, toolbar, table, one dialog. Not on this page because the
+ * API has no endpoint yet: Tambah siswa, Ubah identitas, Ekspor Excel. Their buttons are left out, not shown dead.
+ */
 function StudentsView() {
   const params = useSearchParams();
   const { schoolId, hasRole } = useWorkspace();
@@ -36,21 +53,24 @@ function StudentsView() {
   const [classes, setClasses] = useState<ClassList['items']>([]);
   const [items, setItems] = useState<StudentListItem[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState<string | null>(null);
+  const [state, setState] = useState<LoadState>('loading');
+  const [attempt, setAttempt] = useState(0);
+  const [moreBusy, setMoreBusy] = useState(false);
+  const [leaving, setLeaving] = useState<StudentListItem | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(null);
+  /** One Idempotency-Key per (student, answer): kept when the reply was lost, dropped once the API answered. */
+  const keys = useRef(new Map<string, string>());
   const term = useDebounced(q.trim());
 
-  const load = useCallback(
-    async (after: string | null) => {
-      if (!schoolId) return;
-      const query = new URLSearchParams({ status, limit: '50' });
-      if (term) query.set('q', term);
-      if (classId) query.set('classId', classId);
-      if (after) query.set('cursor', after);
-      const page = await api(`/students?${query.toString()}`, StudentList, { schoolId });
-      setItems((prev) => (after ? [...prev, ...page.items] : page.items));
-      setCursor(page.nextCursor);
+  const query = useCallback(
+    (after: string | null) => {
+      const p = new URLSearchParams({ status, limit: '50' });
+      if (term) p.set('q', term);
+      if (classId) p.set('classId', classId);
+      if (after) p.set('cursor', after);
+      return api(`/students?${p.toString()}`, StudentList, { schoolId });
     },
     [schoolId, status, term, classId],
   );
@@ -63,172 +83,206 @@ function StudentsView() {
   }, [schoolId, allowed]);
 
   useEffect(() => {
-    if (!allowed) return;
+    if (!schoolId || !allowed) return;
     let cancelled = false;
-    Promise.resolve()
-      .then(() => {
-        setLoading(true);
-        setError(null);
-        return load(null);
+    query(null)
+      .then((page) => {
+        if (cancelled) return;
+        setItems(page.items);
+        setCursor(page.nextCursor);
+        setState('ready');
       })
       .catch((err: unknown) => {
-        if (!cancelled) setError(err instanceof ApiError ? err.message : 'Tidak bisa memuat data siswa.');
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setState(isTransient(err) ? 'offline' : 'error');
       });
     return () => {
       cancelled = true;
     };
-  }, [load, allowed]);
+  }, [query, schoolId, allowed, attempt]);
 
-  async function settle(student: StudentListItem, next: 'active' | 'moved' | 'left') {
-    if (!schoolId || !student.enrollment) return;
-    const ask = { active: 'masih bersekolah', moved: 'pindah sekolah', left: 'lulus atau keluar' }[next];
-    if (next !== 'active' && !window.confirm(`Tandai ${student.name} ${ask}? Siswa tidak lagi masuk daftar presensi.`)) return;
-    setBusy(student.id);
+  /** A new search or filter starts again from the top: the old rows stay until the new ones arrive. */
+  function change<V>(set: (value: V) => void) {
+    return (value: V) => {
+      set(value);
+      setState('loading');
+    };
+  }
+
+  async function loadMore() {
+    if (!cursor) return;
+    setMoreBusy(true);
     try {
-      const updated = await api(`/enrollments/${student.enrollment.id}`, StudentListItem, {
-        method: 'PATCH',
-        body: { status: next },
-        schoolId,
-        idempotencyKey: newIdempotencyKey(),
-      });
-      setItems((list) => (status === 'missing' ? list.filter((s) => s.id !== student.id) : list.map((s) => (s.id === student.id ? updated : s))));
+      const page = await query(cursor);
+      setItems((prev) => [...prev, ...page.items]);
+      setCursor(page.nextCursor);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Perubahan tidak tersimpan. Coba lagi.');
+      setState(isTransient(err) ? 'offline' : 'error');
     } finally {
-      setBusy(null);
+      setMoreBusy(false);
+    }
+  }
+
+  async function settle(student: StudentListItem, next: 'active' | Exit): Promise<boolean> {
+    if (!schoolId || !student.enrollment) return false;
+    const slot = `${student.id}:${next}`;
+    const idempotencyKey = keys.current.get(slot) ?? newIdempotencyKey();
+    keys.current.set(slot, idempotencyKey);
+    setBusy(true);
+    setFailed(null);
+    try {
+      const updated = await api(`/enrollments/${student.enrollment.id}`, StudentListItem, { method: 'PATCH', body: { status: next }, schoolId, idempotencyKey });
+      keys.current.delete(slot);
+      // A student who left is no longer on the active or calon keluar list; "Semua" shows the new state.
+      setItems((list) => (next === 'active' && status === 'missing') || (next !== 'active' && status !== 'all') ? list.filter((s) => s.id !== student.id) : list.map((s) => (s.id === student.id ? updated : s)));
+      setDone(fill(next === 'moved' ? t.doneMoved : next === 'left' ? t.doneLeft : t.doneStay, { name: student.name }));
+      return true;
+    } catch (err) {
+      if (err instanceof ApiError) keys.current.delete(slot);
+      setFailed(err instanceof ApiError ? err.message : d.saveFailed);
+      return false;
+    } finally {
+      setBusy(false);
     }
   }
 
   if (!allowed) {
     return (
-      <main className={styles.main}>
-        <p>Halaman ini untuk admin, operator, dan pimpinan sekolah.</p>
-      </main>
+      <PageMain width="xl">
+        <h1 className="m-0 text-h1">{t.title}</h1>
+        <p role="alert" className="m-0 text-body">
+          {d.forbidden}
+        </p>
+      </PageMain>
     );
   }
 
+  const showAction = canManage;
   return (
-    <main className={styles.main}>
-      <Link className={styles.back} href="/">
-        ← Beranda
-      </Link>
-      <h1 className={styles.title}>Data siswa</h1>
-      <div className={styles.toolbar}>
-        <label className={forms.field}>
-          <span className={forms.label}>Cari</span>
-          <input className={forms.input} type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Nama, NISN, atau NIPD" />
-        </label>
-        <label className={forms.field}>
-          <span className={forms.label}>Rombel</span>
-          <select className={forms.input} value={classId} onChange={(e) => setClassId(e.target.value)}>
-            <option value="">Semua rombel</option>
+    <PageMain width="xl">
+      <DataHeader
+        title={t.title}
+        subtitle={classes.length > 0 ? fill(t.subtitle, { n: classes.length }) : undefined}
+        actions={
+          canManage && (
+            <Link href="/import" className={cx(buttonStyles({ variant: 'secondary', size: '48' }), 'no-underline')}>
+              {t.importAction}
+            </Link>
+          )
+        }
+      />
+      <DataToolbar search={{ label: t.searchLabel, value: q, onChange: change(setQ), placeholder: t.searchPlaceholder }}>
+        <Field label={t.classLabel} className="min-w-44">
+          <Select value={classId} onChange={(e) => change(setClassId)(e.target.value)}>
+            <option value="">{t.allClasses}</option>
             {classes.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
-          </select>
-        </label>
-        <label className={forms.field}>
-          <span className={forms.label}>Status</span>
-          <select className={forms.input} value={status} onChange={(e) => setStatus(e.target.value as Status)}>
-            {(Object.keys(STATUS_LABELS) as Status[]).map((s) => (
-              <option key={s} value={s}>
-                {STATUS_LABELS[s]}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      {status === 'missing' && (
-        <p className={styles.notice}>
-          Siswa ini tidak ada di import Dapodik terakhir. Pastikan statusnya: tetap bersekolah, pindah, atau lulus/keluar.
+          </Select>
+        </Field>
+        <SegmentedControl label={t.statusLabel} options={STATUSES} value={status} onChange={change(setStatus)} />
+      </DataToolbar>
+      {status === 'missing' && <Banner kind="info">{t.missingNotice}</Banner>}
+      {state === 'offline' && <Banner kind="offline">{d.offlineBody}</Banner>}
+      {done && (
+        <p role="status" className="m-0 text-small text-papan">
+          {done}
         </p>
       )}
-      {error && (
-        <p className={forms.error} role="alert">
-          {error}
-        </p>
+      {state === 'error' && (
+        <ErrorState title={d.loadFailed} onRetry={() => { setState('loading'); setAttempt((n) => n + 1); }}>
+          {d.loadFailedBody}
+        </ErrorState>
       )}
-      <div className={styles.tableWrap}>
-        {items.length === 0 ? (
-          <p className={styles.empty} role="status">
-            {loading ? 'Memuat…' : 'Tidak ada siswa yang cocok.'}
-          </p>
-        ) : (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Nama</th>
-                <th>NISN</th>
-                <th>Rombel</th>
-                <th>Status</th>
-                {canManage && <th>Kontak</th>}
-                {canManage && status !== 'active' && <th>Tindak lanjut</th>}
-              </tr>
-            </thead>
-            <tbody>
+      {state === 'loading' && items.length === 0 && <SkeletonRows count={6} />}
+      {state !== 'error' && state !== 'loading' && items.length === 0 && <EmptyState title={t.empty}>{t.emptyBody}</EmptyState>}
+      {items.length > 0 && (
+        <>
+          <Table caption={t.table} className="min-w-160">
+            <TableHead>
+              <TableRow>
+                <Th>{t.colName}</Th>
+                <Th>{t.colClass}</Th>
+                <Th>{t.colGender}</Th>
+                <Th>{t.colStatus}</Th>
+                {showAction && <Th>{t.colAction}</Th>}
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {items.map((s) => (
-                <tr key={s.id}>
-                  <td>{s.name}</td>
-                  <td className={s.nisn ? undefined : styles.muted}>{s.nisn ?? 'belum ada'}</td>
-                  <td className={s.enrollment ? undefined : styles.muted}>{s.enrollment?.className ?? 'tanpa rombel'}</td>
-                  <td>
+                <TableRow key={s.id}>
+                  <Th scope="row" className="font-normal">
+                    <span className="flex flex-col">
+                      <span className="text-body-strong text-tinta">{s.name}</span>
+                      <span className="text-small text-tinta-muted">{s.nisn ? `NISN ${s.nisn}` : t.noNisn}</span>
+                    </span>
+                  </Th>
+                  <Td className={s.enrollment ? undefined : 'text-tinta-muted'}>{s.enrollment?.className ?? t.noClass}</Td>
+                  <Td>{s.gender === 'L' ? t.male : s.gender === 'P' ? t.female : '–'}</Td>
+                  <Td>
                     {s.enrollment?.missingSince ? (
-                      <span className={styles.badgeWarn}>Calon keluar</span>
+                      <span className="text-body-strong text-telat">{t.pillMissing}</span>
                     ) : s.enrollment ? (
-                      <span className={styles.badgeOk}>Aktif</span>
+                      <span className="text-body-strong text-hadir">{t.pillActive}</span>
                     ) : (
-                      <span className={styles.muted}>Tidak aktif</span>
+                      <span className="text-tinta-muted">{t.inactive}</span>
                     )}
-                  </td>
-                  {canManage && (
-                    <td>
-                      <Link href={`/siswa/kontak?id=${s.id}`} aria-label={`Kontak WhatsApp ${s.name}`}>
-                        Kontak
-                      </Link>
-                    </td>
+                  </Td>
+                  {showAction && (
+                    <Td>
+                      <span className="flex flex-wrap items-center gap-2">
+                        <Link href={`/siswa/kontak?id=${s.id}`} aria-label={fill(t.contactOf, { name: s.name })} className="text-body-strong text-papan">
+                          {t.contact}
+                        </Link>
+                        {s.enrollment?.missingSince && (
+                          <Button variant="secondary" disabled={busy} aria-label={fill(t.stayOf, { name: s.name })} onClick={() => void settle(s, 'active')}>
+                            {t.stay}
+                          </Button>
+                        )}
+                        {s.enrollment && (
+                          <Button variant="secondary" aria-label={fill(t.exitOf, { name: s.name })} onClick={() => { setFailed(null); setLeaving(s); }}>
+                            {t.exit}
+                          </Button>
+                        )}
+                      </span>
+                    </Td>
                   )}
-                  {canManage && status !== 'active' && (
-                    <td>
-                      {s.enrollment?.missingSince && (
-                        <div className={styles.rowActions}>
-                          <Button variant="secondary" disabled={busy === s.id} onClick={() => void settle(s, 'active')}>
-                            Masih bersekolah
-                          </Button>
-                          <Button variant="secondary" disabled={busy === s.id} onClick={() => void settle(s, 'moved')}>
-                            Pindah sekolah
-                          </Button>
-                          <Button variant="secondary" disabled={busy === s.id} onClick={() => void settle(s, 'left')}>
-                            Lulus/keluar
-                          </Button>
-                        </div>
-                      )}
-                    </td>
-                  )}
-                </tr>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-      {cursor && (
-        <div className={styles.more}>
-          <Button variant="secondary" onClick={() => void load(cursor)}>
-            Muat lebih banyak
-          </Button>
-        </div>
+            </TableBody>
+          </Table>
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="m-0 text-small text-tinta-muted">{fill(t.shown, { n: items.length })}</p>
+            {cursor && (
+              <Button variant="secondary" loading={moreBusy} onClick={() => void loadMore()}>
+                {d.more}
+              </Button>
+            )}
+          </div>
+        </>
       )}
-    </main>
+      <ExitDialog
+        open={leaving !== null}
+        onOpenChange={(open) => !open && !busy && setLeaving(null)}
+        title={fill(t.exitTitle, { name: leaving?.name ?? '' })}
+        description={t.exitBody}
+        reasonLabel={t.exitReason}
+        reasons={REASONS}
+        confirmLabel={t.exit}
+        busy={busy}
+        error={failed}
+        onConfirm={(reason) => {
+          if (leaving) void settle(leaving, reason).then((ok) => ok && setLeaving(null));
+        }}
+      />
+    </PageMain>
   );
 }
 
 export default function StudentsPage() {
   return (
-    <Suspense fallback={<p role="status">Memuat…</p>}>
+    <Suspense fallback={<SkeletonRows count={6} />}>
       <StudentsView />
     </Suspense>
   );
