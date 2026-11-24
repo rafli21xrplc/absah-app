@@ -423,6 +423,14 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - /peringatan-dini (student.early_warning, the URL the push opens): 7/14/30 days; the API scopes wali kelas to the class.
   Student names link to /poin/[enrollmentId] only for POINT_PROFILE_READERS (guru_bk has no profile access).
 
+## Catatan BK (apps/web/app/(staf)/bk, KSW-05)
+- Pins api commit d72b672 (GET /counseling-notes/students?q= for the guru BK, who does not read the registry).
+- Card and page for BK_READERS (guru_bk, admin) when student.counseling. Only BK_WRITERS (guru_bk) see the form
+  (student picker, date up to today, note up to 2000, follow-up none/planned + optional date) and the "Tandai
+  tindak lanjut selesai" button; the admin reads. Filter planned (default) / done / all -> ?followUp=. A 409 on
+  complete just reloads the list. The note text lives only in component state and the response, never in logs,
+  localStorage or analytics; do not add it to any of those.
+
 ## Capabilities in the web
 - Never branch on the school level. Read capabilities from /me/context (active.capabilities) through
   <CapabilitiesProvider> (apps/web/lib/capabilities.tsx); use useCapability(key) for enums and
