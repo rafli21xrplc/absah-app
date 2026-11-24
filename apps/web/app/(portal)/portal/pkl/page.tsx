@@ -124,7 +124,7 @@ export default function PortalPklPage() {
         {p && schoolId && (
           <>
             <Card as="section" aria-label={t.placeLabel} className="flex flex-col gap-1">
-              <strong className="text-h3">{p.partner.name}</strong>
+              <strong className="text-body-strong">{p.partner.name}</strong>
               <span className="text-body text-tinta-muted">{p.partner.address}</span>
               <span className="text-body">{p.hours ? fill(t.hours, { start: p.hours.startsAt.replace(':', '.'), end: p.hours.endsAt.replace(':', '.') }) : t.dudiOff}</span>
               <span className="text-body">{fill(t.mentors, { school: p.schoolMentor ?? '–', industry: p.industryMentor ?? t.noMentor })}</span>

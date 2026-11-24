@@ -181,7 +181,7 @@ function InviteDrawer({ open, onOpenChange, onInvited, onAgain }: { open: boolea
         >
           {created ? (
             <>
-              <h3 className="m-0 text-h3">{fill(t.createdTitle, { name: created.name })}</h3>
+              <h3 className="m-0 text-body-strong">{fill(t.createdTitle, { name: created.name })}</h3>
               <p className="m-0 text-body text-tinta-muted">{fill(t.createdBody, { name: created.name })}</p>
               <Field label={t.linkLabel}>
                 <Input readOnly value={created.link} onFocus={(e) => e.currentTarget.select()} />

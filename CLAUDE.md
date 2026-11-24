@@ -750,6 +750,15 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
   tidak tertahan overlay label (tes Playwright `check()` menggantung 90 detik tanpanya).
 - Ringkasan "Yang aktif untuk ..." (`PresetSummary`, `data-testid="preset-summary"`) dihitung dari `presetCapabilities` yang sama dengan server, tampil sebelum menyimpan.
 
+### Aksesibilitas dan bahasa (U9a)
+- `apps/web/e2e/a11y.spec.ts` menjalankan axe (WCAG 2.1 A dan AA) pada halaman admin yang sudah dipindah (setup, dasbor, siswa, rombel, mapel, jadwal, staf)
+  dan halaman publik (masuk, lapor, lacak), terang dan gelap, laptop dan HP. Halaman baru yang selesai direstyle ditambahkan ke `ADMIN_PAGES`.
+  Storybook axe hanya menguji komponen sendiri; spec ini menangkap yang baru muncul setelah dirakit (dua landmark sama nama, label menunjuk ke tidak ada).
+- `packages/ui/src/repo-conventions.test.ts`: (1) setiap kelas `text-*` ukuran dan kelas warna palet kita (`tinta`, `kapur`, `papan`, `garis`, status) harus
+  ada di `tokens.css`; kelas yang tidak ada tidak menghasilkan gaya dan tidak menghasilkan galat (`text-h3` begitu di tiga halaman); (2) daftar `MOVED`: halaman
+  yang sudah memakai `messages/id.ts` tidak boleh punya kalimat yang diketik langsung di JSX. Halaman yang selesai direstyle masuk daftar ini.
+- Halaman lama (sekitar 110 berkas, 1000 teks) tidak dipindah massal: dipindah bersama restyle masing-masing, supaya satu PR tetap bisa ditinjau.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

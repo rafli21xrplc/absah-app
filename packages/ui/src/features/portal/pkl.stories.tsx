@@ -10,7 +10,7 @@ type Story = StoryObj<typeof meta>;
 
 const Place = () => (
   <Card as="section" aria-label="Tempat PKL" className="flex flex-col gap-1">
-    <strong className="text-h3">PT Mitra Teknik Jaya</strong>
+    <strong className="text-body-strong">PT Mitra Teknik Jaya</strong>
     <span className="text-body text-tinta-muted">Jl. Raya Industri No. 14, Cikarang</span>
     <span className="text-body">Jam kerja hari ini 08.00–16.00</span>
     <span className="text-body">Pembimbing: Bu Nurul (sekolah), Pak Hendra Gunawan (industri)</span>

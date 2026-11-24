@@ -156,13 +156,13 @@ export function CheckoutScreen({ state, actions, onClose }: { state: Ready; acti
           <h1 className="m-0 text-display">
             {step.v.firstName} · {step.v.className}
           </h1>
-          <p className="m-0 text-h3 text-tinta-muted">{step.v.guardians.length === 0 ? t.noGuardians : t.pickWho}</p>
+          <p className="m-0 text-h2 text-tinta-muted">{step.v.guardians.length === 0 ? t.noGuardians : t.pickWho}</p>
           <div className="grid w-full max-w-4xl grid-cols-[repeat(auto-fit,minmax(11rem,13rem))] justify-center gap-4">
             {step.v.guardians.map((g) => (
               <button
                 key={g.id}
                 type="button"
-                className="flex min-h-16 cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-papan bg-kapur-raised p-3 text-h3 text-tinta"
+                className="flex min-h-16 cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-papan bg-kapur-raised p-3 text-body text-tinta"
                 onClick={() => setStep({ step: 'confirm', v: step.v, guardian: g })}
               >
                 <StoredPhoto id={g.id} alt={fill(t.photoOf, { name: g.name })} photoOf={actions.photoOf} />

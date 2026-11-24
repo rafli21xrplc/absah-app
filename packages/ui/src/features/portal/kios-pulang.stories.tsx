@@ -14,10 +14,10 @@ export const PilihPenjemput: Story = {
   render: () => (
     <main className="flex min-h-dvh flex-col items-center gap-6 p-6 text-center">
       <h1 className="m-0 text-display">Aditya · VII A</h1>
-      <p className="m-0 text-h3 text-tinta-muted">Pilih penjemput yang hadir:</p>
+      <p className="m-0 text-h2 text-tinta-muted">Pilih penjemput yang hadir:</p>
       <div className="grid w-full max-w-4xl grid-cols-[repeat(auto-fit,minmax(11rem,13rem))] justify-center gap-4">
         {GUARDIANS.map(([n, r]) => (
-          <button key={n} type="button" className="flex min-h-16 cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-papan bg-kapur-raised p-3 text-h3 text-tinta">
+          <button key={n} type="button" className="flex min-h-16 cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-papan bg-kapur-raised p-3 text-body text-tinta">
             <Photo name={n} />
             <span className="text-h2">{n}</span>
             <small className="text-body text-tinta-muted">{r}</small>

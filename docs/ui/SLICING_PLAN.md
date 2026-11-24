@@ -154,3 +154,12 @@ Ini keputusan kerja, bukan persetujuan produk; masing-masing bisa dibalik dengan
 8. **Warna.** `tokens.json` (papan `#1E5B4B`) mengganti hijau `#0f7a4f` yang dipakai seluruh aplikasi sekarang. Disetujui seluruh aplikasi berubah warna di U1?
 9. **Kios.** Prompt menyebut "rute /pulang"; kios adalah satu halaman. Layar Pulang tetap di dalam halaman itu?
 10. **Platform go.absensekolah.online.** Belum dipelajari dari dalam (daftar konfirmasi prompt). Alur CRUD U6 berasal dari desain Absah sendiri.
+
+## 7. Catatan U9a (aksesibilitas dan bahasa)
+
+Keputusan kerja (mudah dibalik): U9a tidak memindahkan seluruh teks sekaligus. Pencacahan: sekitar 1000 teks literal di 113 berkas halaman, hampir semuanya
+halaman lama yang belum direstyle. Memindahkannya dalam satu PR tidak bisa ditinjau dan berisiko merusak e2e yang mencari teks. Yang dikerjakan:
+1. Cacat nyata: `text-h3` (tidak ada di `tokens.css`) dipakai di tiga halaman dan kios; diganti.
+2. Penjaga: `packages/ui/src/repo-conventions.test.ts` (token yang tidak ada, daftar halaman yang sudah bersih dari teks di JSX).
+3. axe pada halaman nyata: `apps/web/e2e/a11y.spec.ts` (terang, gelap, laptop, HP).
+Sisanya mengikuti aturan: halaman lama dipindahkan bersama restyle-nya dan masuk daftar `MOVED`.
