@@ -730,6 +730,16 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
   setelah API menjawab. Bagian MBG hanya bila `mbg.enabled` dan peran MBG_READERS; "Papan kedatangan" hanya bila `gate.enabled` dan GATE_VIEWERS.
 - Tabel `Table` perlu `caption` yang berbeda dari nama bagian (dua landmark dengan nama sama gagal di axe).
 
+### Pola halaman Data (U6b; contoh: `app/(staf)/siswa`)
+- Urutan tetap: `DataHeader` (judul, satu baris konteks dari API, aksi) → `DataToolbar` (cari, filter `Select`, status `SegmentedControl`) → `Table`
+  (nama sebagai `Th scope="row"`) → "Menampilkan n" + "Muat lebih banyak" (cursor). Halaman Rombel, Mapel, Jadwal, Guru memakai urutan yang sama.
+- Empat keadaan: memuat (`SkeletonRows`, baris lama tetap tampil saat filter berubah), kosong (`EmptyState`), galat (`ErrorState` + Coba lagi),
+  tanpa sinyal (`Banner kind="offline"`, hanya bila `isTransient`).
+- Mengeluarkan orang dari daftar = `ExitDialog` (alertdialog): menyebut data tidak dihapus, alasan wajib dipilih dulu (tidak ada yang terpilih
+  sebelumnya, tombol mati sampai dipilih), satu Idempotency-Key per (baris, jawaban). Jangan `window.confirm`.
+- Tombol tanpa endpoint **dihapus**, tidak dimatikan: Tambah siswa, Ubah identitas siswa, Ekspor Excel (belum ada di absah-api; dicatat di PR U6b).
+- Jumlah total tidak ditulis bila API tidak mengirimnya (daftar siswa memakai cursor tanpa total): subtitle memakai jumlah rombel dari `/classes`.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

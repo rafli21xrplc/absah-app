@@ -39,11 +39,17 @@ test('Dapodik import: preview, apply, re-import changes, settle calon keluar', a
   await expect(page).toHaveURL(/\/siswa\?status=missing/);
   const bunga = page.getByRole('row', { name: /BUNGA LESTARI/ });
   await expect(bunga).toContainText('Calon keluar');
-  page.once('dialog', (dialog) => void dialog.accept());
-  await bunga.getByRole('button', { name: 'Pindah sekolah' }).click();
+  // "Keluarkan" asks first, names what stays, and wants a reason before the button works.
+  await bunga.getByRole('button', { name: 'Keluarkan BUNGA LESTARI' }).click();
+  const ask = page.getByRole('alertdialog', { name: 'Keluarkan BUNGA LESTARI dari siswa aktif?' });
+  await expect(ask).toContainText('Data tidak dihapus');
+  await expect(ask.getByRole('button', { name: 'Keluarkan' })).toBeDisabled();
+  await ask.getByRole('radio', { name: 'Pindah sekolah' }).check();
+  await ask.getByRole('button', { name: 'Keluarkan' }).click();
+  await expect(page.getByText('BUNGA LESTARI ditandai pindah sekolah.')).toBeVisible();
   await expect(page.getByText('Tidak ada siswa yang cocok.')).toBeVisible();
 
-  await page.getByLabel('Status').selectOption('active');
-  await page.getByLabel('Cari').fill('dimas');
+  await page.getByRole('button', { name: 'Aktif' }).click();
+  await page.getByLabel('Cari siswa').fill('dimas');
   await expect(page.getByRole('row', { name: /DIMAS ANGGARA/ })).toContainText('VII B');
 });
