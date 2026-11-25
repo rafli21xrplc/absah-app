@@ -1,7 +1,8 @@
 export { Banner, type BannerKind, type BannerProps } from './components/banner';
 export { buttonStyles } from './components/button-styles';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './components/button';
-export { Field, Input, Select, Textarea, type FieldProps } from './components/field';
+export { Field, Input, Textarea, type FieldProps } from './components/field';
+export { Select } from './components/select';
 export { FilterChip, type FilterChipProps } from './components/filter-chip';
 export { IconButton, type IconButtonProps } from './components/icon-button';
 export { ProgressBar, type ProgressBarProps } from './components/progress-bar';

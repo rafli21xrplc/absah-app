@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, onboardAdmin, otpLogin, randomDigits, TINY_PNG } from './helpers';
+import { choose, createSchool, onboardAdmin, otpLogin, randomDigits, TINY_PNG } from './helpers';
 
 const DUDI = { latitude: -6.2383, longitude: 106.9756 };
 // About 900 m north of the DUDI gate: outside the 150 m radius.
@@ -58,7 +58,7 @@ test('SMK: DUDI dan penempatan, check-in di lokasi dikonfirmasi pembimbing indus
 
   // Aditya and Bunga go to PT Maju Jaya with the admin as guru pembimbing and a pembimbing industri.
   await page.goto('/pkl/penempatan');
-  await page.getByRole('combobox', { name: 'DUDI', exact: true }).selectOption({ label: 'PT Maju Jaya' });
+  await choose(page.getByRole('combobox', { name: 'DUDI', exact: true }), { label: 'PT Maju Jaya' });
   for (const name of ['ADITYA', 'BUNGA']) {
     await page.getByLabel('Cari siswa').fill(name);
     await page.getByRole('button', { name: new RegExp(`^\\+ ${name}`) }).click();
@@ -66,7 +66,7 @@ test('SMK: DUDI dan penempatan, check-in di lokasi dikonfirmasi pembimbing indus
   // Ends in 10 days: the DUDI assessment form opens 14 days before the end (PKL-04).
   const end = new Date(Date.now() + 10 * 86_400_000).toISOString().slice(0, 10);
   await page.getByLabel('Selesai').fill(end);
-  await page.getByLabel('Guru pembimbing').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Guru pembimbing'), { label: 'Admin E2E' });
   await page.getByLabel('Nama pembimbing industri (boleh nanti)').fill('Pak Hendra');
   await page.getByLabel('Nomor WhatsApp pembimbing industri').fill(mentor);
   await page.getByRole('button', { name: 'Tempatkan 2 siswa' }).click();

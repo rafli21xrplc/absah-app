@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
-import { acceptInvite, createSchool, onboardAdmin } from './helpers';
+import { acceptInvite, choose, createSchool, onboardAdmin } from './helpers';
 
 test('Guru dan staf: undang lewat tautan, nonaktifkan dengan konfirmasi, aktifkan lagi', async ({ page, browser }) => {
   const { inviteUrl, email } = createSchool('SMP Negeri Staf E2E');
@@ -19,7 +19,7 @@ test('Guru dan staf: undang lewat tautan, nonaktifkan dengan konfirmasi, aktifka
   const drawer = page.getByRole('dialog', { name: 'Undang staf' });
   await drawer.getByLabel('Nama').fill('Bu Guru Baru');
   await drawer.getByRole('textbox', { name: 'Email' }).fill(guruEmail);
-  await drawer.getByLabel('Peran').selectOption({ label: 'Guru' });
+  await choose(drawer.getByLabel('Peran'), { label: 'Guru' });
   await drawer.getByRole('button', { name: 'Buat undangan' }).click();
   await expect(drawer.getByRole('heading', { name: 'Undangan untuk Bu Guru Baru sudah dibuat' })).toBeVisible();
   const link = await drawer.getByLabel('Tautan undangan').inputValue();

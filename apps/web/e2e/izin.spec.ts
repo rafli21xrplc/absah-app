@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, generateSessions, onboardAdmin } from './helpers';
+import { choose, createSchool, generateSessions, onboardAdmin } from './helpers';
 
 test('Izin dari wali kelas mengisi sesi; dibatalkan, siswa kembali bisa dipilih', async ({ page }) => {
   const { schoolId, inviteUrl, email } = createSchool('SD Negeri Izin E2E', 'sd');
@@ -13,12 +13,12 @@ test('Izin dari wali kelas mengisi sesi; dibatalkan, siswa kembali bisa dipilih'
   await page.getByRole('button', { name: 'Terapkan 10 perubahan' }).click({ timeout: 60_000 });
   await expect(page.getByText(/Import diterapkan ke tahun ajaran/)).toBeVisible();
   await page.goto('/jadwal');
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
 
   // The wali kelas enters izin after a parent's phone call: approved at once.
   await page.goto('/izin/baru');
-  await page.getByLabel('Siswa').selectOption({ label: 'ADITYA PRATAMA · VII A' });
+  await choose(page.getByLabel('Siswa'), { label: 'ADITYA PRATAMA · VII A' });
   await page.getByLabel('Alasan').fill('Demam, ibu menelepon pagi ini');
   await page.getByRole('button', { name: 'Simpan izin' }).click();
   await expect(page.getByRole('status')).toContainText('ADITYA PRATAMA: Sakit');

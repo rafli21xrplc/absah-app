@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button } from './button';
 import { Dialog } from './dialog';
-import { Field, Select } from './field';
+import { Field } from './field';
+import { Select } from './select';
 
 const meta = { title: 'Primitif/Dialog', component: Dialog, args: { open: true, onOpenChange: () => undefined, title: 'Judul' } } satisfies Meta<typeof Dialog>;
 export default meta;

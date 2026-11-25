@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin } from './helpers';
 
 test('Tagihan siswa: admin membuat jenis, menerbitkan ke rombel dua kali, membatalkan satu tagihan, melihat rekap', async ({ page }) => {
   test.slow();
@@ -28,9 +28,9 @@ test('Tagihan siswa: admin membuat jenis, menerbitkan ke rombel dua kali, membat
 
   // Issue it to one rombel; issuing it again creates nothing twice.
   await page.goto('/tagihan-siswa/terbitkan');
-  await page.getByLabel('Jenis tagihan').selectOption({ label: 'SPP (Rp250.000)' });
+  await choose(page.getByLabel('Jenis tagihan'), { label: 'SPP (Rp250.000)' });
   await page.getByLabel(/^Periode/).fill('2026-11');
-  await page.getByRole('combobox', { name: /^Rombel/ }).selectOption({ index: 1 });
+  await choose(page.getByRole('combobox', { name: /^Rombel/ }), { index: 1 });
   await page.getByLabel('Jatuh tempo', { exact: true }).fill('2099-12-10');
   await page.getByRole('button', { name: 'Terbitkan' }).click();
   await expect(page.getByRole('status').filter({ hasText: /tagihan dibuat, total/ })).toBeVisible();
@@ -48,7 +48,7 @@ test('Tagihan siswa: admin membuat jenis, menerbitkan ke rombel dua kali, membat
   page.once('dialog', (dialog) => void dialog.accept('Salah terbit'));
   await rows.first().getByRole('button', { name: 'Batalkan' }).click();
   await expect(rows).toHaveCount(before - 1);
-  await page.getByLabel('Status').selectOption({ label: 'Dibatalkan' });
+  await choose(page.getByLabel('Status'), { label: 'Dibatalkan' });
   await expect(page.getByRole('row').filter({ hasText: 'Salah terbit' })).toHaveCount(1);
 
   // The recap opens for the month and shows what is still owed per rombel.

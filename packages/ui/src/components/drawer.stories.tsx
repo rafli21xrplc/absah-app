@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button } from './button';
 import { Drawer } from './drawer';
-import { Field, Input, Select } from './field';
+import { Field, Input } from './field';
+import { Select } from './select';
 
 const meta = { title: 'Primitif/Drawer', component: Drawer, args: { open: true, onOpenChange: () => undefined, title: 'Judul', children: null } } satisfies Meta<typeof Drawer> ;
 export default meta;

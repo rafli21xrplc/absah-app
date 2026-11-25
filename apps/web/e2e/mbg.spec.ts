@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomInt, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
+import { choose, createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
 
 test('MBG: admin mengatur jam batas dan PIC, alpa tidak dihitung hadir', async ({ page }) => {
   test.slow(); // onboarding, import and a session
@@ -14,7 +14,7 @@ test('MBG: admin mengatur jam batas dan PIC, alpa tidak dihitung hadir', async (
   await page.getByRole('button', { name: 'Terapkan 10 perubahan' }).click({ timeout: 60_000 });
   await expect(page.getByText(/Import diterapkan ke tahun ajaran/)).toBeVisible();
   await page.goto('/jadwal');
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
 
   generateSessions(schoolId);

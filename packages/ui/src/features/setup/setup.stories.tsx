@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from '../../components/button';
-import { Field, Input, Select } from '../../components/field';
+import { Field, Input } from '../../components/field';
+import { Select } from '../../components/select';
 import { PageMain } from '../../components/frames';
 import { ChoiceGroup, PresetSummary, Stepper, WizardNav, type StepperItem } from './setup-parts';
 

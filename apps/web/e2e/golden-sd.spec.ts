@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES, KIOSK_URL } from './env';
-import { TINY_PNG, cardToken, createSchool, fillSession, gateFixture, generateSessions, lastMessage, onboardAdmin, otpLogin, randomDigits, type GateFixture } from './helpers';
+import { cardToken, choose, createSchool, fillSession, gateFixture, type GateFixture, generateSessions, lastMessage, onboardAdmin, otpLogin, randomDigits, TINY_PNG } from './helpers';
 
 /** A USB scanner types the QR text and Enter, once the Pulang screen waits for a card again. */
 async function scan(kiosk: Page, card: GateFixture['cards'][number]) {
@@ -32,7 +32,7 @@ test('SD: sesi harian dan WA alpa, orang tua mendaftarkan penjemput, kios Pulang
   await page.getByRole('button', { name: 'Terapkan 10 perubahan' }).click({ timeout: 60_000 });
   await expect(page.getByText(/Import diterapkan ke tahun ajaran/)).toBeVisible();
   await page.goto('/jadwal');
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
   // SD preset: daily attendance, penjemputan on, 7 KAIH by parents. The gate itself is the school's choice.
   const enabled = await page.request.put('/api/v1/school/capabilities', {
@@ -62,7 +62,7 @@ test('SD: sesi harian dan WA alpa, orang tua mendaftarkan penjemput, kios Pulang
   const children = parent.getByRole('region', { name: /^Penjemput aditya/i });
   await children.getByRole('button', { name: 'Tambah penjemput' }).click();
   await children.getByLabel('Nama penjemput').fill('Pak Darto');
-  await children.getByLabel('Hubungan').selectOption('sopir');
+  await choose(children.getByLabel('Hubungan'), 'sopir');
   await children.getByLabel('Nomor WhatsApp penjemput').fill(`0813${randomDigits(8)}`);
   await children.getByLabel('Foto wajah penjemput').setInputFiles({ name: 'darto.png', mimeType: 'image/png', buffer: TINY_PNG });
   await children.getByRole('button', { name: 'Kirim untuk disetujui' }).click();

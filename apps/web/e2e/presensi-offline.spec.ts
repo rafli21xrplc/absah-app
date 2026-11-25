@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, generateSessions, markStudents, onboardAdmin, pickStatus, sendReview } from './helpers';
+import { choose, createSchool, generateSessions, markStudents, onboardAdmin, pickStatus, sendReview } from './helpers';
 
 // The app's own server stays reachable here (the service worker that keeps the page shells is production-only);
 // what drops is the API, which is what "no signal" means for the session screens (PRS-08).
@@ -17,7 +17,7 @@ test('Guru mengisi dua sesi tanpa sinyal, lalu terkirim otomatis saat sinyal kem
 
   await page.goto('/jadwal');
   for (const rombel of ['VII A', 'VII B']) {
-    await page.getByLabel(`Wali kelas ${rombel}`).selectOption({ label: 'Admin E2E' });
+    await choose(page.getByLabel(`Wali kelas ${rombel}`), { label: 'Admin E2E' });
     await expect(page.getByText(`Wali kelas ${rombel}: Admin E2E.`)).toBeVisible();
   }
   generateSessions(schoolId);

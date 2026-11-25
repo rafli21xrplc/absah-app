@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { expectNoAxeViolations } from '../test/axe';
 import { Button } from './button';
 import { DataToolbar } from './data-toolbar';
-import { Select } from './field';
+import { Select } from './select';
 import { Table, TableBody, TableHead, TableRow, Td, Th } from './table';
 
 function StudentTable() {

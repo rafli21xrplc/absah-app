@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
 import { Button } from './button';
 import { DataToolbar } from './data-toolbar';
-import { Select } from './field';
+import { Select } from './select';
 import { SegmentedControl } from './segmented-control';
 import { StatusPill } from './status-pill';
 import { Table, TableBody, TableHead, TableRow, Td, Th } from './table';
