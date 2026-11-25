@@ -13,7 +13,7 @@ const t = messages.offline;
  * "Keluar". Presensi that wait on the phone are not lost by signing out (the queue stays, keyed by user, and goes out when the
  * same user signs in again), but the teacher is told how many are still not at the school before the account closes.
  */
-export function SignOutButton() {
+export function useSignOut() {
   const router = useRouter();
   const { me, selectSchool } = useWorkspace();
   const [waiting, setWaiting] = useState<number | null>(null);
@@ -31,11 +31,7 @@ export function SignOutButton() {
     setWaiting(n);
   }
 
-  return (
-    <>
-      <Button variant="secondary" onClick={() => void ask()}>
-        Keluar
-      </Button>
+  const dialog = (
       <Dialog
         open={waiting !== null}
         onOpenChange={(open) => !open && setWaiting(null)}
@@ -49,6 +45,19 @@ export function SignOutButton() {
           </Button>
         }
       />
+  );
+  return { ask, dialog };
+}
+
+/** The "Keluar" button of the home page. The side menu has its own (useSignOut), so this stays for the pages without it. */
+export function SignOutButton() {
+  const { ask, dialog } = useSignOut();
+  return (
+    <>
+      <Button variant="secondary" onClick={() => void ask()}>
+        Keluar
+      </Button>
+      {dialog}
     </>
   );
 }

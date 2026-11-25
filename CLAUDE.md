@@ -801,6 +801,15 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - Kelas warna tetap token (`bg-kapur`, `text-tinta`): satu kelas bekerja di kedua tema. Warna tidak boleh ditulis per tema di komponen.
 - E2E `tema.spec.ts` membaca warna asli halaman di laptop dan HP, dan menjalankan axe pada Terang dan Gelap yang dipilih berlawanan dengan pengaturan sistem.
 
+### Menu samping staf (SB1; `app/(staf)/staff-shell.tsx`)
+
+- Susunan kolom 256 px di laptop: ATAS tetap (merek, lalu kartu sekolah), TENGAH menggulir (menu), BAWAH tetap (akun). `AppShell` menerima `sidebarHeader` dan `sidebarFooter` untuk itu; tanpa keduanya kolomnya satu blok menggulir seperti dulu. Akun dan Keluar tidak boleh ikut tergulir: menu admin panjang.
+- Sekolah (`SchoolSwitcher`): satu sekolah = kartu biasa, tanpa tombol; lebih dari satu = tombol yang membuka daftar pendek (popover). Akun (`AccountMenu`): avatar huruf pertama, nama, dan peran di sekolah aktif; popover berisi Tampilan (tema), Notifikasi di HP ini, Catatan rilis, dan Keluar. Isi popover itu hal milik orang, bukan milik sekolah: itu sebabnya "Notifikasi di HP ini" dan "Catatan rilis" pindah dari `STAFF_MENU` ke `ACCOUNT_LINKS` di `lib/nav-menu.ts`.
+- Di HP tidak ada popover: lembar Menu memuat Select sekolah, menu, lalu blok akun yang sama (`accountRows` di `staff-shell.tsx` dipakai kedua tempat). Guru dengan bilah bawah tetap memakai tab Akun (`/pengaturan`) dan tombol Keluar di beranda.
+- Grup menu yang berjudul bisa dilipat (`SideNav collapsible`). Grup yang memuat halaman saat ini selalu terbuka dan tidak bisa ditutup; sisanya mulai tertutup dan mengingat pilihan orang itu di peramban (`absah-menu`). Grup tertutup tidak dirender sama sekali (tidak ada yang bisa di-Tab). Tanpa `collapsible` semuanya terbuka seperti sebelumnya. Ikon chevron berganti arah TANPA animasi: putar chevron tidak ada di papan Motion-UI.
+- Popover sekolah dan akun dimuat lazy (potongan terpisah, sama seperti `Select`), hanya di layar lebar. Tombolnya ada sejak awal; ketukan sebelum potongan tiba membuka popover begitu tiba, jadi tidak ada ketukan yang hilang.
+- Keluar memakai `useSignOut` (`sign-out-button.tsx`): bila ada presensi menunggu di HP, orang diberi tahu jumlahnya dulu. Satu dialog di `StaffShell` melayani popover maupun lembar. Beranda tetap punya tombol Keluar sendiri.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

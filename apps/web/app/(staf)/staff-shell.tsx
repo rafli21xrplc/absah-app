@@ -1,13 +1,18 @@
 'use client';
 
-import { AppShell, AppTopBar, BottomNav, Select, Sheet, SideNav, ThemeSwitch, WorkspaceLabel, type SideNavGroup } from '@absah/ui';
+import { AccountMenu, AccountSummary, AppShell, AppTopBar, BottomNav, BrandMark, menuItemStyles, messages, SchoolSwitcher, Select, Sheet, SideNav, ThemeSwitch, WorkspaceLabel, type SideNavGroup } from '@absah/ui';
+import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo, useState, type ComponentProps, type ReactNode } from 'react';
 import { useCapabilities } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
-import { currentBarKey, currentItemKey, menuContext, TEACHER_BAR, usesTeacherBar, visibleMenu, type BarItem } from '@/lib/nav-menu';
+import { ACCOUNT_LINKS, currentBarKey, currentItemKey, menuContext, TEACHER_BAR, usesTeacherBar, visibleMenu, type BarItem } from '@/lib/nav-menu';
+import { ROLE_LABELS } from '@/lib/roles';
 import { useWorkspace } from '@/lib/workspace';
+import { useSignOut } from './sign-out-button';
+
+const t = messages.sidebar;
 
 /** Menu links do not prefetch: ~40 of them on every page would cost a cheap phone's data and the school's. */
 function MenuLink(props: ComponentProps<typeof Link>) {
@@ -24,6 +29,7 @@ const FOCUS_SCREENS = ['/sesi/'];
  */
 export function StaffShell({ children }: { children: ReactNode }) {
   const { me, schoolId, roles, selectSchool } = useWorkspace();
+  const { ask: askSignOut, dialog: signOutDialog } = useSignOut();
   const capabilities = useCapabilities();
   const pathname = usePathname();
   // The sheet is open for the page it was opened on: any change of page (a menu link, the back button) closes it, no effect needed.
@@ -53,13 +59,37 @@ export function StaffShell({ children }: { children: ReactNode }) {
   const school = me.schools.find((s) => s.id === schoolId);
   if (!school) return <>{children}</>;
 
-  // Tampilan (theme) sits under the menu, in the side menu and in the phone's menu sheet alike.
-  const appearance = (
-    <div className="mt-auto flex flex-col gap-2 border-t border-garis pt-4">
-      <ThemeSwitch />
-    </div>
-  );
   const label = <WorkspaceLabel name={school.name} detail={LEVEL_LABELS[school.level]} />;
+  const roleLine = roles.map((r) => ROLE_LABELS[r]).join(', ');
+  const choices = me.schools.map((x) => ({ id: x.id, name: x.name, detail: LEVEL_LABELS[x.level] }));
+  // What belongs to the person: theme, this phone's notifications, release notes, Keluar. One list for the laptop's popover and
+  // the phone's sheet; `compact` is the narrow popover, `onLeave` closes the sheet before the sign-out question opens.
+  const accountRows = (compact: boolean, onLeave?: () => void) => (
+    <>
+      <div className="flex flex-col gap-1 px-1 pb-1">
+        <span className="px-2 text-small font-bold uppercase text-tinta-muted">{messages.theme.label}</span>
+        <ThemeSwitch compact={compact} />
+      </div>
+      {ACCOUNT_LINKS.map((l) => (
+        <Link key={l.key} href={l.href} prefetch={false} className={menuItemStyles}>
+          <l.icon aria-hidden strokeWidth={1.75} className="size-5 shrink-0" />
+          {l.label}
+        </Link>
+      ))}
+      <button
+        type="button"
+        data-menu-close
+        className={menuItemStyles}
+        onClick={() => {
+          onLeave?.();
+          void askSignOut();
+        }}
+      >
+        <LogOut aria-hidden strokeWidth={1.75} className="size-5 shrink-0" />
+        {t.signOut}
+      </button>
+    </>
+  );
   const switcher =
     me.schools.length > 1 ? (
       <Select aria-label="Sekolah" value={school.id} onChange={(e) => selectSchool(e.target.value)}>
@@ -87,12 +117,21 @@ export function StaffShell({ children }: { children: ReactNode }) {
   return (
     <AppShell
       sidebar={
+        <SideNav groups={navGroups} linkAs={MenuLink} collapsible />
+      }
+      sidebarHeader={
         <>
-          {label}
-          {switcher}
-          <SideNav groups={navGroups} linkAs={MenuLink} />
-          {appearance}
+          <span className="flex items-center gap-2 px-1">
+            <BrandMark size={28} />
+            <span className="text-h2 font-bold">{t.brand}</span>
+          </span>
+          <SchoolSwitcher schools={choices} activeId={school.id} onSelect={selectSchool} />
         </>
+      }
+      sidebarFooter={
+        <AccountMenu name={me.user.name} detail={roleLine} email={me.user.email}>
+          {accountRows(true)}
+        </AccountMenu>
       }
       bottomBar={bottomBar}
       topBar={
@@ -101,14 +140,20 @@ export function StaffShell({ children }: { children: ReactNode }) {
             <AppTopBar onMenu={() => setOpen(true)}>{label}</AppTopBar>
             <Sheet open={open} onOpenChange={setOpen} title="Menu" eyebrow={school.name}>
               {switcher}
-              <SideNav groups={navGroups} linkAs={MenuLink} onNavigate={() => setOpen(false)} />
-              {appearance}
+              <SideNav groups={navGroups} linkAs={MenuLink} collapsible onNavigate={() => setOpen(false)} />
+              <div className="flex flex-col gap-1 border-t border-garis pt-3">
+                <div className="px-2 pb-2">
+                  <AccountSummary name={me.user.name} detail={roleLine} />
+                </div>
+                {accountRows(false, () => setOpen(false))}
+              </div>
             </Sheet>
           </>
         )
       }
     >
       {children}
+      {signOutDialog}
     </AppShell>
   );
 }
