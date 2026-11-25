@@ -71,7 +71,7 @@ export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavi
   const Link = linkAs ?? 'a';
   const [memory, remember] = useGroupMemory(storageKey, collapsible);
   return (
-    <nav aria-label={label} className={cx('flex flex-col gap-5', className)}>
+    <nav aria-label={label} className={cx('flex flex-col gap-3', className)}>
       {groups.map((group) => {
         const folds = collapsible && Boolean(group.title);
         const holdsCurrent = group.items.some((i) => i.current);

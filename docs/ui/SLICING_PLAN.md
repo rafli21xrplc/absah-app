@@ -218,3 +218,12 @@ Permintaan: sidebar tidak memudahkan, harus ada tombol keluar dan workspace; fun
 - Bahasa dan tema (TL) menumpang di blok akun ini: pilihan bahasa nanti ditaruh di baris Tampilan.
 - Tangkapan layar: `docs/ui/sb1/`.
 
+## 12. RF1: tampilan segar, tata letak, dan pencarian
+
+Permintaan: rombak desain agar lebih segar (tetap hijau, dipadu putih natural) karena terlihat usang, rapikan tata letak, tambah pencarian Ctrl+K.
+- **Keputusan palet (mudah dibalik)**: mengubah `tokens.json` (sumber warna) ke versi 3, bukan menimpa di komponen. Alasan: satu tempat, kontras diuji otomatis. Tanda tangan desain di papan lama tidak diubah; selisihnya dicatat di `CLAUDE.md`.
+- **Tata letak**: strip atas dengan pencarian, jarak halaman lebih lega, kartu dasbor tanpa kotak di dalam kotak, angka status lebih besar. Halaman lain mengikuti otomatis karena memakai `PageMain` dan `BoardSection`.
+- **Pencarian**: halaman, tindakan, pindah sekolah, dan siswa. Guru, rombel, dan kegiatan belum dicari lewat server (usulan lanjutan); mereka tetap ketemu sebagai halaman.
+- **Belum dikerjakan**: halaman-halaman Data (tabel, formulir) belum dirapikan satu per satu; lihat hasil di `docs/ui/rf1/` dan beri tahu halaman mana yang paling mengganggu.
+- Tangkapan layar: `docs/ui/rf1/`.
+

@@ -33,6 +33,7 @@ export { Table, TableBody, TableHead, TableRow, Td, Th, type TableProps } from '
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/tabs';
 export { AppShell, AppTopBar, ErrorPage, LoadingPage, NotFoundPage, PageMain, PortalFrame, WorkspaceLabel, type AppShellProps } from './components/frames';
 export { AccountMenu, AccountSummary, Avatar, menuItemStyles, SchoolSwitcher, type AccountMenuProps, type SchoolChoice } from './components/sidebar-menus';
+export { CommandPalette, SearchTrigger, useCommandShortcut, type CommandAction, type CommandGroupData, type CommandPaletteProps } from './components/command-palette';
 export { SideNav, type SideNavGroup, type SideNavItem, type SideNavProps } from './components/side-nav';
 export { GreetingHeader, SessionGroup, SessionHero, SessionItem, type SessionHeroProps, type SessionItemProps, type SessionItemVariant } from './components/today';
 export { AttendanceFlow, type AttendanceFlowProps, type FlowStudent, type SendResult } from './features/presensi/attendance-flow';

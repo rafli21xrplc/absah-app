@@ -14,6 +14,8 @@ export interface AppShellProps {
   sidebarHeader?: ReactNode;
   /** Pinned under the scrolling menu (the account): always in reach, however long the menu is. */
   sidebarFooter?: ReactNode;
+  /** The strip above the page on a laptop (1024 px and up): where search lives. Below that the top bar does the job. */
+  header?: ReactNode;
   /** A bar above the page on screens under 1024 px (menu button, school name). */
   topBar?: ReactNode;
   /** The teacher's bottom bar, phone only (under 1024 px); the page gets room under it. */
@@ -26,7 +28,7 @@ export interface AppShellProps {
  * The staff page frame: skip link, 240 px side column on a laptop, a top bar on a phone, then the page.
  * The page keeps its own <main>; the frame is not a landmark so there is only one.
  */
-export function AppShell({ sidebar, sidebarHeader, sidebarFooter, topBar, bottomBar, children, skipLabel = messages.appShell.skip }: AppShellProps) {
+export function AppShell({ sidebar, sidebarHeader, sidebarFooter, header, topBar, bottomBar, children, skipLabel = messages.appShell.skip }: AppShellProps) {
   return (
     <div className="min-h-dvh bg-kapur text-tinta lg:flex">
       <nav aria-label={messages.appShell.shortcuts}>
@@ -44,6 +46,11 @@ export function AppShell({ sidebar, sidebarHeader, sidebarFooter, topBar, bottom
         <aside className="hidden w-60 shrink-0 flex-col gap-5 overflow-y-auto border-r border-garis bg-kapur-raised p-4 lg:sticky lg:top-0 lg:flex lg:h-dvh">{sidebar}</aside>
       )}
       <div className="flex min-w-0 flex-1 flex-col">
+        {header && (
+          <div className="sticky top-0 z-30 hidden border-b border-garis bg-kapur lg:block">
+            <div className="flex min-h-14 items-center gap-3 px-8">{header}</div>
+          </div>
+        )}
         {topBar && <div className="sticky top-0 z-30 border-b border-garis bg-kapur-raised lg:hidden">{topBar}</div>}
         <div id="isi" tabIndex={-1} className={cx('min-w-0 flex-1 outline-none', bottomBar ? 'pb-14 lg:pb-0' : '')}>
           {children}
@@ -55,13 +62,14 @@ export function AppShell({ sidebar, sidebarHeader, sidebarFooter, topBar, bottom
 }
 
 /** The phone's top bar: a Menu button that opens the menu sheet, then the school (WorkspaceLabel). */
-export function AppTopBar({ onMenu, menuLabel = messages.appShell.menu, children }: { onMenu: () => void; menuLabel?: string; children?: ReactNode }) {
+export function AppTopBar({ onMenu, menuLabel = messages.appShell.menu, children, actions }: { onMenu: () => void; menuLabel?: string; children?: ReactNode; actions?: ReactNode }) {
   return (
     <div className="flex items-center gap-2 px-2 py-2">
       <Button variant="ghost" onClick={onMenu} aria-haspopup="dialog">
         {menuLabel}
       </Button>
       {children}
+      {actions && <div className="ml-auto flex shrink-0 items-center gap-1">{actions}</div>}
     </div>
   );
 }
@@ -78,7 +86,7 @@ export function WorkspaceLabel({ name, detail }: { name: string; detail?: string
 
 /** A page's own main landmark and its column: padding and spacing live here so a page holds no free styling. */
 export function PageMain({ children, width = 'md' }: { children: ReactNode; width?: 'md' | 'lg' | 'xl' }) {
-  return <main className={cx('mx-auto box-border flex w-full flex-col gap-4 px-4 py-6', width === 'xl' ? 'max-w-6xl' : width === 'lg' ? 'max-w-5xl' : 'max-w-xl')}>{children}</main>;
+  return <main className={cx('mx-auto box-border flex w-full flex-col gap-5 px-4 py-6 sm:px-6 lg:px-8 lg:py-8', width === 'xl' ? 'max-w-6xl' : width === 'lg' ? 'max-w-5xl' : 'max-w-xl')}>{children}</main>;
 }
 
 /** The portal: one simple column, at most 480 px wide on a laptop. */

@@ -7,6 +7,8 @@ const apiUrl = process.env.API_URL ?? 'http://localhost:4000';
 const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // The dev badge sits at the right: at the left it covers the account button at the foot of the side menu.
+  devIndicators: { position: 'bottom-right' },
   // Shared packages ship TypeScript source.
   transpilePackages: ['@absah/ui', '@absah/contracts', '@absah/capabilities'],
   headers() {

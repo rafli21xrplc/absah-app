@@ -10,14 +10,16 @@ export interface EmptyStateProps {
   action?: ReactNode;
   /** Heading level of the title, to fit the page outline. */
   headingLevel?: 'h1' | 'h2' | 'h3';
+  /** Quiet version for inside a card that already has its border: no box in a box, just the words. */
+  bare?: boolean;
   className?: string;
 }
 
 /** The "kosong" state of a list or form. */
-export function EmptyState({ title, children, action, headingLevel: Heading = 'h2', className }: EmptyStateProps) {
+export function EmptyState({ title, children, action, headingLevel: Heading = 'h2', bare = false, className }: EmptyStateProps) {
   return (
-    <section className={cx('flex flex-col items-start gap-3 rounded-lg border border-garis bg-kapur-raised p-6 text-tinta', className)}>
-      <Heading className="m-0 text-body-strong">{title}</Heading>
+    <section className={cx('flex flex-col items-start gap-3 text-tinta', bare ? 'py-1' : 'rounded-lg border border-garis bg-kapur-raised p-6', className)}>
+      <Heading className={cx('m-0', bare ? 'text-body font-normal text-tinta-muted' : 'text-body-strong')}>{title}</Heading>
       {children && <p className="m-0 text-body text-tinta-muted">{children}</p>}
       {action}
     </section>

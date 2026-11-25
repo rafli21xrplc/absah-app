@@ -810,6 +810,14 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - Popover sekolah dan akun dimuat lazy (potongan terpisah, sama seperti `Select`), hanya di layar lebar. Tombolnya ada sejak awal; ketukan sebelum potongan tiba membuka popover begitu tiba, jadi tidak ada ketukan yang hilang.
 - Keluar memakai `useSignOut` (`sign-out-button.tsx`): bila ada presensi menunggu di HP, orang diberi tahu jumlahnya dulu. Satu dialog di `StaffShell` melayani popover maupun lembar. Beranda tetap punya tombol Keluar sendiri.
 
+### Tampilan segar dan pencarian (RF1)
+
+- Palet `tokens.json` versi 3: hijau papan lebih terang (`#0B7A52`, tadinya `#1E5B4B`) di atas putih natural (`kapur` `#F8F9F5`, kartu `#FFFFFF`); gelapnya hijau-hitam dengan papan `#4CC38A`. Semua pasangan kontras WCAG AA lolos di `tokens.test.ts`, termasuk tombol utama ditekan di tema gelap (dulu "masalah desain yang diketahui", daftar itu kini kosong; entri baru wajib menyebut alasan). Papan desain di `design/boards` masih berwarna lama: itu gambar, `tokens.json` yang berlaku.
+- Warna HANYA lewat token. Ganti warna merek = ubah `tokens.json` lalu `pnpm tokens:build`; tes e2e dan kode tidak boleh menulis hex (`e2e/tema.spec.ts` membacanya dari `@absah/ui/tokens`).
+- Tata letak: laptop punya strip atas (`AppShell header`) berisi kolom Cari; HP punya tombol Cari di bilah atas. `PageMain` memberi jarak 16, 24, lalu 32 px menurut lebar layar dan jarak antarblok 20 px. Kartu `BoardSection` berjudul `text-body-strong`; keadaan kosongnya `EmptyState bare` (tulisan saja, tanpa kotak di dalam kotak). Angka besar papan memakai `text-angka`.
+- Pencarian Ctrl+K (Cmd+K di Mac): `CommandPalette` (cmdk dalam dialog Radix) dimuat lazy saat pertama dibuka, dan `SearchTrigger` mulai mengunduhnya saat disorot. Isinya: Halaman (persis menu yang boleh dilihat orang itu + tautan akun), Tindakan (Tampilan terang, gelap, sistem; Keluar), Pindah sekolah, dan Siswa (hanya bila boleh membaca siswa; dua huruf atau lebih, jeda 250 ms, enam hasil lewat `GET /students?q=`, dibuka sebagai `/siswa?q=nama`). Kelompok dari server memakai `remote` supaya tidak disaring ulang. Palet tanpa animasi masuk (bukan satu dari 12 gerak Motion-UI).
+- Tambah isi palet = tambah `CommandAction` di `paletteGroups` (`staff-shell.tsx`); jangan menulis palet kedua.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

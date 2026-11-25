@@ -1,10 +1,12 @@
+import { color } from '@absah/ui/tokens';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { createSchool, onboardAdmin } from './helpers';
 
 // Tampilan (TL1): the person picks Sistem, Terang or Gelap in the staff menu. The choice beats the OS, stays after a reload and
 // shows no flash of the other theme. Colours are read from the page itself, so a token that stopped switching would fail here.
-const KAPUR = { light: 'rgb(247, 245, 239)', dark: 'rgb(18, 26, 23)' };
+const rgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')})`;
+const KAPUR = { light: rgb(color.kapur.light), dark: rgb(color.kapur.dark) };
 
 async function openMenu(page: Page, isMobile: boolean) {
   // The choice is in the account menu: a popover under the side menu on a laptop, the end of the Menu sheet on a phone.

@@ -35,7 +35,7 @@ export function StatusBoard({ items, label = t.summaryLabel }: { items: readonly
               </span>
               {kata}
             </span>
-            <span className="text-h1 tabular-nums">{it.count}</span>
+            <span className="text-angka">{it.count}</span>
             {it.caption && <span className="text-small text-tinta-muted">{it.caption}</span>}
           </li>
         );
@@ -74,7 +74,7 @@ export function BoardSection({ title, aside, action, state, emptyText, onRetry, 
     <section aria-labelledby={id} aria-busy={state === 'loading'} className={cx('box-border flex min-w-0 flex-col gap-3 rounded-lg border border-garis bg-kapur-raised p-5', className)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h2 id={id} className="m-0 text-h2">
+          <h2 id={id} className="m-0 text-body-strong">
             {title}
           </h2>
           {aside && <span className="text-small text-tinta-muted">{aside}</span>}
@@ -82,7 +82,7 @@ export function BoardSection({ title, aside, action, state, emptyText, onRetry, 
         {state === 'ready' && action}
       </div>
       {state === 'loading' && <SkeletonRows count={2} />}
-      {state === 'empty' && <EmptyState title={emptyText ?? ''} headingLevel="h3" />}
+      {state === 'empty' && <EmptyState bare title={emptyText ?? ''} headingLevel="h3" />}
       {state === 'error' && (
         <ErrorState title={t.loadFailed.replace('{title}', title)} onRetry={onRetry} headingLevel="h3">
           {t.loadFailedBody}
