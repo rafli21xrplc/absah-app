@@ -227,3 +227,11 @@ Permintaan: rombak desain agar lebih segar (tetap hijau, dipadu putih natural) k
 - **Belum dikerjakan**: halaman-halaman Data (tabel, formulir) belum dirapikan satu per satu; lihat hasil di `docs/ui/rf1/` dan beri tahu halaman mana yang paling mengganggu.
 - Tangkapan layar: `docs/ui/rf1/`.
 
+## 13. CMS1: tata letak CMS dengan palet CMS
+
+Permintaan: rombak tata letak CMS agar rapi, fungsional, segar; riset Dribbble atau platform lain; palet dari dokumen "Absah — Palet Warna CMS".
+- **Palet**: dokumen palet memakai kembali papan `#1E5B4B` dan netral hangat, jadi palet RF1 (v3, hijau terang) diganti v4 sesuai dokumen. Kesan segar datang dari tata letak, bukan dari hijau yang lebih terang. Token sidebar ditambah (dokumen: "sidebar boleh memakai papan 800").
+- **Riset**: pencarian web ditolak di sesi ini, jadi riset memakai pola yang sudah umum dari dasbor SaaS dan bidikan Dribbble yang dikenal (Linear, Stripe, Vercel, Supabase, dasbor sekolah dan HR): (1) sidebar gelap berwarna merek dengan isi terang, item aktif berlatar plus penanda tepi; (2) pemilih workspace di atas, akun di bawah; (3) strip atas tipis dengan jejak lokasi, pencarian Cmd+K, aksi kecil di kanan; (4) kartu KPI putih, angka besar, warna hanya pada penanda; (5) kartu putih dengan bayangan tipis di latar netral hangat; (6) tabel dengan hover baris lembut dan judul kolom kecil. Belum diambil: grafik tren di kartu KPI (API belum memberi selisih), lonceng notifikasi (tidak ada kotak masuk staf), tab di bawah judul halaman.
+- **Keputusan (mudah dibalik)**: HP tetap bilah atas terang (hijau tua di HP memakan layar kecil); item menu 40 px di laptop, 44 px di HP.
+- Tangkapan layar: `docs/ui/cms1/` (terang dan gelap).
+

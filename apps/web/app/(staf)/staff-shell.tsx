@@ -1,6 +1,6 @@
 'use client';
 
-import { AccountMenu, AccountSummary, AppShell, AppTopBar, BottomNav, BrandMark, Button, CommandPalette, menuItemStyles, messages, SchoolSwitcher, SearchTrigger, Select, Sheet, SideNav, ThemeSwitch, useCommandShortcut, useTheme, WorkspaceLabel, type CommandGroupData, type SideNavGroup } from '@absah/ui';
+import { AccountMenu, AccountSummary, AppShell, AppTopBar, BottomNav, BrandMark, Breadcrumbs, Button, ThemeToggle, CommandPalette, menuItemStyles, messages, SchoolSwitcher, SearchTrigger, Select, Sheet, SideNav, ThemeSwitch, useCommandShortcut, useTheme, WorkspaceLabel, type CommandGroupData, type SideNavGroup } from '@absah/ui';
 import { LogOut, Monitor, Moon, Search, Sun, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -50,6 +50,14 @@ export function StaffShell({ children }: { children: ReactNode }) {
   const ctx = useMemo(() => menuContext(roles, capabilities), [roles, capabilities]);
   const groups = useMemo(() => visibleMenu(ctx), [ctx]);
   const current = currentItemKey(groups, pathname);
+  // Header crumbs: Beranda › group › page. Pages outside the menu (a session, an exam) show the menu entry they belong to.
+  const crumbs = useMemo(() => {
+    const home = { label: messages.breadcrumb.home, href: '/' };
+    const group = groups.find((g) => g.items.some((i) => i.key === current));
+    const item = group?.items.find((i) => i.key === current);
+    if (!group || !item) return pathname === '/' ? [{ label: messages.breadcrumb.home }] : [home];
+    return [home, ...(group.title ? [{ label: sentence(group.title) }] : []), { label: item.label }];
+  }, [groups, current, pathname]);
   const navGroups: SideNavGroup[] = useMemo(
     () =>
       groups.map((g) => ({
@@ -167,18 +175,26 @@ export function StaffShell({ children }: { children: ReactNode }) {
   return (
     <AppShell
       sidebar={
-        <SideNav groups={navGroups} linkAs={MenuLink} collapsible />
+        <SideNav groups={navGroups} linkAs={MenuLink} collapsible tone="sidebar" />
       }
       sidebarHeader={
         <>
           <span className="flex items-center gap-2 px-1">
-            <BrandMark size={28} />
-            <span className="text-h2 font-bold">{t.brand}</span>
+            <BrandMark size={28} tone="on-papan" />
+            <span className="text-h2 font-bold text-on-sidebar">{t.brand}</span>
           </span>
           <SchoolSwitcher schools={choices} activeId={school.id} onSelect={selectSchool} />
         </>
       }
-      header={<SearchTrigger className="max-w-xl" onClick={() => setPaletteOpen(true)} />}
+      header={
+        <>
+          <div className="min-w-0 flex-1">
+            <Breadcrumbs items={crumbs} linkAs={MenuLink} />
+          </div>
+          <SearchTrigger className="max-w-sm" onClick={() => setPaletteOpen(true)} />
+          <ThemeToggle />
+        </>
+      }
       sidebarFooter={
         <AccountMenu name={me.user.name} detail={roleLine} email={me.user.email}>
           {accountRows(true)}

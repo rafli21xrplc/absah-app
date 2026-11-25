@@ -812,11 +812,20 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 
 ### Tampilan segar dan pencarian (RF1)
 
-- Palet `tokens.json` versi 3: hijau papan lebih terang (`#0B7A52`, tadinya `#1E5B4B`) di atas putih natural (`kapur` `#F8F9F5`, kartu `#FFFFFF`); gelapnya hijau-hitam dengan papan `#4CC38A`. Semua pasangan kontras WCAG AA lolos di `tokens.test.ts`, termasuk tombol utama ditekan di tema gelap (dulu "masalah desain yang diketahui", daftar itu kini kosong; entri baru wajib menyebut alasan). Papan desain di `design/boards` masih berwarna lama: itu gambar, `tokens.json` yang berlaku.
+- Palet: lihat "Tata letak CMS (CMS1)". Versi 3 (hijau terang `#0B7A52`) sudah digantikan palet CMS di versi 4.
 - Warna HANYA lewat token. Ganti warna merek = ubah `tokens.json` lalu `pnpm tokens:build`; tes e2e dan kode tidak boleh menulis hex (`e2e/tema.spec.ts` membacanya dari `@absah/ui/tokens`).
 - Tata letak: laptop punya strip atas (`AppShell header`) berisi kolom Cari; HP punya tombol Cari di bilah atas. `PageMain` memberi jarak 16, 24, lalu 32 px menurut lebar layar dan jarak antarblok 20 px. Kartu `BoardSection` berjudul `text-body-strong`; keadaan kosongnya `EmptyState bare` (tulisan saja, tanpa kotak di dalam kotak). Angka besar papan memakai `text-angka`.
 - Pencarian Ctrl+K (Cmd+K di Mac): `CommandPalette` (cmdk dalam dialog Radix) dimuat lazy saat pertama dibuka, dan `SearchTrigger` mulai mengunduhnya saat disorot. Isinya: Halaman (persis menu yang boleh dilihat orang itu + tautan akun), Tindakan (Tampilan terang, gelap, sistem; Keluar), Pindah sekolah, dan Siswa (hanya bila boleh membaca siswa; dua huruf atau lebih, jeda 250 ms, enam hasil lewat `GET /students?q=`, dibuka sebagai `/siswa?q=nama`). Kelompok dari server memakai `remote` supaya tidak disaring ulang. Palet tanpa animasi masuk (bukan satu dari 12 gerak Motion-UI).
 - Tambah isi palet = tambah `CommandAction` di `paletteGroups` (`staff-shell.tsx`); jangan menulis palet kedua.
+
+### Tata letak CMS (CMS1)
+
+- Palet mengikuti dokumen "Absah — Palet Warna CMS" (artifact A7Q3k7z5UdkqQ3vgFxpBZG): `tokens.json` versi 4. Main papan `#1E5B4B` (hover `#184A3D`), second stabilo `#F2C14E`, netral hangat kapur `#F7F5EF`, kartu putih, tinta `#1B2421`. Tema gelap: papan `#5FB89A` dengan teks tombol `#0C2A22`, hover lebih terang `#7CCBAF`, kartu `#1E2825`. Proporsi per layar: sekitar 80% netral, 15% main, 5% second.
+- Menu samping laptop hijau tua (token `sidebar`, `sidebar-hover`, `sidebar-aktif`, `sidebar-garis`, `on-sidebar`, `sidebar-muted`). Item aktif: latar papan 600, tebal, dan garis kiri stabilo (satu-satunya sorotan kuning di layar). `SideNav tone="sidebar"`; lembar Menu di HP tetap `tone="light"`. Di dalam `.surface-sidebar` cincin fokus putih dengan celah hijau tua; stabilo tidak pernah jadi cincin fokus.
+- Strip atas laptop: jejak lokasi (`Breadcrumbs`: Beranda, grup, halaman) di kiri, kolom Cari di kanan, lalu `ThemeToggle` (sekali ketuk terang/gelap; pilihan Sistem tetap di menu akun).
+- Kartu putih dengan bayangan tipis (`.card-surface` di `base.css`): `Card`, `BoardSection`, `Table`, kotak status. Kotak status dasbor putih; warna hanya di chip huruf (hijau penuh hanya pada chip Hadir). Baris tabel disorot `papan-tipis` (papan 50), judul kolom `font-semibold`.
+- Sukses tidak berwarna hijau (hijau milik aksi dan Hadir): centang dengan teks tinta.
+- Tanpa preflight Tailwind, elemen `w-full` yang punya padding WAJIB `box-border`, kalau tidak ia melebar keluar wadah.
 
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan

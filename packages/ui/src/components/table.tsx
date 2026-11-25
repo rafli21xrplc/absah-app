@@ -15,7 +15,7 @@ export interface TableProps {
  */
 export function Table({ caption, children, className }: TableProps) {
   return (
-    <div role="region" aria-label={caption} tabIndex={0} className="overflow-x-auto rounded-lg border border-garis bg-kapur-raised">
+    <div role="region" aria-label={caption} tabIndex={0} className="card-surface overflow-x-auto rounded-lg border border-garis bg-kapur-raised">
       <table className={cx('w-full border-collapse text-left text-body text-tinta', className)}>
         <caption className="sr-only">{caption}</caption>
         {children}
@@ -33,7 +33,7 @@ export function TableBody({ children }: { children: ReactNode }) {
 }
 
 export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {
-  return <tr className={cx('hover:bg-kapur', className)} {...props} />;
+  return <tr className={cx('hover:bg-papan-tipis', className)} {...props} />;
 }
 
 /** scope="col" (default) for a column heading, scope="row" for the first cell of a row (e.g. the student's name). */
@@ -41,7 +41,7 @@ export function Th({ scope = 'col', className, ...props }: ThHTMLAttributes<HTML
   return (
     <th
       scope={scope}
-      className={cx('border-b border-garis px-3 py-3 text-left', scope === 'row' ? 'text-body-strong' : 'text-small text-tinta-muted', className)}
+      className={cx('border-b border-garis px-3 py-3 text-left', scope === 'row' ? 'text-body-strong' : 'text-small font-semibold text-tinta-muted', className)}
       {...props}
     />
   );

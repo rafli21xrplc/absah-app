@@ -30,12 +30,19 @@ const PAIRS: Pair[] = [
   { what: 'Batas kolom isian di atas kapur', fg: 'garis-kuat', bg: 'kapur', min: 3 },
   { what: 'Batas kolom isian di atas kartu', fg: 'garis-kuat', bg: 'kapur-raised', min: 3 },
   { what: 'Tombol utama ditekan: teks di atas papan dalam', fg: 'on-papan', bg: 'papan-deep', min: 4.5 },
+  { what: 'Menu samping: teks di atas sidebar', fg: 'on-sidebar', bg: 'sidebar', min: 4.5 },
+  { what: 'Menu samping: teks di atas hover', fg: 'on-sidebar', bg: 'sidebar-hover', min: 4.5 },
+  { what: 'Menu samping: teks di atas item aktif', fg: 'on-sidebar', bg: 'sidebar-aktif', min: 4.5 },
+  { what: 'Menu samping: judul grup di atas sidebar', fg: 'sidebar-muted', bg: 'sidebar', min: 4.5 },
+  { what: 'Menu samping: keterangan di atas hover', fg: 'sidebar-muted', bg: 'sidebar-hover', min: 4.5 },
+  { what: 'Menu samping: penanda stabilo di atas item aktif', fg: 'stabilo', bg: 'sidebar-aktif', min: 3 },
+  { what: 'Teks utama di atas baris hover', fg: 'tinta', bg: 'papan-tipis', min: 4.5 },
   { what: 'Cincin fokus di atas kapur', fg: 'focus', bg: 'kapur', min: 3 },
   { what: 'Cincin fokus di atas kartu', fg: 'focus', bg: 'kapur-raised', min: 3 },
 ];
 
-// Pairs that are below the limit in tokens.json itself, with the design decision still open. Empty since v3 (the fresher
-// palette): the pressed state of the primary button in the dark theme used to be here. A new entry must say why.
+// Pairs that are below the limit in tokens.json itself, with the design decision still open. Empty since v3; v4 (palet CMS)
+// keeps it empty: the pressed state of the primary button in the dark theme used to be here. A new entry must say why.
 const KNOWN_BELOW_LIMIT: (Pair & { theme: ThemeName })[] = [];
 
 /** Printed by `CONTRAST_TABLE=1 pnpm --filter @absah/ui test`, for the PR description. */
@@ -109,11 +116,11 @@ describe('statusTokens', () => {
   });
 
   it('uses the colours of tokens.json', () => {
-    expect(statusHex('H', 'light')).toEqual({ fg: '#0B7A52', bg: '#E6F5EC' });
-    expect(statusHex('T', 'light')).toEqual({ fg: '#995400', bg: '#FDF0D9' });
-    expect(statusHex('I', 'light')).toEqual({ fg: '#2459C7', bg: '#E8EFFD' });
-    expect(statusHex('S', 'light')).toEqual({ fg: '#7440BE', bg: '#F1EAFB' });
-    expect(statusHex('A', 'light')).toEqual({ fg: '#B92F2F', bg: '#FDE8E8' });
+    expect(statusHex('H', 'light')).toEqual({ fg: '#1E5B4B', bg: '#E3EFEA' });
+    expect(statusHex('T', 'light')).toEqual({ fg: '#9A5B00', bg: '#FBEFD9' });
+    expect(statusHex('I', 'light')).toEqual({ fg: '#2F5FC4', bg: '#E6EDFB' });
+    expect(statusHex('S', 'light')).toEqual({ fg: '#7A4CC2', bg: '#EFE8FA' });
+    expect(statusHex('A', 'light')).toEqual({ fg: '#B53434', bg: '#FBE7E7' });
   });
 });
 

@@ -33,6 +33,18 @@ a {
   box-shadow: 0 0 0 2px var(--kapur), 0 0 0 4px var(--focus);
 }
 
+/* Inside the dark green side menu the board-green ring would vanish (papan on papan 800): the ring turns white there, with a
+   gap in the menu's own colour. Stabilo is never a focus ring (palet CMS). */
+.surface-sidebar :focus-visible {
+  box-shadow: 0 0 0 2px var(--sidebar), 0 0 0 4px var(--on-sidebar);
+}
+
+/* Cards (Card, BoardSection, Table, status boxes): a hairline shadow under the border so white cards lift off the warm page.
+   Black at low opacity in both themes: no token exists for shadows, and a tinted one would glow in the dark theme. */
+.card-surface {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.03);
+}
+
 /* Motion is never required to use the app (CLAUDE.md). Library animations check the same media query too. */
 @media (prefers-reduced-motion: reduce) {
   *,

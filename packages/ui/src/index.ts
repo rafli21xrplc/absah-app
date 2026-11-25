@@ -24,6 +24,8 @@ export { ErrorState, type ErrorStateProps } from './components/error-state';
 export { initials } from './components/initials';
 export { ListRow, type ListRowProps } from './components/list-row';
 export { ThemeSwitch } from './components/theme-switch';
+export { ThemeToggle } from './components/theme-toggle';
+export { Breadcrumbs, type Crumb } from './components/breadcrumbs';
 export { applyTheme, parseTheme, readTheme, saveTheme, THEME_PREFERENCES, useTheme, type ThemePreference } from './theme';
 export { THEME_INIT_SCRIPT, THEME_KEY } from './theme-script';
 export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './components/segmented-control';

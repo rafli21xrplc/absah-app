@@ -9,7 +9,10 @@ test('pencarian: Ctrl+K membuka halaman, mengganti tema, dan menutup dengan Esca
   await page.goto('/dasbor');
   await expect(page.getByRole('heading', { level: 1, name: 'Hari ini' })).toBeVisible();
 
-  if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/dasbor-${info.project.name}.png` });
+  if (process.env.SHOTS) {
+    await page.waitForLoadState('networkidle');
+    await page.screenshot({ path: `${process.env.SHOTS}/dasbor-${info.project.name}.png` });
+  }
   const open = async () => {
     if (isMobile) await page.getByRole('button', { name: 'Buka pencarian' }).click();
     else await page.keyboard.press('Control+k');

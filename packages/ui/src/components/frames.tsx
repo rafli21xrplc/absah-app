@@ -37,10 +37,10 @@ export function AppShell({ sidebar, sidebarHeader, sidebarFooter, header, topBar
         </a>
       </nav>
       {sidebarHeader || sidebarFooter ? (
-        <aside className="hidden w-64 shrink-0 flex-col border-r border-garis bg-kapur-raised lg:sticky lg:top-0 lg:flex lg:h-dvh">
+        <aside className="surface-sidebar hidden w-64 shrink-0 flex-col bg-sidebar text-on-sidebar lg:sticky lg:top-0 lg:flex lg:h-dvh">
           {sidebarHeader && <div className="flex shrink-0 flex-col gap-3 p-4 pb-3">{sidebarHeader}</div>}
           <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-3 py-2">{sidebar}</div>
-          {sidebarFooter && <div className="shrink-0 border-t border-garis p-3">{sidebarFooter}</div>}
+          {sidebarFooter && <div className="shrink-0 border-t border-sidebar-garis p-3">{sidebarFooter}</div>}
         </aside>
       ) : (
         <aside className="hidden w-60 shrink-0 flex-col gap-5 overflow-y-auto border-r border-garis bg-kapur-raised p-4 lg:sticky lg:top-0 lg:flex lg:h-dvh">{sidebar}</aside>
@@ -48,7 +48,7 @@ export function AppShell({ sidebar, sidebarHeader, sidebarFooter, header, topBar
       <div className="flex min-w-0 flex-1 flex-col">
         {header && (
           <div className="sticky top-0 z-30 hidden border-b border-garis bg-kapur lg:block">
-            <div className="flex min-h-14 items-center gap-3 px-8">{header}</div>
+            <div className="flex min-h-16 items-center gap-4 px-8">{header}</div>
           </div>
         )}
         {topBar && <div className="sticky top-0 z-30 border-b border-garis bg-kapur-raised lg:hidden">{topBar}</div>}

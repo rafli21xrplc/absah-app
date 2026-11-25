@@ -11,16 +11,16 @@ const KAPUR = { light: rgb(color.kapur.light), dark: rgb(color.kapur.dark) };
 async function openMenu(page: Page, isMobile: boolean) {
   // The choice is in the account menu: a popover under the side menu on a laptop, the end of the Menu sheet on a phone.
   // A pick leaves it open, so only open it when the switch is not on screen.
-  if (await page.getByRole('button', { name: 'Gelap' }).isVisible()) return;
+  if (await page.getByRole('button', { name: 'Gelap', exact: true }).isVisible()) return;
   if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
   else await page.getByRole('button', { name: /Menu akun/ }).click();
-  await expect(page.getByRole('button', { name: 'Gelap' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Gelap', exact: true })).toBeVisible();
 }
 
 const background = (page: Page) => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 const chosen = (page: Page) => page.evaluate(() => document.documentElement.getAttribute('data-theme'));
 
-test('tampilan: pilihan Gelap dan Terang mengalahkan pengaturan sistem dan bertahan setelah dimuat ulang', async ({ page, isMobile }) => {
+test('tampilan: pilihan Gelap dan Terang mengalahkan pengaturan sistem dan bertahan setelah dimuat ulang', async ({ page, isMobile }, info) => {
   await page.emulateMedia({ colorScheme: 'light' });
   const { inviteUrl, email } = createSchool('SMK Tema E2E', 'smk');
   await onboardAdmin(page, inviteUrl, email);
@@ -30,7 +30,7 @@ test('tampilan: pilihan Gelap dan Terang mengalahkan pengaturan sistem dan berta
   expect(await background(page)).toBe(KAPUR.light);
 
   await openMenu(page, isMobile);
-  await page.getByRole('button', { name: 'Gelap' }).click();
+  await page.getByRole('button', { name: 'Gelap', exact: true }).click();
   expect(await chosen(page)).toBe('dark');
   expect(await background(page)).toBe(KAPUR.dark);
 
@@ -38,16 +38,20 @@ test('tampilan: pilihan Gelap dan Terang mengalahkan pengaturan sistem dan berta
   await page.reload();
   expect(await chosen(page)).toBe('dark');
   expect(await background(page)).toBe(KAPUR.dark);
+  if (process.env.SHOTS) {
+    await page.waitForLoadState('networkidle');
+    await page.screenshot({ path: `${process.env.SHOTS}/dasbor-gelap-${info.project.name}.png` });
+  }
 
   // The OS says dark, the person says Terang: the person wins.
   await page.emulateMedia({ colorScheme: 'dark' });
   await openMenu(page, isMobile);
-  await page.getByRole('button', { name: 'Terang' }).click();
+  await page.getByRole('button', { name: 'Terang', exact: true }).click();
   expect(await chosen(page)).toBe('light');
   expect(await background(page)).toBe(KAPUR.light);
 
   // Sistem hands the decision back to the OS.
-  await page.getByRole('button', { name: 'Sistem' }).click();
+  await page.getByRole('button', { name: 'Sistem', exact: true }).click();
   expect(await chosen(page)).toBeNull();
   expect(await background(page)).toBe(KAPUR.dark);
 });
@@ -60,7 +64,7 @@ for (const theme of ['Terang', 'Gelap'] as const) {
     await page.goto('/dasbor');
     await expect(page.getByRole('heading', { level: 1, name: 'Hari ini' })).toBeVisible();
     await openMenu(page, isMobile);
-    await page.getByRole('button', { name: theme }).click();
+    await page.getByRole('button', { name: theme, exact: true }).click();
     if (isMobile) await page.keyboard.press('Escape');
     await page.waitForLoadState('networkidle');
     const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();

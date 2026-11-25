@@ -35,6 +35,8 @@ export interface SideNavProps {
    */
   collapsible?: boolean;
   storageKey?: string;
+  /** "sidebar": on the dark green side column of a laptop. "light" (default): on a light surface, e.g. the phone's sheet. */
+  tone?: 'light' | 'sidebar';
 }
 
 const DEFAULT_KEY = 'absah-menu';
@@ -67,7 +69,8 @@ function useGroupMemory(key: string, enabled: boolean): [Record<string, boolean>
 }
 
 /** The staff side menu: groups of links, the current one marked with aria-current="page". The caller drops items that must not show. */
-export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavigate, className, collapsible = false, storageKey = DEFAULT_KEY }: SideNavProps) {
+export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavigate, className, collapsible = false, storageKey = DEFAULT_KEY, tone = 'light' }: SideNavProps) {
+  const dark = tone === 'sidebar';
   const Link = linkAs ?? 'a';
   const [memory, remember] = useGroupMemory(storageKey, collapsible);
   return (
@@ -80,7 +83,7 @@ export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavi
         return (
           <div key={group.key} className="flex flex-col gap-1">
             {/* A visible heading is enough to read the group; naming the list too would make its title match any label query. */}
-            {group.title && !folds && <p className="m-0 px-3 text-small font-bold uppercase text-tinta-muted">{group.title}</p>}
+            {group.title && !folds && <p className={cx('m-0 px-3 text-small font-bold uppercase', dark ? 'text-sidebar-muted' : 'text-tinta-muted')}>{group.title}</p>}
             {group.title && folds && (
               <button
                 type="button"
@@ -90,7 +93,8 @@ export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavi
                 aria-disabled={holdsCurrent || undefined}
                 onClick={() => !holdsCurrent && remember(group.key, !open)}
                 className={cx(
-                  'flex min-h-9 w-full items-center justify-between gap-2 rounded-md border-0 bg-transparent px-3 text-left text-small font-bold uppercase text-tinta-muted hover:bg-kapur',
+                  'box-border flex min-h-9 w-full items-center justify-between gap-2 rounded-md border-0 bg-transparent px-3 text-left text-small font-bold uppercase',
+                  dark ? 'text-sidebar-muted hover:bg-sidebar-hover' : 'text-tinta-muted hover:bg-kapur',
                   holdsCurrent ? 'cursor-default' : 'cursor-pointer',
                 )}
               >
@@ -110,10 +114,17 @@ export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavi
                     className={cx(
                       // The current item is bold, filled and has a bar on the left, so it does not depend on colour alone.
                       'flex min-h-11 items-center gap-3 rounded-md border-l-4 px-3 text-body no-underline lg:min-h-10',
-                      item.current ? 'border-papan bg-papan-soft font-bold text-papan' : 'border-transparent font-semibold text-tinta hover:bg-kapur',
+                      dark
+                        ? // On the green column the current item is filled, bold and marked by the one yellow highlight (palet CMS).
+                          item.current
+                          ? 'border-stabilo bg-sidebar-aktif font-bold text-on-sidebar'
+                          : 'border-transparent font-semibold text-on-sidebar hover:bg-sidebar-hover'
+                        : item.current
+                          ? 'border-papan bg-papan-soft font-bold text-papan'
+                          : 'border-transparent font-semibold text-tinta hover:bg-kapur',
                     )}
                   >
-                    <span aria-hidden className="inline-flex shrink-0">
+                    <span aria-hidden className={cx('inline-flex shrink-0', dark && !item.current && 'text-sidebar-muted')}>
                       {item.icon}
                     </span>
                     {item.label}
