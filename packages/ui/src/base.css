@@ -175,7 +175,118 @@ a {
   transition: stroke-dashoffset 1s linear;
 }
 
+/* Papan kedatangan contoh di layar masuk (Motion-UI 9, Auth-masuk): 14 detik berulang, jadi ada tombol Jeda (kelas board-paused). */
+@property --absah-count {
+  syntax: '<integer>';
+  initial-value: 0;
+  inherits: false;
+}
+@keyframes absah-board-event {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  6% {
+    opacity: 1;
+    transform: none;
+  }
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  96% {
+    opacity: 0;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes absah-board-count {
+  0% {
+    --absah-count: 0;
+  }
+  55% {
+    --absah-count: 862;
+  }
+  100% {
+    --absah-count: 862;
+  }
+}
+@keyframes absah-board-bar {
+  0% {
+    transform: scaleX(0);
+  }
+  55% {
+    transform: scaleX(0.958);
+  }
+  100% {
+    transform: scaleX(0.958);
+  }
+}
+@keyframes absah-caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.board-event {
+  opacity: 0;
+  animation: absah-board-event 14s var(--ease-masuk) infinite;
+}
+.board-event[data-n='1'] {
+  animation-delay: 0.6s;
+}
+.board-event[data-n='2'] {
+  animation-delay: 2.4s;
+}
+.board-event[data-n='3'] {
+  animation-delay: 4.2s;
+}
+.board-event[data-n='4'] {
+  animation-delay: 6s;
+}
+.board-count {
+  counter-reset: absah-n var(--absah-count);
+  animation: absah-board-count 14s linear infinite;
+}
+.board-count::after {
+  content: counter(absah-n);
+}
+.board-bar {
+  transform-origin: left center;
+  animation: absah-board-bar 14s var(--ease-masuk) infinite;
+}
+.board-paused *,
+.board-paused {
+  animation-play-state: paused !important;
+}
+/* The caret of the code boxes blinks once a second (never faster than 3 times a second). */
+.motion-caret {
+  animation: absah-caret 1s steps(1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .board-event {
+    animation: none !important;
+    opacity: 1;
+  }
+  .board-count {
+    animation: none !important;
+    --absah-count: 862;
+  }
+  .board-bar {
+    animation: none !important;
+    transform: scaleX(0.958);
+  }
+  .motion-caret {
+    animation: none !important;
+  }
   .motion-card-in,
   .motion-banner-in,
   .motion-row-in,

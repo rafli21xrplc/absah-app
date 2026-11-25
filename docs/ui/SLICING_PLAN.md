@@ -188,3 +188,13 @@ Keputusan kerja (mudah dibalik), berlaku untuk seluruh fase:
 Token gerak masuk ke `tokens.json` (bukan hanya CSS), keyframes dan kelas `motion-*` di `base.css`, lima komponen dan dua hook di `packages/ui/src/components/motion`.
 `Button loading` kini tetap berwarna (papan Motion-UI kartu 2: sibuk bukan nonaktif). `Banner` turun 8 px saat muncul. Peta 12 gerak ke komponen: Storybook, Gerak/Komponen.
 Kartu tanpa padanan: 6 (syarat menyala, dibuat di UA3), 10 (status berganti), 11 (garis Urungkan menyusut). Kartu 8 (lembar naik) sudah dipenuhi `Sheet`.
+
+### UA2
+Halaman `/masuk` sesuai papan Auth-masuk: tiga tab, validasi sisi klien, empat keadaan (berhasil, salah, terkunci, tanpa sinyal) dan langkah dua kode untuk admin dan operator.
+- **Orang tua dikerjakan di sini, bukan UA4**: tab Orang tua harus berfungsi saat PR ini digabung, jadi alur nomor dan kode enam kotak (`CodeInput`, hitung mundur kirim ulang) masuk UA2. UA4 tinggal pilih sekolah, sesi diam, dan keluar otomatis.
+- **Kode autentikator (admin)** tidak ada di papan. Dipakai komponen `CodeInput` yang sama dengan teks sendiri; ditandai di PR sebagai "belum ada desain".
+- **Sisa percobaan dan jam buka kunci**: server belum mengirimnya. Banner "salah" menulis "Sisa percobaan: n dari 5" hanya bila server menjawab `attemptsLeft`; banner "terkunci" memakai `unlockAt` atau `X-Retry-After` (429 dari pembatas laju Better Auth: 5 per menit untuk `/sign-in/*`). Kunci akun 10 menit setelah 5 salah adalah pekerjaan absah-api.
+- **"Lupa kata sandi?"** disembunyikan sampai `NEXT_PUBLIC_ABSAH_PASSWORD_RESET=1` (UA3 membangun halamannya; server belum bisa mengirim email).
+- **"Ingat saya"** mengirim `rememberMe` ke Better Auth; tidak dicentang berarti cookie sesi yang berakhir saat peramban ditutup. Bawaan tidak dicentang, mengikuti papan.
+- **Kalimat kode orang tua** ditulis bersyarat ("Jika nomor ini terdaftar di sekolah, kami kirim kode...") supaya tidak membocorkan keberadaan akun; papan menulisnya pasti.
+- Bar "Skenario demo" milik papan tidak dibawa. Tombol `loading` kini tetap berwarna (lihat UA1).

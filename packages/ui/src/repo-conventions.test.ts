@@ -62,12 +62,12 @@ describe('motion comes from tokens', () => {
     expect(bad).toEqual([]);
   });
 
-  it('base.css keyframes move transform, opacity and the two SVG strokes only', () => {
+  it('base.css keyframes move transform, opacity, the SVG strokes and the counter of the sample board only', () => {
     const css = readFileSync(join(__dirname, 'base.css'), 'utf8');
     const frames = [...css.matchAll(/@keyframes\s+absah-[\w-]+\s*\{([\s\S]*?\n\})/g)].map((m) => m[1] ?? '');
     expect(frames.length).toBeGreaterThanOrEqual(7);
     const props = new Set(frames.flatMap((f) => [...f.matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1] ?? '')));
-    expect([...props].filter((p) => !['transform', 'opacity', 'stroke-dashoffset'].includes(p))).toEqual([]);
+    expect([...props].filter((p) => !['transform', 'opacity', 'stroke-dashoffset', '--absah-count'].includes(p))).toEqual([]);
   });
 });
 
@@ -87,6 +87,7 @@ const MOVED = [
   'apps/web/app/(portal)/portal/page.tsx',
   'apps/web/app/(portal)/portal/pkl/page.tsx',
   'apps/web/app/(lapor)/lapor',
+  'apps/web/app/(akun)/masuk',
   'apps/kiosk/components/checkout-screen.tsx',
 ];
 

@@ -28,7 +28,7 @@ interface Workspace {
 const WorkspaceContext = createContext<Workspace | null>(null);
 const STORAGE_KEY = 'absah.schoolId';
 
-function storedSchool(): string | null {
+export function storedSchool(): string | null {
   try {
     return localStorage.getItem(STORAGE_KEY);
   } catch {

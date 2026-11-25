@@ -88,7 +88,7 @@ export async function acceptInvite(page: Page, inviteUrl: string, email: string)
 
   await page.getByRole('textbox', { name: 'Email' }).fill(email);
   await page.getByLabel('Kata sandi').fill(PASSWORD);
-  await page.getByRole('button', { name: 'Masuk' }).click();
+  await page.getByRole('button', { name: 'Masuk', exact: true }).click();
   // Signed in once the app leaves /masuk (a page opened earlier would race the session cookie).
   await page.waitForURL((url) => !url.pathname.startsWith('/masuk'));
 }
@@ -178,8 +178,8 @@ export async function otpLogin(page: Page, localPhone: string, next: string) {
   await expect(page.getByLabel('Kode dari WhatsApp')).toBeVisible();
   const code = lastOtp(`+62${localPhone.replace(/^0/, '')}`);
   if (!code) throw new Error('no login code');
+  // The six boxes send themselves on the last digit: there is no button to press.
   await page.getByLabel('Kode dari WhatsApp').fill(code);
-  await page.getByRole('button', { name: 'Masuk' }).click();
   await page.waitForURL((url) => url.pathname === next);
 }
 

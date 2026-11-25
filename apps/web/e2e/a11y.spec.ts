@@ -41,7 +41,9 @@ for (const scheme of ['light', 'dark'] as const) {
   });
 
   test(`halaman publik tanpa pelanggaran aksesibilitas (${scheme})`, async ({ page }) => {
-    await page.emulateMedia({ colorScheme: scheme });
+    // The sample board on /masuk fades its rows in and out in a loop; axe would measure a row halfway through its fade.
+    // Reduced motion shows the end state, which is what the contrast has to hold for (the animation never changes a colour).
+    await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
     const report: Record<string, string[]> = {};
     for (const path of ['/masuk', '/lapor?s=bukan-sekolah', '/lapor/lacak']) {
       await page.goto(path);

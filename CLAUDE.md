@@ -776,6 +776,15 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - Layar TPPK, keluar otomatis, dan galat berat hanya muncul dan memudar: tidak bergetar, tidak berkedip, tidak merah.
 - Komponen: `Spinner`, `CheckDraw`, `CountdownRing` (angka dan cincin dari satu jam; pembaca layar hanya diberi tahu saat mulai, 10 detik terakhir, dan selesai), `StepList` (status diatur halaman dari kemajuan sungguhan, tidak pewaktu palsu), hook `useShake(hitungan)` dan `useReducedMotion()`. `Button loading` memakai `Spinner` dan tetap berwarna; yang abu-abu hanya tombol nonaktif.
 
+### Masuk (UA2; `app/(akun)/masuk`)
+
+- Satu layar `/masuk` dengan tiga tab (Guru dan staf, Orang tua, Siswa). `/masuk/hp` tetap ada (PWA dan tautan lama) dan membuka tab Orang tua. `?jalur=` memilih tab, `?lanjut=` tujuan setelah masuk (hanya jalur satu situs).
+- Kerangka `AuthShell` (`packages/ui/src/features/auth`): panel merek 600 px di kiri mulai 1024 px, satu kolom di HP. Panel contoh bersifat dekoratif (`aria-hidden`) dan berulang 14 detik, jadi tombol "Jeda animasi" selalu ada.
+- Semua angka waktu di `apps/web/lib/auth-config.ts`. Jawaban server dipetakan `lib/auth.ts` (`AuthError.kind`: invalid, locked, offline, unreachable); pesan tidak pernah menyebut mana yang salah (email atau kata sandi) dan tidak membocorkan apakah akun ada.
+- Kode (WhatsApp, autentikator) memakai `CodeInput`: SATU input digambar enam kotak, masuk sendiri pada angka ke-6, tempel dibaca di `onPaste` (maxLength memotong "481 723"). Kode salah: kotak bergetar (`useShake`), isian kosong.
+- Setelah berhasil: `CheckDraw` dan `StepList` yang mengikuti pemuatan sungguhan (`lib/home.ts`), pindah segera begitu siap, paling lama `maxWaitAfterSignInMs`. Layar itu dimuat lazy supaya zod tidak masuk muatan pertama `/masuk` (anggaran 260 kB).
+- Kata sandi atau token tidak pernah di URL, log, atau localStorage. Tombol Tampilkan/Sembunyikan memakai `aria-pressed`; tempel tidak diblokir.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

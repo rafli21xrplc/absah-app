@@ -1,4 +1,4 @@
-import { CircleAlert, Info, TriangleAlert, WifiOff } from 'lucide-react';
+import { CircleAlert, Info, TriangleAlert, WifiOff, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { messages } from '../../messages/id';
 import { cx } from '../cx';
@@ -20,14 +20,16 @@ export interface BannerProps {
   title?: string;
   /** One sentence: what happened and what is safe. Never an error code. */
   children: ReactNode;
+  /** A more exact icon than the kind's own, e.g. a padlock for a locked account. Colour and bold title still carry the kind. */
+  icon?: LucideIcon;
   /** Optional button or link on the right, e.g. "Coba lagi". */
   action?: ReactNode;
   className?: string;
 }
 
-export function Banner({ kind = 'info', title, children, action, className }: BannerProps) {
+export function Banner({ kind = 'info', title, children, icon, action, className }: BannerProps) {
   const k = KIND[kind];
-  const Icon = k.icon;
+  const Icon = icon ?? k.icon;
   return (
     <div role={k.role} className={cx('motion-banner-in flex items-start gap-3 rounded-md border px-4 py-3 text-body text-tinta', k.box, className)}>
       <Icon aria-hidden strokeWidth={1.75} className={cx('mt-px size-5 shrink-0', k.title)} />
