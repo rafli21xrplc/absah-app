@@ -31,7 +31,7 @@ export function SchoolPopover({ schools, activeId, onSelect, defaultOpen }: { sc
                   if (s.id !== active.id) onSelect(s.id);
                 }}
                 className={cx(
-                  'flex min-h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-md border-0 px-3 py-2 text-left',
+                  'box-border flex min-h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-md border-0 px-3 py-2 text-left',
                   s.id === active.id ? 'bg-papan-soft text-papan' : 'bg-transparent text-tinta hover:bg-kapur',
                 )}
               >

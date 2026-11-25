@@ -28,8 +28,9 @@ export function StatusBoard({ items, label = t.summaryLabel }: { items: readonly
       {items.map((it) => {
         const { huruf, kata } = statusTokens(it.code);
         return (
-          <li key={it.code} className={cx('box-border flex min-h-28 flex-col gap-1 rounded-lg border p-4', STATUS_LOOK[it.code].pill)}>
-            <span className="flex items-center gap-2 text-body-strong">
+          // White cards: the colour is only the letter chip (palet CMS: 80% neutral; full green only on the Hadir chip).
+          <li key={it.code} className="card-surface box-border flex min-h-28 flex-col gap-2 rounded-lg border border-garis bg-kapur-raised p-4 text-tinta">
+            <span className="flex items-center gap-2 text-body-strong text-tinta-muted">
               <span aria-hidden className={cx('inline-flex size-7 items-center justify-center rounded-sm text-small font-bold', STATUS_LOOK[it.code].chip)}>
                 {huruf}
               </span>
@@ -71,7 +72,7 @@ export function BoardSection({ title, aside, action, state, emptyText, onRetry, 
     </Button>
   );
   return (
-    <section aria-labelledby={id} aria-busy={state === 'loading'} className={cx('box-border flex min-w-0 flex-col gap-3 rounded-lg border border-garis bg-kapur-raised p-5', className)}>
+    <section aria-labelledby={id} aria-busy={state === 'loading'} className={cx('card-surface box-border flex min-w-0 flex-col gap-3 rounded-lg border border-garis bg-kapur-raised p-5', className)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
           <h2 id={id} className="m-0 text-body-strong">

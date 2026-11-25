@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import type { HTMLAttributes } from 'react';
 import { cx } from '../cx';
 
-const card = cva('rounded-lg border bg-kapur-raised text-tinta', {
+const card = cva('card-surface rounded-lg border bg-kapur-raised text-tinta', {
   variants: {
     // active = "what is happening now" (the lesson in progress), muted = quiet background group.
     tone: { default: 'border-garis', active: 'border-2 border-papan', muted: 'border-garis bg-kapur' },

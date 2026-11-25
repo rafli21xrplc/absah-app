@@ -680,7 +680,13 @@ export const messages = {
     groupOpen: 'Buka',
     groupClose: 'Tutup',
   },
+  breadcrumb: {
+    label: 'Lokasi',
+    home: 'Beranda',
+  },
   theme: {
+    toDark: 'Ganti ke tema gelap',
+    toLight: 'Ganti ke tema terang',
     label: 'Tampilan',
     system: 'Sistem',
     light: 'Terang',

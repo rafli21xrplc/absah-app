@@ -91,7 +91,7 @@ export function SearchTrigger({ className, ...props }: ComponentProps<'button'>)
       onFocus={() => void loadDialog()}
       {...props}
       className={cx(
-        'flex min-h-10 w-full cursor-pointer items-center gap-2 rounded-md border border-garis bg-kapur-raised px-3 text-left text-body text-tinta-muted hover:border-garis-kuat',
+        'box-border flex min-h-10 w-full cursor-pointer items-center gap-2 rounded-md border border-garis bg-kapur-raised px-3 text-left text-body text-tinta-muted hover:border-garis-kuat',
         className,
       )}
     >
