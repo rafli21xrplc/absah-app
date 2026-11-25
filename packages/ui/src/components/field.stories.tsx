@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Field, Input, Select, Textarea } from './field';
+import { Field, Input, Textarea } from './field';
+import { Select } from './select';
 import { Cell, Matrix } from './story-helpers';
 
 const meta = { title: 'Primitif/Field', component: Field, args: { label: 'Nama', children: null } } satisfies Meta<typeof Field>;
@@ -23,6 +24,7 @@ export const StateMatrix: Story = {
       <Cell fill title="Textarea: galat"><Field label="Alasan" error="Alasan wajib diisi"><Textarea /></Field></Cell>
       <Cell fill title="Select: bawaan"><Field label="Rombel"><Select defaultValue=""><option value="" disabled>Pilih rombel</option><option>VII A</option><option>VII B</option></Select></Field></Cell>
       <Cell fill title="Select: galat"><Field label="Rombel" error="Pilih rombel dulu"><Select defaultValue=""><option value="" disabled>Pilih rombel</option><option>VII A</option></Select></Field></Cell>
+      <Cell fill title="Select: 12 pilihan (popover dengan pencarian di laptop)"><Field label="Kelas"><Select defaultValue="x3">{Array.from({ length: 12 }, (_, i) => <option key={i} value={`x${i + 1}`}>{`Kelas X-${i + 1}`}</option>)}</Select></Field></Cell>
       <Cell fill title="Select: nonaktif"><Field label="Rombel"><Select disabled><option>VII A</option></Select></Field></Cell>
     </Matrix>
   ),

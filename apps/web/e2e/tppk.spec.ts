@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin } from './helpers';
 
 test('TPPK: admin menunjuk tim, laporan anonim hanya untuk anggota, kode lacak mengikuti penanganan', async ({ page, browser }) => {
   const { schoolId, inviteUrl, email } = createSchool('SMP Lapor E2E', 'smp');
@@ -30,7 +30,7 @@ test('TPPK: admin menunjuk tim, laporan anonim hanya untuk anggota, kode lacak m
   await expect(student.getByText('Pilih jenis kejadian.')).toBeVisible();
   await student.getByLabel('Perundungan').check();
   await student.getByLabel('Ceritakan kejadiannya').fill('Saya diejek terus di grup kelas dan tidak diajak bermain sejak awal semester.');
-  await student.getByLabel('Saya adalah').selectOption({ label: 'Siswa' });
+  await choose(student.getByLabel('Saya adalah'), { label: 'Siswa' });
   await expect(student.getByLabel('Kirim tanpa nama')).toBeChecked();
   await student.getByRole('button', { name: 'Kirim laporan' }).click();
   await expect(student.getByRole('heading', { name: 'Laporan Anda sudah diterima' })).toBeVisible();
@@ -61,7 +61,7 @@ test('TPPK: admin menunjuk tim, laporan anonim hanya untuk anggota, kode lacak m
   await page.getByLabel('Isi').fill('Memanggil siswa yang dilaporkan bersama wali kelas.');
   await page.getByRole('button', { name: 'Simpan' }).click();
   await expect(page.getByRole('list', { name: 'Riwayat penanganan' })).toContainText('Memanggil siswa yang dilaporkan');
-  await page.getByLabel('Jenis').selectOption({ label: 'Tutup kasus' });
+  await choose(page.getByLabel('Jenis'), { label: 'Tutup kasus' });
   await page.getByLabel('Hasil penanganan').fill('Mediasi selesai, grup kelas diawasi wali kelas.');
   page.once('dialog', (d) => void d.accept());
   await page.getByRole('button', { name: 'Tutup kasus' }).click();

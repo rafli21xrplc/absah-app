@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createSchool, onboardAdmin, randomDigits } from './helpers';
+import { choose, createSchool, onboardAdmin, randomDigits } from './helpers';
 
 type Level = 'sd' | 'smk';
 
@@ -48,7 +48,7 @@ for (const c of cases) {
     await expect(page.getByRole('heading', { name: 'Profil sekolah' })).toBeVisible();
     await page.getByLabel('Nama sekolah').fill(c.school);
     await page.getByLabel('NPSN').fill(randomDigits(8));
-    await page.getByLabel('Zona waktu').selectOption('Asia/Jakarta');
+    await choose(page.getByLabel('Zona waktu'), 'Asia/Jakarta');
     await page.getByRole('button', { name: 'Simpan dan lanjut' }).click();
 
     // 2. Level, with the feature summary shown before saving
@@ -77,7 +77,7 @@ for (const c of cases) {
     await expect(page.getByRole('heading', { name: 'Undang staf' })).toBeVisible();
     await page.getByLabel('Nama').fill('Guru E2E');
     await page.getByRole('textbox', { name: 'Email' }).fill(`guru-${randomDigits(10)}@test.local`);
-    await page.getByLabel('Peran').selectOption('guru');
+    await choose(page.getByLabel('Peran'), 'guru');
     await page.getByRole('button', { name: 'Undang' }).click();
     await expect(page.getByRole('list', { name: 'Sudah diundang' })).toContainText('/undangan#');
     await page.getByRole('button', { name: 'Selesai' }).click();

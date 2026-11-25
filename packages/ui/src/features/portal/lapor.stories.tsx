@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Banner } from '../../components/banner';
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
-import { Field, Input, Select, Textarea } from '../../components/field';
+import { Field, Input, Textarea } from '../../components/field';
+import { Select } from '../../components/select';
 import { PageMain } from '../../components/frames';
 
 const meta = { title: 'Portal/Lapor TPPK', component: Card, parameters: { layout: 'fullscreen', ownsMain: true } } satisfies Meta<typeof Card>;

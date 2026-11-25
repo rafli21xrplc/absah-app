@@ -785,6 +785,14 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - Setelah berhasil: `CheckDraw` dan `StepList` yang mengikuti pemuatan sungguhan (`lib/home.ts`), pindah segera begitu siap, paling lama `maxWaitAfterSignInMs`. Layar itu dimuat lazy supaya zod tidak masuk muatan pertama `/masuk` (anggaran 260 kB).
 - Kata sandi atau token tidak pernah di URL, log, atau localStorage. Tombol Tampilkan/Sembunyikan memakai `aria-pressed`; tempel tidak diblokir.
 
+### shadcn dan popover (SH1)
+
+- Komponen `packages/ui` bertahap diganti dengan sumber shadcn/ui (registry `new-york-v4`, diambil dengan `pnpm dlx shadcn@latest view <nama>`), TETAPI warna, radius, dan ukuran dipetakan ke token Absah: `bg-popover` = `kapur-raised`, `border` = `garis`, `bg-accent` = `papan-soft`, radius `lg`, baris 44 px. Jangan menjalankan `shadcn add` langsung: ia menulis kelas tema bawaan (`bg-popover`, `text-muted-foreground`, `animate-in`) yang tidak ada di sini. `cx` menggantikan `cn` (tailwind-merge tidak mengenal ukuran teks token).
+- Sudah: `Popover`, `Command` (cmdk), dan `Select`. Popover dan Command SENGAJA tidak diekspor dari barrel `@absah/ui`: barrel tidak ter-tree-shake, dan keduanya (Radix popover, cmdk, floating-ui, sekitar 35 kB) akan masuk muatan pertama semua halaman. `Select` memuatnya lazy (`select-popover.tsx`) hanya di layar lebar, setelah mount; impor dari berkas komponen bila perlu. `Select` punya props dan anak `<option>` yang sama dengan `<select>`, jadi halaman tidak berubah. Mulai 1024 px ia tampil sebagai popover (pencarian bila 8 pilihan atau lebih); di bawahnya tetap pilihan bawaan peramban (paling mudah di HP Android murah). `<select>` asli tetap ada di halaman (tersembunyi) sebagai pembawa `name`, `required`, dan event `change`, jadi `onChange` menerima event sungguhan. Anak `<option>` yang tidak bisa dibaca (komponen yang merender option) jatuh ke `<select>` bawaan.
+- Popover muncul tanpa animasi: dropdown bukan salah satu dari 12 gerak papan Motion-UI. Bayangan lembut dari `.popover-surface` di `base.css` (tidak ada token bayangan).
+- E2E memilih lewat `choose(locator, opsi)` di `e2e/helpers.ts` (bekerja untuk `<select>` dan popover); jangan memanggil `selectOption` langsung. `popover.spec.ts` mengklik popover sungguhan.
+- Kolom teks tetap `<input>` biasa (keputusan: popover di atas kolom ketik mengganggu keyboard HP).
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

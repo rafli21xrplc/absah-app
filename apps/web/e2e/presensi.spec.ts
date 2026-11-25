@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, fillSession, generateSessions, onboardAdmin, pickStatus, sendReview } from './helpers';
+import { choose, createSchool, fillSession, generateSessions, onboardAdmin, pickStatus, sendReview } from './helpers';
 
 test('Presensi harian SD: Hari ini, Semua hadir lalu yang tidak hadir, resubmit', async ({ page }) => {
   const { schoolId, inviteUrl, email } = createSchool('SD Negeri Presensi E2E', 'sd');
@@ -16,7 +16,7 @@ test('Presensi harian SD: Hari ini, Semua hadir lalu yang tidak hadir, resubmit'
   // SD runs on daily sessions owned by the wali kelas.
   await page.goto('/jadwal');
   await expect(page.getByRole('tab', { name: 'Wali kelas', selected: true })).toBeVisible();
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
   generateSessions(schoolId);
 

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, fillSession, generateSessions, lastActionLink, onboardAdmin, randomDigits } from './helpers';
+import { choose, createSchool, fillSession, generateSessions, lastActionLink, onboardAdmin, randomDigits } from './helpers';
 
 test('Orang tua membuka tautan aksi, mengajukan izin, wali kelas menyetujui, status sesi berubah', async ({ page, browser }) => {
   test.slow(); // onboarding, import, session, link, approval and the worker in one flow
@@ -13,7 +13,7 @@ test('Orang tua membuka tautan aksi, mengajukan izin, wali kelas menyetujui, sta
   await page.getByRole('button', { name: 'Terapkan 10 perubahan' }).click({ timeout: 60_000 });
   await expect(page.getByText(/Import diterapkan ke tahun ajaran/)).toBeVisible();
   await page.goto('/jadwal');
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
 
   // The parent's WhatsApp number, entered by the school.

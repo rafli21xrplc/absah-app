@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, fillSession, generateSessions, onboardAdmin, otpLogin, randomDigits } from './helpers';
+import { choose, createSchool, fillSession, generateSessions, onboardAdmin, otpLogin, randomDigits } from './helpers';
 
 /** ISO weekday (1 = Senin) of today in Jakarta: the lessons are put on today, whatever day CI runs. */
 const todayIsoDay = () => {
@@ -21,7 +21,7 @@ test('SMP: presensi per jam pelajaran, lalu siswa mengisi jurnal 7 kebiasaan dan
   await expect(page.getByText(/Import diterapkan ke tahun ajaran/)).toBeVisible();
   await page.goto('/jadwal');
   await page.getByRole('tab', { name: 'Wali kelas' }).click(); // per_period opens on the timetable
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
 
   // Two lessons for VII A today (the schedule UI has its own spec, jadwal.spec.ts).
@@ -67,7 +67,7 @@ test('SMP: presensi per jam pelajaran, lalu siswa mengisi jurnal 7 kebiasaan dan
 
   // The wali kelas sees this week per student.
   await page.goto('/kebiasaan');
-  await page.getByLabel('Rombel').selectOption({ label: 'VII A' });
+  await choose(page.getByLabel('Rombel'), { label: 'VII A' });
   const row = page.getByRole('row', { name: /ADITYA PRATAMA/ });
   await expect(row).toContainText('1/7');
   await expect(page.getByRole('row', { name: /BUNGA LESTARI/ })).toContainText('0/7');

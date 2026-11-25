@@ -3,7 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { expectNoAxeViolations } from '../test/axe';
-import { Field, Input, Select, Textarea } from './field';
+import { Field, Input, Textarea } from './field';
+import { Select } from './select';
 
 describe('Field', () => {
   it('puts the label above the control and ties them together', () => {

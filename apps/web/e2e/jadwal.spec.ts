@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin } from './helpers';
 
 test('Jadwal: jam pelajaran, wali kelas, lesson with clash check, Excel template round trip', async ({ page }, testInfo) => {
   const { inviteUrl, email } = createSchool('SMP Negeri Jadwal E2E');
@@ -25,22 +25,22 @@ test('Jadwal: jam pelajaran, wali kelas, lesson with clash check, Excel template
   await expect(page.getByText('Jam pelajaran tersimpan.')).toBeVisible();
 
   await page.getByRole('tab', { name: 'Wali kelas' }).click();
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
 
   await page.getByRole('tab', { name: 'Jadwal pelajaran' }).click();
-  await page.getByLabel('Rombel').selectOption({ label: 'VII A' });
+  await choose(page.getByLabel('Rombel'), { label: 'VII A' });
   await page.getByRole('button', { name: 'Senin jam 1: kosong' }).click();
   await page.getByLabel('Nama mapel baru').fill('Matematika');
-  await page.getByLabel('Guru').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Guru'), { label: 'Admin E2E' });
   await page.getByRole('button', { name: 'Simpan' }).click();
   await expect(page.getByRole('button', { name: 'Senin jam 1: Matematika' })).toContainText('Admin E2E');
 
   // The same teacher in another rombel at the same time is refused.
-  await page.getByLabel('Rombel').selectOption({ label: 'VII B' });
+  await choose(page.getByLabel('Rombel'), { label: 'VII B' });
   await page.getByRole('button', { name: 'Senin jam 1: kosong' }).click();
-  await page.getByLabel('Mapel').selectOption({ label: 'Matematika' });
-  await page.getByLabel('Guru').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Mapel'), { label: 'Matematika' });
+  await choose(page.getByLabel('Guru'), { label: 'Admin E2E' });
   await page.getByRole('button', { name: 'Simpan' }).click();
   await expect(page.getByRole('alert').filter({ hasText: 'Jadwal bentrok' })).toContainText('Admin E2E sudah mengajar VII A di jam ini.');
 

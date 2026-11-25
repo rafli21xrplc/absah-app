@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin } from './helpers';
 
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(new Date());
 
@@ -41,7 +41,7 @@ test('Ujian: admin membuat ujian hari ini, menata ruang, mengisi rombel dan menc
   await page.getByLabel('Nama ruang').fill('R1');
   await page.getByRole('button', { name: 'Tambah ruang' }).click();
   await expect(page.getByRole('listitem', { name: 'R1' })).toContainText('pengawas: belum ada');
-  await page.getByLabel('Isi R1 dengan rombel').selectOption({ label: 'VII A' });
+  await choose(page.getByLabel('Isi R1 dengan rombel'), { label: 'VII A' });
   await expect(page.getByText(/R1: \d+ siswa ditambahkan/)).toBeVisible();
 
   // The pengawas (here the admin) records an arrival by hand.

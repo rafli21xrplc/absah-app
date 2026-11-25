@@ -18,6 +18,11 @@ export const messages = {
     optional: '(boleh dikosongkan)',
     errorLabel: 'Perlu diperbaiki',
   },
+  select: {
+    search: 'Cari',
+    choices: 'Pilihan',
+    empty: 'Tidak ditemukan.',
+  },
   banner: {
     info: 'Info',
     warning: 'Perhatian',

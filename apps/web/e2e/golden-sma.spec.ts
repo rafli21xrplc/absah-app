@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
+import { choose, createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
 
 /** ISO weekday (1 = Senin) of today in Jakarta: the lesson is put on today, whatever day CI runs. */
 const todayIsoDay = () => {
@@ -30,18 +30,18 @@ test('SMA: kelompok belajar lintas rombel, sesi kelompok, jam siswa, dan rekap k
   // Mapel pilihan: Fisika A takes Aditya from VII A and Eka from VII B.
   await page.goto('/jadwal');
   await page.getByRole('tab', { name: 'Wali kelas' }).click();
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
   await page.getByRole('tab', { name: 'Kelompok belajar' }).click();
   const form = page.getByRole('form', { name: 'Kelompok baru' });
   await form.getByLabel('Nama kelompok').fill('Fisika A');
-  await form.getByRole('combobox', { name: 'Mapel', exact: true }).selectOption({ label: 'Fisika' });
-  await form.getByRole('combobox', { name: 'Guru', exact: true }).selectOption({ label: 'Admin E2E' });
+  await choose(form.getByRole('combobox', { name: 'Mapel', exact: true }), { label: 'Fisika' });
+  await choose(form.getByRole('combobox', { name: 'Guru', exact: true }), { label: 'Admin E2E' });
   await form.getByRole('button', { name: 'Buat kelompok' }).click();
   const members = page.getByRole('region', { name: 'Anggota Fisika A' });
-  await members.getByLabel('Tambah dari rombel').selectOption({ label: 'VII A' });
+  await choose(members.getByLabel('Tambah dari rombel'), { label: 'VII A' });
   await members.getByRole('checkbox', { name: 'ADITYA PRATAMA' }).check();
-  await members.getByLabel('Tambah dari rombel').selectOption({ label: 'VII B' });
+  await choose(members.getByLabel('Tambah dari rombel'), { label: 'VII B' });
   await members.getByRole('checkbox', { name: 'EKA PUTRI RAHAYU' }).check();
   await members.getByRole('button', { name: 'Simpan anggota' }).click();
   await expect(members.getByText('Anggota tersimpan: 2 siswa.')).toBeVisible();
@@ -59,7 +59,7 @@ test('SMA: kelompok belajar lintas rombel, sesi kelompok, jam siswa, dan rekap k
 
   // The wali kelas of VII A sees the group lesson in each student's day.
   await page.goto('/jam-siswa');
-  await page.getByLabel('Rombel').selectOption({ label: 'VII A' });
+  await choose(page.getByLabel('Rombel'), { label: 'VII A' });
   await expect(page.getByRole('columnheader', { name: 'Jam 1 · Fisika · Fisika A' })).toBeVisible();
   await expect(page.getByRole('row', { name: /ADITYA PRATAMA/ })).toContainText('Alpa');
   await expect(page.getByRole('row', { name: /BUNGA LESTARI/ })).toContainText('—');

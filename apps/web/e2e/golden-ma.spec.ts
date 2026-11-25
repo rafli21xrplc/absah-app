@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { EMIS_FIXTURES } from './env';
-import { acceptInvite, createSchool, fillSession, onboardAdmin, otpLogin, randomDigits, releaseFlag } from './helpers';
+import { acceptInvite, choose, createSchool, fillSession, onboardAdmin, otpLogin, randomDigits, releaseFlag } from './helpers';
 
 test('MA: import EMIS, ibadah berjamaah, setoran hafalan dilihat siswa, rekap per jurusan dan ekspor RDM setelah flag dibuka', async ({ page, browser }) => {
   test.slow();
@@ -23,7 +23,7 @@ test('MA: import EMIS, ibadah berjamaah, setoran hafalan dilihat siswa, rekap pe
   // Sholat dzuhur berjamaah as an activity, attendance on the usual session screen.
   await page.goto('/kegiatan');
   await page.getByLabel('Nama kegiatan').fill('Dzuhur berjamaah');
-  await page.getByLabel('Jenis').selectOption({ label: 'Ibadah berjamaah' });
+  await choose(page.getByLabel('Jenis'), { label: 'Ibadah berjamaah' });
   await page.getByRole('checkbox', { name: 'Sen' }).check();
   await page.getByRole('checkbox', { name: 'Admin E2E' }).check();
   await page.getByRole('button', { name: 'Simpan kegiatan' }).click();
@@ -52,7 +52,7 @@ test('MA: import EMIS, ibadah berjamaah, setoran hafalan dilihat siswa, rekap pe
   await ustadz.getByRole('main').getByRole('link', { name: 'Setoran hafalan' }).click();
   await ustadz.getByLabel('Cari siswa').fill('ahmad');
   await ustadz.getByRole('button', { name: 'AHMAD FAUZAN · X IPA 1' }).click();
-  await ustadz.getByLabel('Surah').selectOption({ label: '67. Al-Mulk (30 ayat)' });
+  await choose(ustadz.getByLabel('Surah'), { label: '67. Al-Mulk (30 ayat)' });
   await ustadz.getByLabel('Ayat awal').fill('1');
   await ustadz.getByLabel('Ayat akhir').fill('15');
   await ustadz.getByLabel(/Nilai/).fill('88');
@@ -79,7 +79,7 @@ test('MA: import EMIS, ibadah berjamaah, setoran hafalan dilihat siswa, rekap pe
 
   // Rekap per jurusan; RDM export waits for the Absah team to open the trial for this madrasah.
   await page.goto('/rekap');
-  await page.getByLabel('Jurusan').selectOption({ label: 'IPS' });
+  await choose(page.getByLabel('Jurusan'), { label: 'IPS' });
   await expect(page.getByRole('link', { name: 'X IPS 1' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'X IPA 1' })).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Ekspor semester jurusan IPS' })).toBeVisible();

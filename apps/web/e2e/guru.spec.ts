@@ -2,7 +2,7 @@ import { expect, test, type Browser, type Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { acceptInvite, createSchool, generateSessions, onboardAdmin } from './helpers';
+import { acceptInvite, choose, createSchool, generateSessions, onboardAdmin } from './helpers';
 
 /** Is today a school day for a school without periods (Monday to Friday on the Jakarta clock)? The API refuses check-in otherwise. */
 function schoolDayToday(): boolean {
@@ -37,7 +37,7 @@ test('Guru: absen, izin disetujui, sesi tanpa pengganti tetap tampil, pengganti 
 
   // SD runs on daily sessions owned by the wali kelas: Bu Wali holds VII A today.
   await page.goto('/jadwal');
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Bu Wali' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Bu Wali' });
   await expect(page.getByText('Wali kelas VII A: Bu Wali.')).toBeVisible();
   generateSessions(schoolId);
 

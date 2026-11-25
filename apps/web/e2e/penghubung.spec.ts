@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin } from './helpers';
 
 test('Buku penghubung: wali kelas menulis ke orang tua, menarik pesan dalam 15 menit, admin mengatur jam layanan', async ({ page }) => {
   const { inviteUrl, email } = createSchool('SMP Penghubung E2E', 'smp');
@@ -13,7 +13,7 @@ test('Buku penghubung: wali kelas menulis ke orang tua, menarik pesan dalam 15 m
   await expect(page.getByText(/Import diterapkan ke tahun ajaran/)).toBeVisible();
   await page.goto('/jadwal');
   await page.getByRole('tab', { name: 'Wali kelas' }).click();
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
 
   // The admin's service hours.

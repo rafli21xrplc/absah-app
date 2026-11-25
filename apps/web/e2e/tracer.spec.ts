@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createSchool, lastMessage, onboardAdmin, randomDigits } from './helpers';
+import { choose, createSchool, lastMessage, onboardAdmin, randomDigits } from './helpers';
 
 test('Tracer study: BKK menambah alumni dan mengundang, alumni mengisi lewat tautan, rekap BMW terbarui (PKL-05)', async ({ page, browser }) => {
   const { schoolId, inviteUrl, email } = createSchool('SMK Tracer E2E', 'smk');
@@ -20,7 +20,7 @@ test('Tracer study: BKK menambah alumni dan mengundang, alumni mengisi lewat tau
 
   // The invitation goes through the worker: nothing is sent from the request.
   const invite = page.getByRole('form', { name: 'Kirim undangan' });
-  await invite.getByLabel('Angkatan').selectOption(String(year));
+  await choose(invite.getByLabel('Angkatan'), String(year));
   await invite.getByRole('button', { name: 'Kirim undangan' }).click();
   await expect(page.getByText('1 undangan dikirim lewat WhatsApp.')).toBeVisible();
 

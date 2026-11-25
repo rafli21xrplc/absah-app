@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
+import { choose, createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
 
 test('Rekap: alpa hari ini masuk rekap rombel dan siswa, ekspor e-Rapor dibuat worker, pengisian sesi', async ({ page }) => {
   test.slow(); // onboarding, import, a session and the worker building the file
@@ -13,7 +13,7 @@ test('Rekap: alpa hari ini masuk rekap rombel dan siswa, ekspor e-Rapor dibuat w
   await page.getByRole('button', { name: 'Terapkan 10 perubahan' }).click({ timeout: 60_000 });
   await expect(page.getByText(/Import diterapkan ke tahun ajaran/)).toBeVisible();
   await page.goto('/jadwal');
-  await page.getByLabel('Wali kelas VII A').selectOption({ label: 'Admin E2E' });
+  await choose(page.getByLabel('Wali kelas VII A'), { label: 'Admin E2E' });
   await expect(page.getByText('Wali kelas VII A: Admin E2E.')).toBeVisible();
 
   generateSessions(schoolId);

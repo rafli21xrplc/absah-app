@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { KIOSK_URL } from './env';
-import { createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin } from './helpers';
 
 test('Buku tamu: tamu mengisi form di kios (offline tidak mencatat ganda), piket menandai keluar', async ({ page, browser }) => {
   const { schoolId, inviteUrl, email } = createSchool('SMP Buku Tamu E2E', 'smp');
@@ -35,7 +35,7 @@ test('Buku tamu: tamu mengisi form di kios (offline tidak mencatat ganda), piket
   await kiosk.getByLabel('Nama', { exact: true }).fill('Pak Hendra');
   await kiosk.getByLabel('Instansi (boleh dikosongkan)').fill('Dinas Pendidikan');
   await kiosk.getByLabel('Tujuan kunjungan').fill('Monitoring BOS');
-  await kiosk.getByLabel('Bertemu dengan (boleh dikosongkan)').selectOption({ label: 'Admin E2E' });
+  await choose(kiosk.getByLabel('Bertemu dengan (boleh dikosongkan)'), { label: 'Admin E2E' });
 
   // The connection drops: the form says so, keeps what was typed, and nothing is recorded.
   await kioskContext.setOffline(true);

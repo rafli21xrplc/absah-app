@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { createHmac, randomUUID } from 'node:crypto';
 import { API_ENV, API_SERVER_DIR } from './env';
@@ -219,4 +219,14 @@ export async function fillSession(page: Page, exceptions: { name: string; status
   await markStudents(page, exceptions);
   await sendReview(page);
   await page.getByRole('heading', { name: /^Presensi .+ terkirim$/ }).waitFor();
+}
+
+/**
+ * Picks an option in a dropdown. A phone shows the browser's <select>; a laptop shows a popover button (role combobox) with the
+ * real <select> kept beside it as the form control. Either way the pick goes through that <select>, so one call serves both.
+ * The popover itself is clicked by hand in popover.spec.ts.
+ */
+export async function choose(control: Locator, option: string | { label?: string; index?: number; value?: string }) {
+  // Resolved at action time: on a laptop the native select is swapped for the popover button a moment after the page loads.
+  await control.locator('xpath=self::select | preceding-sibling::select').selectOption(option);
 }
