@@ -654,6 +654,19 @@ export const messages = {
   sideNav: {
     label: 'Menu utama',
   },
+  search: {
+    trigger: 'Cari',
+    title: 'Pencarian',
+    placeholder: 'Cari halaman, siswa, atau tindakan',
+    empty: 'Tidak ada yang cocok.',
+    loading: 'Mencari…',
+    pages: 'Halaman',
+    people: 'Siswa',
+    actions: 'Tindakan',
+    schools: 'Pindah sekolah',
+    hint: 'Ketik untuk mencari. Panah untuk memilih, Enter untuk membuka, Esc untuk menutup.',
+    open: 'Buka pencarian',
+  },
   sidebar: {
     brand: 'Absah',
     school: 'Sekolah',

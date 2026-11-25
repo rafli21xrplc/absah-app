@@ -16,10 +16,8 @@ export const buttonStyles = cva(
       {
         variant: 'primary',
         blocked: false,
-        // In the dark theme papan-deep is too dark under the dark label (3.46:1, see tokens.test.ts), so the pressed
-        // state keeps papan and dims it instead. Pending a design decision (PR #63).
-        class:
-          'border border-transparent bg-papan text-on-papan hover:bg-papan-deep active:bg-papan-deep dark:hover:bg-papan dark:active:bg-papan dark:hover:brightness-90 dark:active:brightness-90',
+        // papan-deep keeps the label readable in both themes since tokens v3 (checked in tokens.test.ts).
+        class: 'border border-transparent bg-papan text-on-papan hover:bg-papan-deep active:bg-papan-deep',
       },
       { variant: 'stabilo', blocked: false, class: 'border border-transparent bg-stabilo text-on-stabilo hover:brightness-95 active:brightness-90' },
       {

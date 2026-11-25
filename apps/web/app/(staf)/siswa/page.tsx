@@ -47,7 +47,7 @@ function StudentsView() {
   const allowed = hasRole(...STUDENT_READERS);
   const canManage = hasRole(...STUDENT_MANAGERS);
 
-  const [q, setQ] = useState('');
+  const [q, setQ] = useState(params.get('q') ?? '');
   const [status, setStatus] = useState<Status>(params.get('status') === 'missing' ? 'missing' : 'active');
   const [classId, setClassId] = useState(params.get('rombel') ?? '');
   const [classes, setClasses] = useState<ClassList['items']>([]);

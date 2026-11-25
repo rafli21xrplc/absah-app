@@ -1,18 +1,21 @@
 'use client';
 
-import { AccountMenu, AccountSummary, AppShell, AppTopBar, BottomNav, BrandMark, menuItemStyles, messages, SchoolSwitcher, Select, Sheet, SideNav, ThemeSwitch, WorkspaceLabel, type SideNavGroup } from '@absah/ui';
-import { LogOut } from 'lucide-react';
+import { AccountMenu, AccountSummary, AppShell, AppTopBar, BottomNav, BrandMark, Button, CommandPalette, menuItemStyles, messages, SchoolSwitcher, SearchTrigger, Select, Sheet, SideNav, ThemeSwitch, useCommandShortcut, useTheme, WorkspaceLabel, type CommandGroupData, type SideNavGroup } from '@absah/ui';
+import { LogOut, Monitor, Moon, Search, Sun, User } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useMemo, useState, type ComponentProps, type ReactNode } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useMemo, useState, type ComponentProps, type ReactNode } from 'react';
 import { useCapabilities } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
 import { ACCOUNT_LINKS, currentBarKey, currentItemKey, menuContext, TEACHER_BAR, usesTeacherBar, visibleMenu, type BarItem } from '@/lib/nav-menu';
 import { ROLE_LABELS } from '@/lib/roles';
+import { STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
 import { useSignOut } from './sign-out-button';
+import { MIN_SEARCH, useStudentSearch } from './use-student-search';
 
 const t = messages.sidebar;
+const sentence = (text: string) => text.charAt(0) + text.slice(1).toLowerCase();
 
 /** Menu links do not prefetch: ~40 of them on every page would cost a cheap phone's data and the school's. */
 function MenuLink(props: ComponentProps<typeof Link>) {
@@ -30,6 +33,13 @@ const FOCUS_SCREENS = ['/sesi/'];
 export function StaffShell({ children }: { children: ReactNode }) {
   const { me, schoolId, roles, selectSchool } = useWorkspace();
   const { ask: askSignOut, dialog: signOutDialog } = useSignOut();
+  const router = useRouter();
+  const [, setTheme] = useTheme();
+  // Ctrl+K: one palette for the whole staff area. What it can open follows the same menu the person sees.
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const togglePalette = useCallback(() => setPaletteOpen((o) => !o), []);
+  useCommandShortcut(togglePalette);
   const capabilities = useCapabilities();
   const pathname = usePathname();
   // The sheet is open for the page it was opened on: any change of page (a menu link, the back button) closes it, no effect needed.
@@ -55,6 +65,46 @@ export function StaffShell({ children }: { children: ReactNode }) {
       })),
     [groups, current],
   );
+
+  const canSearchStudents = ctx.hasRole(...STUDENT_READERS);
+  const students = useStudentSearch(paletteOpen && canSearchStudents ? query : '', schoolId);
+  const paletteGroups = useMemo<CommandGroupData[]>(() => {
+    const go = (href: string) => () => router.push(href);
+    const pages = [
+      ...groups.flatMap((g) =>
+        g.items.map((i) => ({ key: i.key, label: i.label, ...(g.title ? { hint: sentence(g.title) } : {}), icon: <i.icon aria-hidden strokeWidth={1.75} className="size-4" />, onSelect: go(i.href) })),
+      ),
+      ...ACCOUNT_LINKS.map((l) => ({ key: l.key, label: l.label, hint: messages.sidebar.account, icon: <l.icon aria-hidden strokeWidth={1.75} className="size-4" />, onSelect: go(l.href) })),
+    ];
+    const icon = (Icon: typeof Sun) => <Icon aria-hidden strokeWidth={1.75} className="size-4" />;
+    const actions = [
+      { key: 'tema-terang', label: `${messages.theme.label}: ${messages.theme.light}`, icon: icon(Sun), keywords: ['tema', 'light', 'terang', 'putih'], onSelect: () => setTheme('light') },
+      { key: 'tema-gelap', label: `${messages.theme.label}: ${messages.theme.dark}`, icon: icon(Moon), keywords: ['tema', 'dark', 'gelap', 'malam'], onSelect: () => setTheme('dark') },
+      { key: 'tema-sistem', label: `${messages.theme.label}: ${messages.theme.system}`, icon: icon(Monitor), keywords: ['tema', 'system', 'otomatis'], onSelect: () => setTheme('system') },
+      { key: 'keluar', label: messages.sidebar.signOut, icon: icon(LogOut), keywords: ['logout', 'sign out', 'keluar akun'], onSelect: () => void askSignOut() },
+    ];
+    const others = me.schools.filter((x) => x.id !== schoolId).map((x) => ({ key: x.id, label: x.name, hint: LEVEL_LABELS[x.level], icon: icon(User), onSelect: () => selectSchool(x.id) }));
+    const out: CommandGroupData[] = [
+      { key: 'halaman', heading: messages.search.pages, items: pages },
+      { key: 'tindakan', heading: messages.search.actions, items: actions },
+    ];
+    if (others.length > 0) out.push({ key: 'sekolah', heading: messages.search.schools, items: others });
+    if (canSearchStudents && students.items.length > 0) {
+      out.unshift({
+        key: 'siswa',
+        heading: messages.search.people,
+        remote: true,
+        items: students.items.map((st) => ({
+          key: st.id,
+          label: st.name,
+          ...(st.enrollment ? { hint: st.enrollment.className } : {}),
+          icon: icon(User),
+          onSelect: () => router.push(`/siswa?q=${encodeURIComponent(st.name)}`),
+        })),
+      });
+    }
+    return out;
+  }, [groups, me.schools, schoolId, router, setTheme, askSignOut, selectSchool, canSearchStudents, students.items]);
 
   const school = me.schools.find((s) => s.id === schoolId);
   if (!school) return <>{children}</>;
@@ -128,6 +178,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
           <SchoolSwitcher schools={choices} activeId={school.id} onSelect={selectSchool} />
         </>
       }
+      header={<SearchTrigger className="max-w-xl" onClick={() => setPaletteOpen(true)} />}
       sidebarFooter={
         <AccountMenu name={me.user.name} detail={roleLine} email={me.user.email}>
           {accountRows(true)}
@@ -137,7 +188,16 @@ export function StaffShell({ children }: { children: ReactNode }) {
       topBar={
         focusScreen || teacherBar ? undefined : (
           <>
-            <AppTopBar onMenu={() => setOpen(true)}>{label}</AppTopBar>
+            <AppTopBar
+              onMenu={() => setOpen(true)}
+              actions={
+                <Button variant="ghost" aria-label={messages.search.open} aria-haspopup="dialog" onClick={() => setPaletteOpen(true)} className="px-3">
+                  <Search aria-hidden strokeWidth={1.75} className="size-5" />
+                </Button>
+              }
+            >
+              {label}
+            </AppTopBar>
             <Sheet open={open} onOpenChange={setOpen} title="Menu" eyebrow={school.name}>
               {switcher}
               <SideNav groups={navGroups} linkAs={MenuLink} collapsible onNavigate={() => setOpen(false)} />
@@ -154,6 +214,16 @@ export function StaffShell({ children }: { children: ReactNode }) {
     >
       {children}
       {signOutDialog}
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={(next) => {
+          setPaletteOpen(next);
+          if (!next) setQuery('');
+        }} 
+        groups={paletteGroups}
+        query={query}
+        onQueryChange={setQuery}
+        busy={students.busy && query.trim().length >= MIN_SEARCH} />
     </AppShell>
   );
 }

@@ -14,11 +14,12 @@ function Command({ className, ...props }: ComponentProps<typeof CommandPrimitive
 
 function CommandInput({ className, ...props }: ComponentProps<typeof CommandPrimitive.Input>) {
   return (
-    <div data-slot="command-input-wrapper" className="flex min-h-11 items-center gap-2 border-b border-garis px-3">
+    <div data-slot="command-input-wrapper" className="flex min-h-11 items-center gap-2 border-b border-garis px-3 focus-within:border-papan">
       <Search aria-hidden strokeWidth={1.75} className="size-4 shrink-0 text-tinta-muted" />
       <CommandPrimitive.Input
         data-slot="command-input"
-        className={cx('flex min-h-11 w-full bg-transparent text-body text-tinta outline-hidden placeholder:text-tinta-muted', className)}
+        // The field sits in a box that shows focus by its bottom line turning green; the global ring would draw a second frame inside it.
+        className={cx('flex min-h-11 w-full border-0 bg-transparent p-0 text-body text-tinta outline-hidden placeholder:text-tinta-muted focus-visible:!shadow-none', className)}
         {...props}
       />
     </div>
