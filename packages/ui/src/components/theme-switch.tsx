@@ -7,12 +7,12 @@ import { SegmentedControl } from './segmented-control';
 const t = messages.theme;
 
 /** Sistem, Terang or Gelap. The choice applies at once and stays on this device (see theme.ts). */
-export function ThemeSwitch() {
+export function ThemeSwitch({ compact = false }: { compact?: boolean }) {
   const [theme, setTheme] = useTheme();
   const options: { value: ThemePreference; label: string }[] = [
     { value: 'system', label: t.system },
     { value: 'light', label: t.light },
     { value: 'dark', label: t.dark },
   ];
-  return <SegmentedControl label={t.label} options={options} value={theme} onChange={setTheme} />;
+  return <SegmentedControl label={t.label} options={options} value={theme} onChange={setTheme} compact={compact} />;
 }

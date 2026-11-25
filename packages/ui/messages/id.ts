@@ -654,6 +654,19 @@ export const messages = {
   sideNav: {
     label: 'Menu utama',
   },
+  sidebar: {
+    brand: 'Absah',
+    school: 'Sekolah',
+    switchSchool: 'Ganti sekolah',
+    chooseSchool: 'Pilih sekolah',
+    account: 'Akun',
+    accountMenu: 'Menu akun',
+    signOut: 'Keluar',
+    notifications: 'Notifikasi di HP ini',
+    releaseNotes: 'Catatan rilis',
+    groupOpen: 'Buka',
+    groupClose: 'Tutup',
+  },
   theme: {
     label: 'Tampilan',
     system: 'Sistem',

@@ -201,10 +201,17 @@ export const STAFF_MENU: readonly MenuGroup[] = [
       { key: 'setup', label: 'Pengaturan sekolah', href: '/setup', icon: Settings, visible: (c) => c.isAdmin },
       { key: 'ekspor-data', label: 'Ekspor data sekolah', href: '/ekspor-data', icon: Download, visible: (c) => c.isAdmin },
       { key: 'integrasi', label: 'Integrasi', href: '/integrasi', icon: Plug, visible: (c) => c.isAdmin && on(c, 'platform.openApi') },
-      { key: 'notif-hp', label: 'Notifikasi di HP ini', href: '/pengaturan', icon: Smartphone },
-      { key: 'rilis', label: 'Catatan rilis', href: '/rilis', icon: HeartPulse },
     ],
   },
+];
+
+/**
+ * What belongs to the person, not to the school: it sits in the account menu at the foot of the side column (and under the menu
+ * on a phone), so the long menu above holds only school work. Everyone signed in has these.
+ */
+export const ACCOUNT_LINKS: readonly { key: string; label: string; href: string; icon: LucideIcon }[] = [
+  { key: 'notif-hp', label: 'Notifikasi di HP ini', href: '/pengaturan', icon: Smartphone },
+  { key: 'rilis', label: 'Catatan rilis', href: '/rilis', icon: HeartPulse },
 ];
 
 export interface VisibleItem {

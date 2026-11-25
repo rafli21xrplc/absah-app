@@ -10,6 +10,10 @@ import { SkeletonRows } from './skeleton';
 export interface AppShellProps {
   /** Side menu column (240 px, from 1024 px up). Below that it is hidden: the page offers the menu another way (a sheet). */
   sidebar: ReactNode;
+  /** Pinned above the scrolling menu (brand, school). Without it and `sidebarFooter` the column is one scrolling block. */
+  sidebarHeader?: ReactNode;
+  /** Pinned under the scrolling menu (the account): always in reach, however long the menu is. */
+  sidebarFooter?: ReactNode;
   /** A bar above the page on screens under 1024 px (menu button, school name). */
   topBar?: ReactNode;
   /** The teacher's bottom bar, phone only (under 1024 px); the page gets room under it. */
@@ -22,7 +26,7 @@ export interface AppShellProps {
  * The staff page frame: skip link, 240 px side column on a laptop, a top bar on a phone, then the page.
  * The page keeps its own <main>; the frame is not a landmark so there is only one.
  */
-export function AppShell({ sidebar, topBar, bottomBar, children, skipLabel = messages.appShell.skip }: AppShellProps) {
+export function AppShell({ sidebar, sidebarHeader, sidebarFooter, topBar, bottomBar, children, skipLabel = messages.appShell.skip }: AppShellProps) {
   return (
     <div className="min-h-dvh bg-kapur text-tinta lg:flex">
       <nav aria-label={messages.appShell.shortcuts}>
@@ -30,7 +34,15 @@ export function AppShell({ sidebar, topBar, bottomBar, children, skipLabel = mes
           {skipLabel}
         </a>
       </nav>
-      <aside className="hidden w-60 shrink-0 flex-col gap-5 overflow-y-auto border-r border-garis bg-kapur-raised p-4 lg:sticky lg:top-0 lg:flex lg:h-dvh">{sidebar}</aside>
+      {sidebarHeader || sidebarFooter ? (
+        <aside className="hidden w-64 shrink-0 flex-col border-r border-garis bg-kapur-raised lg:sticky lg:top-0 lg:flex lg:h-dvh">
+          {sidebarHeader && <div className="flex shrink-0 flex-col gap-3 p-4 pb-3">{sidebarHeader}</div>}
+          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-3 py-2">{sidebar}</div>
+          {sidebarFooter && <div className="shrink-0 border-t border-garis p-3">{sidebarFooter}</div>}
+        </aside>
+      ) : (
+        <aside className="hidden w-60 shrink-0 flex-col gap-5 overflow-y-auto border-r border-garis bg-kapur-raised p-4 lg:sticky lg:top-0 lg:flex lg:h-dvh">{sidebar}</aside>
+      )}
       <div className="flex min-w-0 flex-1 flex-col">
         {topBar && <div className="sticky top-0 z-30 border-b border-garis bg-kapur-raised lg:hidden">{topBar}</div>}
         <div id="isi" tabIndex={-1} className={cx('min-w-0 flex-1 outline-none', bottomBar ? 'pb-14 lg:pb-0' : '')}>

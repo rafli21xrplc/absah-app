@@ -210,3 +210,11 @@ Keputusan kerja (mudah dibalik):
 ### TL1
 `ThemeSwitch` di menu samping dan lembar menu HP. `build-tokens.mjs` kini menghasilkan `:root[data-theme='dark']` di samping jalur `prefers-color-scheme`. Tes: `theme.test.ts`, `theme-switch.test.tsx`, `tokens.test.ts`, dan `e2e/tema.spec.ts` (laptop dan HP).
 
+## 11. SB1: menu samping staf
+
+Permintaan: sidebar tidak memudahkan, harus ada tombol keluar dan workspace; fungsional, minimalis, elegan. Papan `Main` hanya menggambar merek, kartu sekolah, dan menu, jadi akun dan Keluar adalah tambahan di luar papan (keputusan kerja, mudah dibalik).
+- **Masalah yang diperbaiki**: Keluar hanya ada di beranda; ganti sekolah hanya lewat `<select>` kecil atau beranda; menu admin sekitar 35 tautan dalam 7 grup tergulir semuanya; tema dan hal pribadi bercampur dengan pekerjaan sekolah.
+- **Keputusan**: kolom atas dan bawah tetap, menu tengah menggulir dan grupnya bisa dilipat; popover untuk sekolah dan akun hanya di laptop (HP tetap lembar Menu). Pencarian menu (Ctrl+K) sengaja belum: usulan lanjutan bila grup lipat belum cukup.
+- Bahasa dan tema (TL) menumpang di blok akun ini: pilihan bahasa nanti ditaruh di baris Tampilan.
+- Tangkapan layar: `docs/ui/sb1/`.
+

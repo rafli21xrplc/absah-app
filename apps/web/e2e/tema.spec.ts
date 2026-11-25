@@ -7,8 +7,12 @@ import { createSchool, onboardAdmin } from './helpers';
 const KAPUR = { light: 'rgb(247, 245, 239)', dark: 'rgb(18, 26, 23)' };
 
 async function openMenu(page: Page, isMobile: boolean) {
-  // On a phone the menu is a sheet behind the Menu button; on a laptop it is the side menu.
+  // The choice is in the account menu: a popover under the side menu on a laptop, the end of the Menu sheet on a phone.
+  // A pick leaves it open, so only open it when the switch is not on screen.
+  if (await page.getByRole('button', { name: 'Gelap' }).isVisible()) return;
   if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
+  else await page.getByRole('button', { name: /Menu akun/ }).click();
+  await expect(page.getByRole('button', { name: 'Gelap' })).toBeVisible();
 }
 
 const background = (page: Page) => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
