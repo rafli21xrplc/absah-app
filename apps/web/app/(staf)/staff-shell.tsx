@@ -1,6 +1,6 @@
 'use client';
 
-import { AppShell, AppTopBar, BottomNav, Select, Sheet, SideNav, WorkspaceLabel, type SideNavGroup } from '@absah/ui';
+import { AppShell, AppTopBar, BottomNav, Select, Sheet, SideNav, ThemeSwitch, WorkspaceLabel, type SideNavGroup } from '@absah/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo, useState, type ComponentProps, type ReactNode } from 'react';
@@ -53,6 +53,12 @@ export function StaffShell({ children }: { children: ReactNode }) {
   const school = me.schools.find((s) => s.id === schoolId);
   if (!school) return <>{children}</>;
 
+  // Tampilan (theme) sits under the menu, in the side menu and in the phone's menu sheet alike.
+  const appearance = (
+    <div className="mt-auto flex flex-col gap-2 border-t border-garis pt-4">
+      <ThemeSwitch />
+    </div>
+  );
   const label = <WorkspaceLabel name={school.name} detail={LEVEL_LABELS[school.level]} />;
   const switcher =
     me.schools.length > 1 ? (
@@ -85,6 +91,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
           {label}
           {switcher}
           <SideNav groups={navGroups} linkAs={MenuLink} />
+          {appearance}
         </>
       }
       bottomBar={bottomBar}
@@ -95,6 +102,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
             <Sheet open={open} onOpenChange={setOpen} title="Menu" eyebrow={school.name}>
               {switcher}
               <SideNav groups={navGroups} linkAs={MenuLink} onNavigate={() => setOpen(false)} />
+              {appearance}
             </Sheet>
           </>
         )

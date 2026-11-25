@@ -82,13 +82,17 @@ export function buildCss(tokens) {
   const names = tokens.color.tokens.map((t) => t.name);
   const out = [`/* ${HEADER} */`, ''];
 
-  // Raw colours: one variable per token and theme. Dark follows the OS (prefers-color-scheme).
-  out.push(':root {');
+  // Raw colours: one variable per token and theme. The person's choice is the data-theme attribute on <html> ("light" or
+  // "dark", set by packages/ui/src/theme.ts); without it the dark theme follows the OS (prefers-color-scheme).
+  out.push(':root {', '  color-scheme: light dark;');
   for (const t of tokens.color.tokens) out.push(`  --${t.name}: ${t.value.light};`);
   for (const t of [...(tokens.motion?.duration ?? []), ...(tokens.motion?.easing ?? [])]) out.push(`  --${t.name}: ${t.value};`);
-  out.push('}', '', '@media (prefers-color-scheme: dark) {', '  :root {');
+  out.push('}', '', ":root[data-theme='light'] {", '  color-scheme: light;', '}', '');
+  out.push('@media (prefers-color-scheme: dark) {', "  :root:not([data-theme='light']) {");
   for (const t of tokens.color.tokens) out.push(`    --${t.name}: ${t.value.dark};`);
-  out.push('  }', '}', '');
+  out.push('  }', '}', '', ":root[data-theme='dark'] {", '  color-scheme: dark;');
+  for (const t of tokens.color.tokens) out.push(`  --${t.name}: ${t.value.dark};`);
+  out.push('}', '');
 
   // Tailwind v4 theme. The resets remove Tailwind's own palette, type scale and radii, so a class such as
   // bg-red-500 or text-xl does not exist: tokens.json is the only vocabulary.

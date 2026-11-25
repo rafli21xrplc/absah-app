@@ -793,6 +793,14 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - E2E memilih lewat `choose(locator, opsi)` di `e2e/helpers.ts` (bekerja untuk `<select>` dan popover); jangan memanggil `selectOption` langsung. `popover.spec.ts` mengklik popover sungguhan.
 - Kolom teks tetap `<input>` biasa (keputusan: popover di atas kolom ketik mengganggu keyboard HP).
 
+### Tema terang dan gelap (TL1)
+
+- Tema dipilih orang lewat `ThemeSwitch` (Sistem, Terang, Gelap) di menu staf, dan disimpan di `localStorage` perangkat itu (`absah-tema`), bukan di akun: tidak perlu permintaan ke server dan tidak ada kedipan. Pilihan Terang atau Gelap mengalahkan pengaturan sistem; Sistem menghapus atribut dan mengembalikan keputusan ke `prefers-color-scheme`.
+- Cara kerjanya: atribut `data-theme="light|dark"` di `<html>`, dibaca `tokens.css`. `tokens.css` dihasilkan `build-tokens.mjs` dari `tokens.json`; JANGAN menulis blok warna tema dengan tangan. Gelap ada dua jalur dengan nilai sama (mengikuti sistem, dan dipilih), dan `tokens.test.ts` menjaganya.
+- Skrip kecil di `<head>` (`THEME_INIT_SCRIPT`, di `theme-script.ts`) memasang `data-theme` sebelum cat pertama. Ia sengaja tanpa React dan tanpa `'use client'`, karena layout akar (server) menyisipkannya; hook ada di `theme.ts` (client). Dua berkas ini tidak boleh digabung.
+- Kelas warna tetap token (`bg-kapur`, `text-tinta`): satu kelas bekerja di kedua tema. Warna tidak boleh ditulis per tema di komponen.
+- E2E `tema.spec.ts` membaca warna asli halaman di laptop dan HP, dan menjalankan axe pada Terang dan Gelap yang dipilih berlawanan dengan pengaturan sistem.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

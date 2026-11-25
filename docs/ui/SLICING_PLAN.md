@@ -198,3 +198,15 @@ Halaman `/masuk` sesuai papan Auth-masuk: tiga tab, validasi sisi klien, empat k
 - **"Ingat saya"** mengirim `rememberMe` ke Better Auth; tidak dicentang berarti cookie sesi yang berakhir saat peramban ditutup. Bawaan tidak dicentang, mengikuti papan.
 - **Kalimat kode orang tua** ditulis bersyarat ("Jika nomor ini terdaftar di sekolah, kami kirim kode...") supaya tidak membocorkan keberadaan akun; papan menulisnya pasti.
 - Bar "Skenario demo" milik papan tidak dibawa. Tombol `loading` kini tetap berwarna (lihat UA1).
+
+## 10. Fase TL (tema dan bahasa halaman admin)
+
+Permintaan: "untuk page admin tambahkan en dan id, dan tambahkan theme dark dan light." Dua pekerjaan terpisah, satu PR per langkah, ditumpuk di atas SH1.
+
+Keputusan kerja (mudah dibalik):
+- **Tema dulu (TL1)**: kecil dan berdiri sendiri. Gelap sudah ada sebagai token tetapi hanya mengikuti sistem; yang ditambah adalah pilihan manual. Disimpan per perangkat (`localStorage`), bukan per akun, supaya tidak butuh API baru.
+- **Bahasa (TL2 dan seterusnya)** dikerjakan per kelompok rute admin, bukan sekaligus: sekitar 75 berkas halaman `(staf)` dan 540 frasa di `lib/` masih menulis teks Indonesia langsung. Bahasa bawaan tetap Indonesia sehingga e2e yang ada tidak berubah.
+
+### TL1
+`ThemeSwitch` di menu samping dan lembar menu HP. `build-tokens.mjs` kini menghasilkan `:root[data-theme='dark']` di samping jalur `prefers-color-scheme`. Tes: `theme.test.ts`, `theme-switch.test.tsx`, `tokens.test.ts`, dan `e2e/tema.spec.ts` (laptop dan HP).
+
