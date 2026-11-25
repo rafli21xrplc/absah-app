@@ -654,6 +654,12 @@ export const messages = {
   sideNav: {
     label: 'Menu utama',
   },
+  theme: {
+    label: 'Tampilan',
+    system: 'Sistem',
+    light: 'Terang',
+    dark: 'Gelap',
+  },
   appShell: {
     skip: 'Lewati ke isi halaman',
     shortcuts: 'Pintasan',

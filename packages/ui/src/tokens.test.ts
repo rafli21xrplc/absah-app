@@ -130,8 +130,20 @@ describe('generated files', () => {
   it('every colour token has a variable in both themes and a Tailwind colour', () => {
     const css = readFileSync(CSS_OUT, 'utf8');
     for (const name of Object.keys(color)) {
-      expect(css.match(new RegExp(`^\\s+--${name}: #`, 'gm'))?.length).toBe(2);
+      // light, dark by the OS, dark by the person's choice (data-theme)
+      expect(css.match(new RegExp(`^\\s+--${name}: #`, 'gm'))?.length).toBe(3);
       expect(css).toContain(`--color-${name}: var(--${name});`);
     }
+  });
+
+  it('dark is reachable two ways, with the same values, and light can override the OS', () => {
+    const css = readFileSync(CSS_OUT, 'utf8');
+    const system = css.slice(css.indexOf('@media (prefers-color-scheme: dark)'), css.indexOf(":root[data-theme='dark']"));
+    const chosen = css.slice(css.indexOf(":root[data-theme='dark']"), css.indexOf('@theme static'));
+    expect(system).toContain(":root:not([data-theme='light'])");
+    const declarations = (block: string) => [...block.matchAll(/--[a-z-]+: #[0-9A-F]{6};/g)].map((m) => m[0]);
+    expect(declarations(chosen)).toEqual(declarations(system));
+    expect(declarations(chosen)).toHaveLength(Object.keys(color).length);
+    expect(css).toContain(":root[data-theme='light'] {\n  color-scheme: light;");
   });
 });
