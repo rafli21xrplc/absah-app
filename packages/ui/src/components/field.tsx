@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDown, CircleAlert } from 'lucide-react';
-import { createContext, useContext, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { createContext, useContext, useId, type ComponentPropsWithRef, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { messages } from '../../messages/id';
 import { cx } from '../cx';
 
@@ -74,7 +74,8 @@ const control =
   'box-border w-full rounded-md bg-kapur-raised px-3 text-body text-tinta placeholder:text-tinta-muted disabled:cursor-not-allowed disabled:bg-garis disabled:text-tinta-muted';
 const border = (invalid: boolean) => (invalid ? 'border-2 border-alpa' : 'border border-garis-kuat');
 
-export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
+/** `ref` works as a plain prop (React 19), so a page can focus the first box with a mistake. */
+export function Input({ className, ...props }: ComponentPropsWithRef<'input'>) {
   const c = useControl(props);
   return <input {...props} id={c.id} aria-describedby={c['aria-describedby']} aria-invalid={c['aria-invalid']} className={cx(control, 'min-h-12', border(c.invalid), className)} />;
 }

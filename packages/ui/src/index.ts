@@ -46,3 +46,8 @@ export { Spinner, type SpinnerProps } from './components/motion/spinner';
 export { StepList, type Step, type StepListProps, type StepStatus } from './components/motion/step-list';
 export { useReducedMotion } from './components/motion/use-reduced-motion';
 export { useShake } from './components/motion/use-shake';
+export { BrandMark, BrandName, BrandPanel } from './features/auth/brand';
+export { AuthShell, type AuthShellProps } from './features/auth/auth-shell';
+export { CodeInput, type CodeInputProps } from './features/auth/code-input';
+export { PasswordField, type PasswordFieldProps } from './features/auth/password-field';
+export { RoleTabs, type RoleTab, type RoleTabsProps } from './features/auth/role-tabs';
