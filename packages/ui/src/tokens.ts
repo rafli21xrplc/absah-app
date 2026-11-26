@@ -31,6 +31,34 @@ export const color = {
   "on-sidebar": { light: "#FFFFFF", dark: "#E8ECEA" },
   "sidebar-muted": { light: "#A9C4BA", dark: "#9AA7A2" },
   "focus": { light: "#1E5B4B", dark: "#5FB89A" },
+  "latar-app": { light: "#EEF2EF", dark: "#101815" },
+  "ubin": { light: "#F6F8F5", dark: "#18221E" },
+  "hairline": { light: "#EDF1EE", dark: "#26312C" },
+  "track": { light: "#E9EEEA", dark: "#2A3531" },
+  "batas-lembut": { light: "#DCE3DE", dark: "#34413B" },
+  "papan-hero": { light: "#143F34", dark: "#173B31" },
+  "on-papan-hero": { light: "#FFFFFF", dark: "#F2F6F4" },
+  "papan-hero-muted": { light: "#C3D8CF", dark: "#B9D0C6" },
+  "stabilo-soft": { light: "#FCEFC6", dark: "#3A2F10" },
+  "on-stabilo-soft": { light: "#5F440A", dark: "#F2D58A" },
+  "grafik-batang": { light: "#5F9F89", dark: "#4F8F79" },
+  "grafik-target": { light: "#848C84", dark: "#7D8C86" },
+  "delta-baik": { light: "#1E5B4B", dark: "#7CCBAF" },
+  "delta-baik-soft": { light: "#E3EFEA", dark: "#1D3A31" },
+  "delta-buruk": { light: "#B53434", dark: "#F28B8B" },
+  "delta-buruk-soft": { light: "#FBE7E7", dark: "#3D1C1C" },
+  "delta-netral": { light: "#5B6661", dark: "#AAB6B1" },
+  "delta-netral-soft": { light: "#EEF1EE", dark: "#26312C" },
+  "avatar-1": { light: "#DDE9E3", dark: "#22362E" },
+  "on-avatar-1": { light: "#2A5547", dark: "#B5D6C8" },
+  "avatar-2": { light: "#F1E9D8", dark: "#3A3220" },
+  "on-avatar-2": { light: "#5F4A18", dark: "#E6D3A6" },
+  "avatar-3": { light: "#DFE8F2", dark: "#22303F" },
+  "on-avatar-3": { light: "#2F4E75", dark: "#B8CCE6" },
+  "avatar-4": { light: "#F1E1E1", dark: "#3D2626" },
+  "on-avatar-4": { light: "#703636", dark: "#EBC0C0" },
+  "avatar-5": { light: "#E6E3F0", dark: "#2D2940" },
+  "on-avatar-5": { light: "#4B3F77", dark: "#CEC6EC" },
 } as const;
 
 export type ColorName = keyof typeof color;
@@ -46,6 +74,13 @@ export const text = {
   "body-strong": { fontSize: "15px", lineHeight: "22px", fontWeight: 600 },
   "small": { fontSize: "13px", lineHeight: "18px", fontWeight: 500 },
   "angka": { fontSize: "32px", lineHeight: "36px", fontWeight: 700, fontVariantNumeric: "tabular-nums" },
+  "isi": { fontSize: "14px", lineHeight: "20px", fontWeight: 400 },
+  "isi-strong": { fontSize: "14px", lineHeight: "20px", fontWeight: 600 },
+  "judul-kartu": { fontSize: "16px", lineHeight: "24px", fontWeight: 600 },
+  "mini": { fontSize: "12px", lineHeight: "16px", fontWeight: 500 },
+  "sumbu": { fontSize: "11px", lineHeight: "14px", fontWeight: 500 },
+  "angka-ubin": { fontSize: "30px", lineHeight: "34px", fontWeight: 700, letterSpacing: "-0.01em", fontVariantNumeric: "tabular-nums" },
+  "angka-hero": { fontSize: "40px", lineHeight: "44px", fontWeight: 700, letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" },
 } as const;
 
 export type TextName = keyof typeof text;
@@ -64,6 +99,15 @@ export const radius = {
   "radius-md": "10px",
   "radius-lg": "16px",
   "radius-full": "9999px",
+  "radius-kontrol": "12px",
+  "radius-ubin": "14px",
+  "radius-kartu": "20px",
+} as const;
+
+export const shadow = {
+  "shadow-kartu": "0 1px 2px rgba(20, 63, 52, 0.05), 0 10px 28px rgba(20, 63, 52, 0.06)",
+  "shadow-hero": "0 14px 34px rgba(20, 63, 52, 0.28)",
+  "shadow-aksi": "0 4px 12px rgba(30, 91, 75, 0.25)",
 } as const;
 
 export const motion = {

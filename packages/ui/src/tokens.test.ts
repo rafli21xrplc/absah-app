@@ -36,6 +36,26 @@ const PAIRS: Pair[] = [
   { what: 'Menu samping: judul grup di atas sidebar', fg: 'sidebar-muted', bg: 'sidebar', min: 4.5 },
   { what: 'Menu samping: keterangan di atas hover', fg: 'sidebar-muted', bg: 'sidebar-hover', min: 4.5 },
   { what: 'Menu samping: penanda stabilo di atas item aktif', fg: 'stabilo', bg: 'sidebar-aktif', min: 3 },
+  { what: 'v3: teks utama di atas latar app', fg: 'tinta', bg: 'latar-app', min: 4.5 },
+  { what: 'v3: teks pendukung di atas latar app', fg: 'tinta-muted', bg: 'latar-app', min: 4.5 },
+  { what: 'v3: teks pendukung di atas ubin', fg: 'tinta-muted', bg: 'ubin', min: 4.5 },
+  { what: 'v3: tautan di atas ubin', fg: 'papan', bg: 'ubin', min: 4.5 },
+  { what: 'v3: batas kolom isian di atas ubin', fg: 'garis-kuat', bg: 'ubin', min: 3 },
+  { what: 'v3: lencana hitungan', fg: 'on-stabilo-soft', bg: 'stabilo-soft', min: 4.5 },
+  { what: 'v3: batang grafik di atas kartu', fg: 'grafik-batang', bg: 'kapur-raised', min: 3 },
+  { what: 'v3: batang hari ini di atas kartu', fg: 'papan', bg: 'kapur-raised', min: 3 },
+  { what: 'v3: garis target di atas kartu', fg: 'grafik-target', bg: 'kapur-raised', min: 3 },
+  { what: 'v3: bilah progres (papan) di atas track', fg: 'papan', bg: 'track', min: 3 },
+  { what: 'v3: teks di atas kartu hero', fg: 'on-papan-hero', bg: 'papan-hero', min: 4.5 },
+  { what: 'v3: teks sekunder di atas kartu hero', fg: 'papan-hero-muted', bg: 'papan-hero', min: 4.5 },
+  { what: 'v3: pil delta baik', fg: 'delta-baik', bg: 'delta-baik-soft', min: 4.5 },
+  { what: 'v3: pil delta buruk', fg: 'delta-buruk', bg: 'delta-buruk-soft', min: 4.5 },
+  { what: 'v3: pil delta netral', fg: 'delta-netral', bg: 'delta-netral-soft', min: 4.5 },
+  { what: 'v3: avatar 1', fg: 'on-avatar-1', bg: 'avatar-1', min: 4.5 },
+  { what: 'v3: avatar 2', fg: 'on-avatar-2', bg: 'avatar-2', min: 4.5 },
+  { what: 'v3: avatar 3', fg: 'on-avatar-3', bg: 'avatar-3', min: 4.5 },
+  { what: 'v3: avatar 4', fg: 'on-avatar-4', bg: 'avatar-4', min: 4.5 },
+  { what: 'v3: avatar 5', fg: 'on-avatar-5', bg: 'avatar-5', min: 4.5 },
   { what: 'Teks utama di atas baris hover', fg: 'tinta', bg: 'papan-tipis', min: 4.5 },
   { what: 'Cincin fokus di atas kapur', fg: 'focus', bg: 'kapur', min: 3 },
   { what: 'Cincin fokus di atas kartu', fg: 'focus', bg: 'kapur-raised', min: 3 },
@@ -146,7 +166,7 @@ describe('generated files', () => {
     const system = css.slice(css.indexOf('@media (prefers-color-scheme: dark)'), css.indexOf(":root[data-theme='dark']"));
     const chosen = css.slice(css.indexOf(":root[data-theme='dark']"), css.indexOf('@theme static'));
     expect(system).toContain(":root:not([data-theme='light'])");
-    const declarations = (block: string) => [...block.matchAll(/--[a-z-]+: #[0-9A-F]{6};/g)].map((m) => m[0]);
+    const declarations = (block: string) => [...block.matchAll(/--[a-z0-9-]+: #[0-9A-F]{6};/g)].map((m) => m[0]);
     expect(declarations(chosen)).toEqual(declarations(system));
     expect(declarations(chosen)).toHaveLength(Object.keys(color).length);
     expect(css).toContain(":root[data-theme='light'] {\n  color-scheme: light;");

@@ -30,7 +30,10 @@ function check(tokens) {
     }
   }
   for (const key of Object.keys(tokens)) {
-    if (!['name', 'version', 'color', 'type', 'spacing', 'radius', 'motion'].includes(key)) throw new Error(`tokens.json: unknown section "${key}"`);
+    if (!['name', 'version', 'history', 'color', 'type', 'spacing', 'radius', 'shadow', 'motion'].includes(key)) throw new Error(`tokens.json: unknown section "${key}"`);
+  }
+  for (const t of tokens.shadow?.tokens ?? []) {
+    if (!/^shadow-[a-z]+$/.test(t.name)) throw new Error(`tokens.json: shadow ${t.name} must be named shadow-<word>`);
   }
   for (const t of tokens.motion?.duration ?? []) {
     if (!/^\d+ms$/.test(t.value)) throw new Error(`tokens.json: ${t.name} must be a whole number of ms`);
@@ -69,6 +72,11 @@ export function buildTs(tokens) {
   out.push('export const radius = {');
   for (const t of tokens.radius.tokens) out.push(`  ${q(t.name)}: ${q(t.value)},`);
   out.push('} as const;', '');
+  if (tokens.shadow) {
+    out.push('export const shadow = {');
+    for (const t of tokens.shadow.tokens) out.push(`  ${q(t.name)}: ${q(t.value)},`);
+    out.push('} as const;', '');
+  }
   if (tokens.motion) {
     out.push('export const motion = {');
     for (const t of [...tokens.motion.duration, ...tokens.motion.easing]) out.push(`  ${q(t.name)}: ${q(t.value)},`);
@@ -96,11 +104,12 @@ export function buildCss(tokens) {
 
   // Tailwind v4 theme. The resets remove Tailwind's own palette, type scale and radii, so a class such as
   // bg-red-500 or text-xl does not exist: tokens.json is the only vocabulary.
-  out.push('@theme static {', '  --color-*: initial;', '  --text-*: initial;', '  --radius-*: initial;', '  --font-*: initial;', '');
+  out.push('@theme static {', '  --color-*: initial;', '  --text-*: initial;', '  --radius-*: initial;', '  --font-*: initial;', '  --shadow-*: initial;', '');
   out.push(`  --font-sans: var(${FONT_VARIABLE}), ${tokens.type.families.sans};`);
   out.push('  --spacing: 4px;');
   for (const t of tokens.radius.tokens) out.push(`  --${t.name}: ${t.value};`);
   for (const t of tokens.spacing.tokens) out.push(`  --${t.name}: ${t.value};`);
+  for (const t of tokens.shadow?.tokens ?? []) out.push(`  --${t.name}: ${t.value};`);
   for (const g of tokens.type.groups) {
     for (const s of g.styles) {
       out.push(`  --text-${s.name}: ${s.fontSize};`);
