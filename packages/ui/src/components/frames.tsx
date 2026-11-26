@@ -30,25 +30,26 @@ export interface AppShellProps {
  */
 export function AppShell({ sidebar, sidebarHeader, sidebarFooter, header, topBar, bottomBar, children, skipLabel = messages.appShell.skip }: AppShellProps) {
   return (
-    <div className="min-h-dvh bg-kapur text-tinta lg:flex">
+    <div className="min-h-dvh bg-latar-app text-tinta lg:flex">
       <nav aria-label={messages.appShell.shortcuts}>
         <a href="#isi" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-kapur-raised focus:px-4 focus:py-3 focus:font-bold">
           {skipLabel}
         </a>
       </nav>
       {sidebarHeader || sidebarFooter ? (
-        <aside className="surface-sidebar hidden w-64 shrink-0 flex-col bg-sidebar text-on-sidebar lg:sticky lg:top-0 lg:flex lg:h-dvh">
-          {sidebarHeader && <div className="flex shrink-0 flex-col gap-3 p-4 pb-3">{sidebarHeader}</div>}
-          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-3 py-2">{sidebar}</div>
-          {sidebarFooter && <div className="shrink-0 border-t border-sidebar-garis p-3">{sidebarFooter}</div>}
+        // v3: light column, 248 px from 1280 px, a 72 px icon rail from 1024 to 1279 px, a sheet below (the page's top bar).
+        <aside className="surface-sidebar hidden w-18 shrink-0 flex-col border-r border-sidebar-garis bg-sidebar text-on-sidebar lg:sticky lg:top-0 lg:flex lg:h-dvh xl:w-62">
+          {sidebarHeader && <div className="flex shrink-0 flex-col gap-4 px-4 pb-3 pt-5 lg:max-xl:items-center lg:max-xl:px-2">{sidebarHeader}</div>}
+          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-2 lg:max-xl:px-2">{sidebar}</div>
+          {sidebarFooter && <div className="shrink-0 p-4 lg:max-xl:px-2">{sidebarFooter}</div>}
         </aside>
       ) : (
         <aside className="hidden w-60 shrink-0 flex-col gap-5 overflow-y-auto border-r border-garis bg-kapur-raised p-4 lg:sticky lg:top-0 lg:flex lg:h-dvh">{sidebar}</aside>
       )}
       <div className="flex min-w-0 flex-1 flex-col">
         {header && (
-          <div className="sticky top-0 z-30 hidden border-b border-garis bg-kapur lg:block">
-            <div className="flex min-h-16 items-center gap-4 px-8">{header}</div>
+          <div className="sticky top-0 z-30 hidden bg-latar-app lg:block">
+            <div className="mx-auto box-border flex min-h-18 w-full max-w-360 items-center gap-3 px-8">{header}</div>
           </div>
         )}
         {topBar && <div className="sticky top-0 z-30 border-b border-garis bg-kapur-raised lg:hidden">{topBar}</div>}
@@ -84,8 +85,12 @@ export function WorkspaceLabel({ name, detail }: { name: string; detail?: string
   );
 }
 
-/** A page's own main landmark and its column: padding and spacing live here so a page holds no free styling. */
-export function PageMain({ children, width = 'md' }: { children: ReactNode; width?: 'md' | 'lg' | 'xl' }) {
+/**
+ * A page's own main landmark and its column: padding and spacing live here so a page holds no free styling.
+ * `full` (v3 boards): the whole width next to the side menu, up to 1440 px, 16 px between cards.
+ */
+export function PageMain({ children, width = 'md' }: { children: ReactNode; width?: 'md' | 'lg' | 'xl' | 'full' }) {
+  if (width === 'full') return <main className="mx-auto box-border flex w-full max-w-360 flex-col gap-4 px-4 pb-8 pt-4 sm:px-6 lg:px-8 lg:pt-2">{children}</main>;
   return <main className={cx('mx-auto box-border flex w-full flex-col gap-5 px-4 py-6 sm:px-6 lg:px-8 lg:py-8', width === 'xl' ? 'max-w-6xl' : width === 'lg' ? 'max-w-5xl' : 'max-w-xl')}>{children}</main>;
 }
 

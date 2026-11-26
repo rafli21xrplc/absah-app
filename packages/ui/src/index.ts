@@ -64,3 +64,4 @@ export { Avatar, avatarPair, type AvatarProps, type AvatarSize } from './compone
 export { Chip, StatusChip, type ChipProps, type ChipTone, type StatusChipProps } from './components/chip';
 export { DeltaPill, deltaOf, type DeltaDirection, type DeltaMeaning, type DeltaPillProps } from './components/delta-pill';
 export { StackBar, stackLabel, type StackBarProps, type StackPart, type StackTone } from './components/stack-bar';
+export { DateSwitcher, PageHeader, type DateSwitcherProps, type PageHeaderProps } from './components/page-header';

@@ -26,7 +26,7 @@ export function ThemeToggle() {
       aria-label={label}
       title={label}
       onClick={() => setTheme(dark ? 'light' : 'dark')}
-      className="inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md border border-garis bg-kapur-raised text-tinta hover:border-garis-kuat"
+      className="inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-kontrol border border-batas-lembut bg-kapur-raised text-tinta shadow-kartu hover:border-garis-kuat"
     >
       {dark ? <Sun aria-hidden strokeWidth={1.75} className="size-5" /> : <Moon aria-hidden strokeWidth={1.75} className="size-5" />}
     </button>

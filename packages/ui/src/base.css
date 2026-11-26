@@ -74,14 +74,12 @@ input[type='radio'] {
   box-shadow: 0 0 0 2px var(--kapur), 0 0 0 4px var(--focus);
 }
 
-/* Inside the dark green side menu the board-green ring would vanish (papan on papan 800): the ring turns white there, with a
-   gap in the menu's own colour. Stabilo is never a focus ring (palet CMS). */
+/* Side menu (v3, light): the same papan ring, with a gap in the menu's own colour. Stabilo is never a focus ring. */
 .surface-sidebar :focus-visible {
-  box-shadow: 0 0 0 2px var(--sidebar), 0 0 0 4px var(--on-sidebar);
+  box-shadow: 0 0 0 2px var(--sidebar), 0 0 0 4px var(--focus);
 }
 
-/* Cards (Card, BoardSection, Table, status boxes): a hairline shadow under the border so white cards lift off the warm page.
-   Black at low opacity in both themes: no token exists for shadows, and a tinted one would glow in the dark theme. */
+/* Cards (Card, BoardSection, Table, status boxes): the v3 two-layer shadow (token shadow-kartu) lifts white cards off latar-app. */
 .card-surface {
   box-shadow: var(--shadow-kartu);
 }
