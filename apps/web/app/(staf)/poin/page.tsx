@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatePointEvidenceResponse, PointEntry, PointRuleList, PointStudentList, type PointRule } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -134,7 +134,7 @@ function NewEntry({ schoolId, timezone, onDone }: { schoolId: string | null; tim
       />
       <label className={forms.field}>
         Aturan
-        <select
+        <Select
           value={ruleId}
           onChange={(e) => {
             changed();
@@ -151,7 +151,7 @@ function NewEntry({ schoolId, timezone, onDone }: { schoolId: string | null; tim
               ))}
             </optgroup>
           ))}
-        </select>
+        </Select>
       </label>
       {rules.length === 0 && <p className={styles.empty}>Belum ada aturan poin. Wakasek atau admin menambahkannya di halaman aturan.</p>}
       <label className={forms.field}>

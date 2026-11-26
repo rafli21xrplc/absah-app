@@ -9,6 +9,7 @@ import { dateLabel, monthLabel, rupiah } from '@/lib/billing';
 import { STUDENT_BILLING_READING } from '@/lib/student-billing';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../../data.module.css';
+import { Select } from '@absah/ui';
 
 /** Rekap pembayaran (TGH-04): what came in during a month and what is still owed per rombel. JSON only on the API for now. */
 export default function RekapTagihanPage() {
@@ -60,14 +61,14 @@ function Recap() {
         </label>
         <label>
           Jenis{' '}
-          <select value={feeTypeId} onChange={(e) => setFeeTypeId(e.target.value)}>
+          <Select value={feeTypeId} onChange={(e) => setFeeTypeId(e.target.value)}>
             <option value="">Semua jenis</option>
             {fees.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.name}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       </form>
       {error && <p role="alert">{error}</p>}

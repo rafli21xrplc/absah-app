@@ -1,7 +1,7 @@
 'use client';
 
 import { PklAssessmentForm } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input, Textarea } from '@absah/ui';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -83,12 +83,12 @@ export default function DudiAssessmentFormPage() {
                 <label key={a.id} className={forms.field}>
                   <span className={forms.label}>{a.name} (0-100)</span>
                   {a.description && <span className={forms.hint}>{a.description}</span>}
-                  <input className={forms.input} inputMode="numeric" value={typed[a.id] ?? ''} onChange={(e) => setTyped((t) => ({ ...t, [a.id]: e.target.value }))} />
+                  <Input inputMode="numeric" value={typed[a.id] ?? ''} onChange={(e) => setTyped((t) => ({ ...t, [a.id]: e.target.value }))} />
                 </label>
               ))}
               <label className={forms.field}>
                 <span className={forms.label}>Catatan (boleh kosong)</span>
-                <textarea className={forms.input} rows={3} maxLength={1000} value={note} onChange={(e) => setNote(e.target.value)} />
+                <Textarea rows={3} maxLength={1000} value={note} onChange={(e) => setNote(e.target.value)} />
               </label>
               <Button type="submit" disabled={busy}>
                 {busy ? 'Menyimpan…' : form.assessment ? 'Simpan perbaikan' : 'Simpan penilaian'}

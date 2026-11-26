@@ -1,7 +1,7 @@
 'use client';
 
 import { StudentContacts, type GuardianRelation } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, type FormEvent } from 'react';
@@ -98,7 +98,7 @@ function ContactsView() {
                   <span className={forms.label}>
                     {RELATION_LABELS[g.relation]}: {g.name} {g.phone ? `(sekarang ${g.phone})` : '(belum ada nomor)'}
                   </span>
-                  <input className={forms.input} name={`guardian-${g.id}`} type="tel" inputMode="tel" placeholder="0812 3456 7890" autoComplete="off" />
+                  <Input name={`guardian-${g.id}`} type="tel" inputMode="tel" placeholder="0812 3456 7890" autoComplete="off" />
                 </label>
                 <label>
                   <input type="checkbox" name={`portal-${g.id}`} defaultChecked={g.portal} /> Akses portal: {g.name} masuk ke aplikasi Absah dengan nomor ini
@@ -117,7 +117,7 @@ function ContactsView() {
               <span className={forms.label}>
                 WhatsApp siswa {contacts.account.phone ? `(sekarang ${contacts.account.phone}${contacts.account.active ? '' : ', tidak aktif'})` : '(belum ada)'}
               </span>
-              <input className={forms.input} name="student" type="tel" inputMode="tel" placeholder="0812 3456 7890" autoComplete="off" />
+              <Input name="student" type="tel" inputMode="tel" placeholder="0812 3456 7890" autoComplete="off" />
             </label>
             {contacts.account.active && (
               <label>

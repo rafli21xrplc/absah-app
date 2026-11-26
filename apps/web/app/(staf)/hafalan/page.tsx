@@ -1,7 +1,7 @@
 'use client';
 
 import { MemorizationLog, MemorizationStudentList, surahLabel } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input, Select, Textarea } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -120,33 +120,33 @@ export default function HafalanPage() {
               <h2 id="setoran">Setoran baru</h2>
               <label className={forms.field}>
                 <span className={forms.label}>Surah</span>
-                <select className={forms.input} value={surah} onChange={(e) => setSurah(Number(e.target.value))}>
+                <Select value={surah} onChange={(e) => setSurah(Number(e.target.value))}>
                   {SURAH_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>
                       {o.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>Ayat awal</span>
-                <input className={forms.input} name="ayatFrom" type="number" inputMode="numeric" min={1} max={max} required />
+                <Input name="ayatFrom" type="number" inputMode="numeric" min={1} max={max} required />
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>Ayat akhir</span>
-                <input className={forms.input} name="ayatTo" type="number" inputMode="numeric" min={1} max={max} required />
+                <Input name="ayatTo" type="number" inputMode="numeric" min={1} max={max} required />
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>Juz (boleh kosong)</span>
-                <input className={forms.input} name="juz" type="number" inputMode="numeric" min={1} max={30} />
+                <Input name="juz" type="number" inputMode="numeric" min={1} max={30} />
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>Nilai 0–100 (boleh kosong)</span>
-                <input className={forms.input} name="score" type="number" inputMode="numeric" min={0} max={100} />
+                <Input name="score" type="number" inputMode="numeric" min={0} max={100} />
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>Catatan</span>
-                <textarea className={forms.input} name="note" maxLength={500} rows={2} />
+                <Textarea name="note" maxLength={500} rows={2} />
               </label>
               <Button type="submit" disabled={busy}>
                 {busy ? 'Menyimpan…' : 'Simpan setoran'}

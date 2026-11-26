@@ -1,7 +1,7 @@
 'use client';
 
 import { MbgDaily, MbgSettings } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -151,15 +151,15 @@ export default function MbgPage() {
             <form className={forms.form} onSubmit={(e) => void saveSettings(e)}>
               <label className={forms.field}>
                 <span className={forms.label}>Jam batas</span>
-                <input className={forms.input} name="cutoffTime" type="time" required defaultValue={settings.cutoffTime} />
+                <Input name="cutoffTime" type="time" required defaultValue={settings.cutoffTime} />
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>Nama PIC MBG</span>
-                <input className={forms.input} name="picName" defaultValue={settings.picName ?? ''} maxLength={100} autoComplete="off" />
+                <Input name="picName" defaultValue={settings.picName ?? ''} maxLength={100} autoComplete="off" />
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>WhatsApp PIC {settings.picPhone ? `(sekarang ${settings.picPhone})` : '(belum ada)'}</span>
-                <input className={forms.input} name="picPhone" type="tel" inputMode="tel" placeholder="0812 3456 7890" autoComplete="off" />
+                <Input name="picPhone" type="tel" inputMode="tel" placeholder="0812 3456 7890" autoComplete="off" />
               </label>
               {settings.picPhone && (
                 <label>

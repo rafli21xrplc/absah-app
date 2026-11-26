@@ -228,5 +228,5 @@ export async function fillSession(page: Page, exceptions: { name: string; status
  */
 export async function choose(control: Locator, option: string | { label?: string; index?: number; value?: string }) {
   // Resolved at action time: on a laptop the native select is swapped for the popover button a moment after the page loads.
-  await control.locator('xpath=self::select | preceding-sibling::select').selectOption(option);
+  await control.locator('xpath=self::select | preceding-sibling::select | following-sibling::select').first().selectOption(option);
 }

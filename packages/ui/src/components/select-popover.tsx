@@ -37,17 +37,6 @@ export default function PopoverSelect({ sections, className, children, ...props 
 
   return (
     <span className="relative block">
-      <select
-        {...rest}
-        ref={native}
-        {...(props.value !== undefined ? { value: props.value } : { defaultValue: props.defaultValue })}
-        onChange={onChange}
-        aria-hidden
-        tabIndex={-1}
-        className="sr-only"
-      >
-        {children}
-      </select>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
@@ -96,6 +85,18 @@ export default function PopoverSelect({ sections, className, children, ...props 
           </Command>
         </PopoverContent>
       </Popover>
+      {/* After the button: a <label> wrapped around the whole control names its first labelable child, which must be the button. */}
+      <select
+        {...rest}
+        ref={native}
+        {...(props.value !== undefined ? { value: props.value } : { defaultValue: props.defaultValue })}
+        onChange={onChange}
+        aria-hidden
+        tabIndex={-1}
+        className="sr-only"
+      >
+        {children}
+      </select>
     </span>
   );
 }

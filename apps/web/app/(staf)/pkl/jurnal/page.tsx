@@ -7,6 +7,7 @@ import { useWorkspace } from '@/lib/workspace';
 import { PklJournals } from '../../../_pkl/journals';
 import forms from '../../../forms.module.css';
 import styles from '../../data.module.css';
+import { Select } from '@absah/ui';
 
 /** Jurnal PKL for the guru pembimbing and leaders (PKL-03): read, approve or ask for a revision. */
 export default function PklJournalPage() {
@@ -21,10 +22,10 @@ export default function PklJournalPage() {
         <h1 className={styles.title}>Jurnal PKL siswa</h1>
         <label className={forms.field}>
           <span className={forms.label}>Tampilkan</span>
-          <select className={forms.input} value={status} onChange={(e) => setStatus(e.target.value)}>
+          <Select value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="submitted">Menunggu tinjauan</option>
             <option value="">Semua (31 hari terakhir)</option>
-          </select>
+          </Select>
         </label>
         {schoolId && <PklJournals schoolId={schoolId} query={status ? `status=${status}` : ''} />}
       </main>

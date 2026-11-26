@@ -1,7 +1,7 @@
 'use client';
 
 import { TracerFormContext } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError } from '@/lib/api';
 import { answerRequest, ORGANIZATION_LABELS, POSITION_LABELS, TRACER_STATUS_LABELS, TRACER_STATUSES, tokenFromHash } from '@/lib/tracer';
@@ -118,11 +118,11 @@ function AlumniForm({ token, initial }: { token: string; initial: TracerFormCont
           <>
             <label className={forms.field}>
               <span className={forms.label}>{ORGANIZATION_LABELS[named]}</span>
-              <input className={forms.input} value={organization} maxLength={120} onChange={(e) => setOrganization(e.target.value)} />
+              <Input value={organization} maxLength={120} onChange={(e) => setOrganization(e.target.value)} />
             </label>
             <label className={forms.field}>
               <span className={forms.label}>{POSITION_LABELS[named]}</span>
-              <input className={forms.input} value={position} maxLength={120} onChange={(e) => setPosition(e.target.value)} />
+              <Input value={position} maxLength={120} onChange={(e) => setPosition(e.target.value)} />
             </label>
           </>
         )}

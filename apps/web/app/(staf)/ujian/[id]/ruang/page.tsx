@@ -1,7 +1,7 @@
 'use client';
 
 import { ClassList, ExamRoom, ExamRoomList, SeatStudentsResult, SchoolMembersResponse } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Select } from '@absah/ui';
 import Link from 'next/link';
 import { z } from 'zod';
 import { use, useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
@@ -117,14 +117,14 @@ function Rooms({ periodId }: { periodId: string }) {
                 {' '}
                 <label>
                   Isi dengan rombel{' '}
-                  <select value="" aria-label={`Isi ${r.name} dengan rombel`} onChange={(e) => void seat(r, e.target.value)}>
+                  <Select value="" aria-label={`Isi ${r.name} dengan rombel`} onChange={(e) => void seat(r, e.target.value)}>
                     <option value="">Pilih rombel…</option>
                     {classes.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>{' '}
                 <Button variant="secondary" type="button" onClick={() => void remove(r)}>
                   Hapus
@@ -147,14 +147,14 @@ function Rooms({ periodId }: { periodId: string }) {
           </label>
           <label className={forms.field}>
             Pengawas
-            <select value={supervisorId} onChange={(e) => { key.current = null; setSupervisorId(e.target.value); }}>
+            <Select value={supervisorId} onChange={(e) => { key.current = null; setSupervisorId(e.target.value); }}>
               <option value="">Belum ditentukan</option>
               {staff.map((s) => (
                 <option key={s.userId} value={s.userId}>
                   {s.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <Button type="submit" disabled={busy}>
             Tambah ruang

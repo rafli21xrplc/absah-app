@@ -1,7 +1,7 @@
 'use client';
 
 import { DudiPartnerList, PklPlacementList, PklStaffList, PklStudentList, type DudiPartner } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
@@ -99,7 +99,7 @@ export default function NewPlacementsPage() {
           <form className={styles.section} onSubmit={(e) => void submit(e)} onChange={() => (key.current = null)}>
             <label className={forms.field}>
               <span className={forms.label}>DUDI</span>
-              <select className={forms.input} name="partnerId" required defaultValue="">
+              <Select name="partnerId" required defaultValue="">
                 <option value="" disabled>
                   Pilih DUDI
                 </option>
@@ -108,7 +108,7 @@ export default function NewPlacementsPage() {
                     {p.name}
                   </option>
                 ))}
-              </select>
+              </Select>
               {partners.length === 0 && (
                 <span className={forms.hint}>
                   Belum ada DUDI aktif. <Link href="/pkl/dudi">Tambah DUDI</Link> dulu.
@@ -117,7 +117,7 @@ export default function NewPlacementsPage() {
             </label>
             <label className={forms.field}>
               <span className={forms.label}>Cari siswa</span>
-              <input value={query} onChange={(e) => setQuery(e.target.value)} className={forms.input} placeholder="Nama atau NISN, minimal 2 huruf" autoComplete="off" />
+              <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Nama atau NISN, minimal 2 huruf" autoComplete="off" />
             </label>
             {query.trim().length >= 2 && (
               <ul className={ui.sessions} aria-label="Hasil pencarian">
@@ -161,15 +161,15 @@ export default function NewPlacementsPage() {
             </ul>
             <label className={forms.field}>
               <span className={forms.label}>Mulai</span>
-              <input className={forms.input} name="startsOn" type="date" defaultValue={today} required />
+              <Input name="startsOn" type="date" defaultValue={today} required />
             </label>
             <label className={forms.field}>
               <span className={forms.label}>Selesai</span>
-              <input className={forms.input} name="endsOn" type="date" min={today} required />
+              <Input name="endsOn" type="date" min={today} required />
             </label>
             <label className={forms.field}>
               <span className={forms.label}>Guru pembimbing</span>
-              <select className={forms.input} name="schoolMentorId" required defaultValue="">
+              <Select name="schoolMentorId" required defaultValue="">
                 <option value="" disabled>
                   Pilih guru
                 </option>
@@ -178,15 +178,15 @@ export default function NewPlacementsPage() {
                     {m.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className={forms.field}>
               <span className={forms.label}>Nama pembimbing industri (boleh nanti)</span>
-              <input className={forms.input} name="mentorName" maxLength={100} />
+              <Input name="mentorName" maxLength={100} />
             </label>
             <label className={forms.field}>
               <span className={forms.label}>Nomor WhatsApp pembimbing industri</span>
-              <input className={forms.input} name="mentorPhone" type="tel" inputMode="tel" placeholder="0812…" />
+              <Input name="mentorPhone" type="tel" inputMode="tel" placeholder="0812…" />
               <span className={forms.hint}>Pembimbing industri masuk ke /dudi dengan kode WhatsApp ke nomor ini.</span>
             </label>
             {message && (

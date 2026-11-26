@@ -1,7 +1,7 @@
 'use client';
 
 import { API_KEY_DEFAULT_RATE, API_KEY_SCOPES, ApiKey, ApiKeyList, CreatedApiKey, type ApiKeyScope } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { keyState, KEY_STATE_LABELS, parseRate, SCOPE_LABELS, toggle } from '@/lib/integration';
@@ -106,7 +106,7 @@ export function Keys({ schoolId, timezone }: { schoolId: string; timezone: strin
       >
         <label className={forms.field}>
           <span className={forms.label}>Nama kunci</span>
-          <input className={forms.input} value={name} maxLength={60} onChange={(e) => { createKey.current = null; setName(e.target.value); }} placeholder="Misalnya: Dasbor Dinas" required />
+          <Input value={name} maxLength={60} onChange={(e) => { createKey.current = null; setName(e.target.value); }} placeholder="Misalnya: Dasbor Dinas" required />
         </label>
         <fieldset className={local.checks}>
           <legend className={forms.label}>Izin</legend>
@@ -118,7 +118,7 @@ export function Keys({ schoolId, timezone }: { schoolId: string; timezone: strin
         </fieldset>
         <label className={forms.field}>
           <span className={forms.label}>Batas permintaan per menit</span>
-          <input className={forms.input} inputMode="numeric" value={rate} onChange={(e) => { createKey.current = null; setRate(e.target.value); }} />
+          <Input inputMode="numeric" value={rate} onChange={(e) => { createKey.current = null; setRate(e.target.value); }} />
         </label>
         <Button type="submit" disabled={busy || name.trim().length < 2 || scopes.length === 0}>
           {busy ? 'Membuat…' : 'Buat kunci'}

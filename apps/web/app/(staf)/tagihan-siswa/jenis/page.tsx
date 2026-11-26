@@ -1,7 +1,7 @@
 'use client';
 
 import { FEE_KINDS, FeeType, FeeTypeList, type FeeKind } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -124,13 +124,13 @@ function Types() {
         </label>
         <label className={forms.field}>
           Golongan
-          <select value={kind} onChange={(e) => setKind(e.target.value as FeeKind)}>
+          <Select value={kind} onChange={(e) => setKind(e.target.value as FeeKind)}>
             {FEE_KINDS.map((k) => (
               <option key={k} value={k}>
                 {FEE_KIND_LABELS[k]}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label className={forms.field}>
           Nominal bawaan (rupiah)

@@ -1,7 +1,7 @@
 'use client';
 
 import { AlumniFromClassResult, InviteTracerResult, TracerAlumnus, type TracerClassList } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input, Select } from '@absah/ui';
 import { useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
 import { normalizePhone } from '@/lib/auth';
@@ -74,30 +74,30 @@ function AddAlumnus({ schoolId, onChanged }: { schoolId: string; onChanged: () =
       <h3>Tambah satu alumni</h3>
       <label className={forms.field}>
         <span className={forms.label}>Nama</span>
-        <input className={forms.input} name="name" required minLength={2} maxLength={100} />
+        <Input name="name" required minLength={2} maxLength={100} />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Angkatan (tahun lulus)</span>
-        <input className={forms.input} name="year" type="number" min={1990} max={2100} defaultValue={thisYear} required />
+        <Input name="year" type="number" min={1990} max={2100} defaultValue={thisYear} required />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Jurusan (boleh kosong)</span>
-        <select className={forms.input} name="stream" defaultValue="">
+        <Select name="stream" defaultValue="">
           <option value="">Tidak ada</option>
           {STREAM_OPTIONS.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       <label className={forms.field}>
         <span className={forms.label}>NISN (boleh kosong)</span>
-        <input className={forms.input} name="nisn" inputMode="numeric" maxLength={10} />
+        <Input name="nisn" inputMode="numeric" maxLength={10} />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Nomor WhatsApp (untuk undangan)</span>
-        <input className={forms.input} name="phone" type="tel" inputMode="tel" placeholder="0812…" />
+        <Input name="phone" type="tel" inputMode="tel" placeholder="0812…" />
       </label>
       <Message message={message} />
       <Button type="submit" disabled={busy}>
@@ -136,18 +136,18 @@ function CopyClass({ schoolId, classes, onChanged }: { schoolId: string; classes
       <h3>Salin dari rombel</h3>
       <label className={forms.field}>
         <span className={forms.label}>Rombel</span>
-        <select className={forms.input} value={classId} onChange={(e) => setClassId(e.target.value)} required>
+        <Select value={classId} onChange={(e) => setClassId(e.target.value)} required>
           <option value="">Pilih rombel…</option>
           {classes.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name} ({c.activeStudents} siswa)
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Angkatan (tahun lulus)</span>
-        <input className={forms.input} type="number" min={1990} max={2100} value={year} onChange={(e) => setYear(Number(e.target.value))} required />
+        <Input type="number" min={1990} max={2100} value={year} onChange={(e) => setYear(Number(e.target.value))} required />
       </label>
       <Message message={message} />
       <Button type="submit" disabled={busy || !classId}>
@@ -188,14 +188,14 @@ function InviteYear({ schoolId, years, onChanged }: { schoolId: string; years: n
       <p className={styles.muted}>Hanya alumni yang punya nomor WhatsApp. Satu alumni menerima satu undangan per hari.</p>
       <label className={forms.field}>
         <span className={forms.label}>Angkatan</span>
-        <select className={forms.input} value={year} onChange={(e) => setYear(e.target.value ? Number(e.target.value) : '')} required>
+        <Select value={year} onChange={(e) => setYear(e.target.value ? Number(e.target.value) : '')} required>
           <option value="">Pilih angkatan…</option>
           {years.map((y) => (
             <option key={y} value={y}>
               {y}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       <label>
         <input type="checkbox" checked={resend} onChange={(e) => setResend(e.target.checked)} /> Kirim juga ke yang sudah mengisi
@@ -273,24 +273,24 @@ export function AlumnusActions({ schoolId, alumnus, onChanged }: { schoolId: str
         <form className={forms.form} onSubmit={(e) => void submit(e)} aria-label={`Jawaban ${alumnus.name}`}>
           <label className={forms.field}>
             <span className={forms.label}>Status</span>
-            <select className={forms.input} value={status} onChange={(e) => setStatus(e.target.value)} required>
+            <Select value={status} onChange={(e) => setStatus(e.target.value)} required>
               <option value="">Pilih status…</option>
               {TRACER_STATUSES.map((s) => (
                 <option key={s} value={s}>
                   {TRACER_STATUS_LABELS[s]}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           {named && (
             <>
               <label className={forms.field}>
                 <span className={forms.label}>{ORGANIZATION_LABELS[named]}</span>
-                <input className={forms.input} value={organization} maxLength={120} onChange={(e) => setOrganization(e.target.value)} />
+                <Input value={organization} maxLength={120} onChange={(e) => setOrganization(e.target.value)} />
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>{POSITION_LABELS[named]}</span>
-                <input className={forms.input} value={position} maxLength={120} onChange={(e) => setPosition(e.target.value)} />
+                <Input value={position} maxLength={120} onChange={(e) => setPosition(e.target.value)} />
               </label>
             </>
           )}

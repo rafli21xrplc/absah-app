@@ -1,7 +1,7 @@
 'use client';
 
 import { BillingClassList, FeeTypeList, IssueBillsResult, MAX_INSTALLMENTS } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -86,14 +86,14 @@ function Issue() {
       <form onSubmit={(e) => void submit(e)} aria-label="Terbitkan tagihan">
         <label className={forms.field}>
           Jenis tagihan
-          <select value={form.feeTypeId} onChange={(e) => change({ feeTypeId: e.target.value })}>
+          <Select value={form.feeTypeId} onChange={(e) => change({ feeTypeId: e.target.value })}>
             <option value="">Pilih jenis…</option>
             {fees.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.name} ({rupiah(f.defaultAmount)})
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label className={forms.field}>
           Periode
@@ -120,14 +120,14 @@ function Issue() {
         {form.target === 'class' ? (
           <label className={forms.field}>
             Rombel
-            <select value={form.classId} onChange={(e) => change({ classId: e.target.value })}>
+            <Select value={form.classId} onChange={(e) => change({ classId: e.target.value })}>
               <option value="">Pilih rombel…</option>
               {classes.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name} ({c.activeStudents} siswa)
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         ) : (
           <label className={forms.field}>
@@ -138,14 +138,14 @@ function Issue() {
         {students !== null && students > 0 && <p className={styles.muted}>{students} siswa aktif akan ditagih.</p>}
         <label className={forms.field}>
           Dibayar dalam
-          <select value={form.parts} onChange={(e) => change({ parts: Number(e.target.value) })}>
+          <Select value={form.parts} onChange={(e) => change({ parts: Number(e.target.value) })}>
             <option value={1}>Sekali bayar</option>
             {Array.from({ length: MAX_INSTALLMENTS - 1 }, (_, i) => i + 2).map((n) => (
               <option key={n} value={n}>
                 {n} cicilan, sebulan sekali
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label className={forms.field}>
           {form.parts > 1 ? 'Jatuh tempo cicilan pertama' : 'Jatuh tempo'}

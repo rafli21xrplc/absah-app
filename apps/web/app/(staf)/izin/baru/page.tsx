@@ -1,7 +1,7 @@
 'use client';
 
 import { CreateLeaveAttachmentResponse, LEAVE_ATTACHMENT_MAX_BYTES, LEAVE_ATTACHMENT_TYPES, LeaveRequest, LeaveStudentList, type LeaveKind } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -98,14 +98,14 @@ export default function IzinBaruPage() {
       <form className={forms.form} onSubmit={(e) => void submit(e)}>
         <label className={forms.field}>
           <span className={forms.label}>Siswa</span>
-          <select className={forms.input} required value={enrollmentId} onChange={(e) => change(setEnrollmentId)(e.target.value)}>
+          <Select required value={enrollmentId} onChange={(e) => change(setEnrollmentId)(e.target.value)}>
             <option value="">{students ? 'Pilih siswa' : 'Memuat…'}</option>
             {students?.map((s) => (
               <option key={s.enrollmentId} value={s.enrollmentId}>
                 {s.name} · {s.className}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <div className={ui.segment} role="group" aria-label="Jenis">
           {(['sakit', 'izin'] as const).map((k) => (
@@ -116,8 +116,7 @@ export default function IzinBaruPage() {
         </div>
         <label className={forms.field}>
           <span className={forms.label}>Mulai</span>
-          <input
-            className={forms.input}
+          <Input
             type="date"
             required
             value={startsOn}
@@ -129,7 +128,7 @@ export default function IzinBaruPage() {
         </label>
         <label className={forms.field}>
           <span className={forms.label}>Sampai</span>
-          <input className={forms.input} type="date" required min={startsOn} value={endsOn} onChange={(e) => change(setEndsOn)(e.target.value)} />
+          <Input type="date" required min={startsOn} value={endsOn} onChange={(e) => change(setEndsOn)(e.target.value)} />
         </label>
         <label className={forms.field}>
           <span className={forms.label}>Alasan</span>

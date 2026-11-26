@@ -1,7 +1,7 @@
 'use client';
 
 import { TppkCaseDetail, TppkReportDetail } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useState, type FormEvent } from 'react';
@@ -78,7 +78,7 @@ export default function LaporanPage({ params }: { params: Promise<{ id: string }
             <form className={forms.form} onSubmit={(e) => void openCase(e)}>
               <label className={forms.field}>
                 <span className={forms.label}>Ringkasan kasus</span>
-                <input className={forms.input} value={summary} onChange={(e) => setSummary(e.target.value)} maxLength={300} />
+                <Input value={summary} onChange={(e) => setSummary(e.target.value)} maxLength={300} />
               </label>
               <Button type="submit" disabled={busy || summary.trim().length < 5}>
                 {busy ? 'Menyimpan…' : 'Buat kasus'}

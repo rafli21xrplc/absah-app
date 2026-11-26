@@ -244,3 +244,10 @@ Permintaan: tata letak seperti gambar referensi (formulir kiri, kartu ilustrasi 
 - Keputusan (mudah dibalik): tanpa titik karusel (hanya satu slide); tanpa tombol masuk Google/GitHub (Absah tidak punya login pihak ketiga).
 - Tangkapan layar: `docs/ui/ma1/`.
 \n
+
+## 15. MA2 dan IN1: gerak panel masuk, kontrol isian seragam
+
+- MA2: tombol tema di halaman masuk; diagram panel tersusun lalu bergerak, dengan tombol jeda (putaran 8 detik > 5 detik).
+- IN1: 35 `<select>` polos (23 berkas) diganti `Select` berpopover; 22 berkas berpindah dari `forms.input` ke `Input`/`Textarea`; kontrol polos sisanya diberi gaya dasar yang sama.
+- Belum (fase berikut, IN2): pemilih tanggal berpopover (kalender) untuk 22 isian `type="date"` dan bulan/jam; kotak centang gaya kustom bila gaya bawaan berwarna papan dirasa kurang; tombol unggah berkas.
+

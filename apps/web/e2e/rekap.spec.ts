@@ -23,7 +23,8 @@ test('Rekap: alpa hari ini masuk rekap rombel dan siswa, ekspor e-Rapor dibuat w
 
   // Rekap per rombel: the current semester by default.
   await page.goto('/rekap');
-  await expect(page.getByLabel('Periode')).toHaveValue(/[0-9a-f-]{36}/);
+  // On a laptop the label names the popover button; the value sits in the form select next to it.
+  await expect(page.getByLabel('Periode').locator('xpath=self::select | following-sibling::select').first()).toHaveValue(/[0-9a-f-]{36}/);
   const row = page.getByRole('row', { name: /VII A/ });
   await expect(row).toContainText('Admin E2E');
   await expect(row).toContainText('75%'); // 3 of 4 present today

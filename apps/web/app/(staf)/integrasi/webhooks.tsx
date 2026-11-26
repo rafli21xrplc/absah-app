@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatedWebhook, Webhook, WebhookDeliveryList, WebhookList, WebhookTestQueued, WEBHOOK_EVENTS, type WebhookDelivery, type WebhookEventType } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -174,7 +174,7 @@ export function Webhooks({ schoolId }: { schoolId: string }) {
       >
         <label className={forms.field}>
           <span className={forms.label}>Alamat penerima</span>
-          <input className={forms.input} type="url" value={url} onChange={(e) => { createKey.current = null; setUrl(e.target.value); }} placeholder="https://sistem-anda.example/absah" required />
+          <Input type="url" value={url} onChange={(e) => { createKey.current = null; setUrl(e.target.value); }} placeholder="https://sistem-anda.example/absah" required />
           <span className={forms.hint}>Alamat disimpan terenkripsi dan setelah ini hanya tampil nama hostnya.</span>
         </label>
         <fieldset className={local.checks}>

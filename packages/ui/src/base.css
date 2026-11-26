@@ -25,6 +25,47 @@ a {
   color: var(--papan);
 }
 
+/* Form controls a page writes bare (no class at all), so they match Input, Textarea and Select from @absah/ui: same height,
+   border, radius and colours. A control with any class is left to that class (Tailwind utilities or a CSS module). Checkboxes
+   and radios keep the browser's own shape, in the board colour, at a size a thumb can hit. (IN1) */
+:where(input:not([class]):not([type='checkbox'], [type='radio'], [type='file'], [type='hidden'], [type='range'], [type='color'])),
+:where(textarea:not([class])),
+:where(select:not([class])) {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--garis-kuat);
+  border-radius: var(--radius-md);
+  background: var(--kapur-raised);
+  color: var(--tinta);
+  font-size: var(--text-body);
+  max-width: 100%;
+}
+:where(textarea:not([class])) {
+  padding: 12px;
+  min-height: 96px;
+}
+:where(input:not([class]), textarea:not([class]), select:not([class]))::placeholder {
+  color: var(--tinta-muted);
+  opacity: 1;
+}
+:where(input:not([class]), textarea:not([class]), select:not([class])):disabled {
+  cursor: not-allowed;
+  background: var(--garis);
+  color: var(--tinta-muted);
+}
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--papan);
+}
+:where(input[type='checkbox']:not([class]), input[type='radio']:not([class])) {
+  width: 20px;
+  height: 20px;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
 /* Focus ring (token focus): 2 px green board ring with a 2 px chalk gap. The transparent outline keeps a ring in
    forced-colors mode, where box-shadow is dropped. */
 :focus-visible {
