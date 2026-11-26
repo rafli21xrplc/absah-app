@@ -17,7 +17,7 @@ describe('dashboard parts', () => {
   it('pagination says the range and moves pages', async () => {
     const onPage = vi.fn();
     render(<Pagination page={2} pageCount={3} total={24} size={10} onPage={onPage} />);
-    expect(screen.getByText('11–20 dari 24')).toBeTruthy();
+    expect(screen.getByText('Menampilkan 11–20 dari 24')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Halaman 2' }).getAttribute('aria-current')).toBe('page');
     await userEvent.click(screen.getByRole('button', { name: 'Halaman berikutnya' }));
     expect(onPage).toHaveBeenCalledWith(3);

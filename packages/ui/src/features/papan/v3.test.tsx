@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 import { render, screen } from '@testing-library/react';
-import { CheckCircle2, MessageCircle } from 'lucide-react';
+import { CheckCircle2, CircleCheck, MessageCircle } from 'lucide-react';
 import { describe, expect, it } from 'vitest';
 import { expectNoAxeViolations } from '../../test/axe';
-import { ActivityFeed, Histogram, HeroRingCard, StatGroupCard, TrendBarChart, percentText, trendSummary } from './v3';
+import { Table, TableBody, TableHead, TableRow, Td, Th } from '../../components/table';
+import { ActivityFeed, Histogram, HeroRingCard, StatGroupCard, SummaryCard, TrendBarChart, percentText, trendSummary } from './v3';
 import { ARRIVALS, TREND } from './v3.fixtures';
 
 describe('percentText', () => {
@@ -81,5 +82,37 @@ describe('Histogram and ActivityFeed', () => {
     const { container } = render(<ActivityFeed items={items} moreHref="/x" />);
     expect(container.querySelectorAll('time')).toHaveLength(5);
     expect(container.querySelector('li')?.textContent).toContain('Kejadian 6');
+  });
+});
+
+describe('SummaryCard', () => {
+  it('names the card and keeps the number with its unit and context', () => {
+    render(<SummaryCard title="Sudah diisi" icon={CircleCheck} value="130" unit="dari 308 sesi" note="42,2% sesi hari ini sudah diisi" />);
+    expect(screen.getByRole('heading', { name: 'Sudah diisi' })).toBeTruthy();
+    expect(screen.getByText('130')).toBeTruthy();
+    expect(screen.getByText('dari 308 sesi')).toBeTruthy();
+    expect(screen.getByText('42,2% sesi hari ini sudah diisi')).toBeTruthy();
+  });
+});
+
+describe('Table sticky', () => {
+  it('scrolls in its own focusable region with a sticky head', () => {
+    render(
+      <Table sticky caption="Tabel sesi">
+        <TableHead>
+          <TableRow>
+            <Th>Rombel</Th>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow>
+            <Td>X-1</Td>
+          </TableRow>
+        </TableBody>
+      </Table>,
+    );
+    const region = screen.getByRole('region', { name: 'Tabel sesi' });
+    expect(region.className).toContain('[&_thead_th]:sticky');
+    expect(region.tabIndex).toBe(0);
   });
 });

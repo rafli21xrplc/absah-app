@@ -1,16 +1,17 @@
 'use client';
 
 import { SessionDetail, TodayResponse, type SessionSummary } from '@absah/contracts';
-import { Banner, EmptyState, ErrorState, GreetingHeader, PageMain, SegmentedControl, SessionGroup, SessionHero, SessionItem, SkeletonRows, StatCard, messages } from '@absah/ui';
+import { Banner, EmptyState, ErrorState, GreetingHeader, PageHeader, PageMain, percentText, ProgressBar, SegmentedControl, SessionGroup, SessionHero, SessionItem, SkeletonRows, SummaryCard, messages } from '@absah/ui';
 import { CircleCheck, ClipboardList, Clock, Hourglass } from 'lucide-react';
-import { AllSessionsTable, type RowState } from './all-sessions';
+import { AllSessionsTable, FILTERS, type AllSessionsView, type Filter, type RowState } from './all-sessions';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
 import { ALL_SESSIONS_VIEWERS } from '@/lib/attendance';
 import { isTransient, offlineStore, QUEUE_CHANGED_EVENT, savedLabel, sessionCacheKey, todayCacheKey } from '@/lib/offline-queue';
 import { clockOffset, greetingName, greetingPart, groupToday, minutesOfDay } from '@/lib/session-clock';
 import { SESSIONS_SYNCED_EVENT } from '@/lib/sync-sessions';
+import { useUrlState } from '@/lib/url-state';
 import { useWorkspace } from '@/lib/workspace';
 
 const t = messages.today;
@@ -44,12 +45,38 @@ function metaOf(s: SessionSummary, showTeacher: boolean): string {
   return parts.join(' · ');
 }
 
-/** Hari ini: what to fill now, what comes next, what is done (PRS-01). The one big action is the session in progress. */
 export default function HariIniPage() {
+  return (
+    <Suspense fallback={<SkeletonRows count={3} />}>
+      <HariIniView />
+    </Suspense>
+  );
+}
+
+/**
+ * Hari ini / Presensi kelas: what to fill now, what comes next, what is done (PRS-01). The one big action is the session in
+ * progress. Staff who see every session get the v3 layout on a laptop (V5): PageHeader, four summary cards, the session table.
+ * Scope, filter, search and page live in the URL.
+ */
+function HariIniView() {
   const { schoolId, hasRole, me } = useWorkspace();
   const timezone = me.schools.find((x) => x.id === schoolId)?.timezone ?? 'Asia/Jakarta';
   const canSeeAll = hasRole(...ALL_SESSIONS_VIEWERS);
-  const [scope, setScope] = useState<'mine' | 'all'>('mine');
+  const [params, setParams] = useUrlState();
+  const scope: 'mine' | 'all' = canSeeAll && params.get('lingkup') === 'semua' ? 'all' : 'mine';
+  const setScope = (v: 'mine' | 'all') => setParams({ lingkup: v === 'all' ? 'semua' : null, status: null, q: null, hal: null });
+  const rawFilter = params.get('status');
+  const view: AllSessionsView = {
+    filter: FILTERS.includes(rawFilter as Filter) ? (rawFilter as Filter) : 'todo',
+    query: params.get('q') ?? '',
+    page: Number(params.get('hal')) || 1,
+  };
+  const onView = (patch: Partial<AllSessionsView>) =>
+    setParams({
+      ...(patch.filter !== undefined ? { status: patch.filter === 'todo' ? null : patch.filter } : {}),
+      ...(patch.query !== undefined ? { q: patch.query } : {}),
+      ...(patch.page !== undefined ? { hal: patch.page > 1 ? String(patch.page) : null } : {}),
+    });
   const [data, setData] = useState<TodayResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -144,28 +171,35 @@ export default function HariIniPage() {
     [groups, waiting],
   );
   const table = scope === 'all';
+  const filled = doneCount + waiting.length;
+  const scopeControl = canSeeAll ? (
+    <div>
+      <SegmentedControl
+        label={t.scope}
+        value={scope}
+        onChange={setScope}
+        options={[
+          { value: 'mine', label: t.scopeMine },
+          { value: 'all', label: t.scopeAll },
+        ]}
+      />
+    </div>
+  ) : null;
 
   return (
-    <PageMain width="xl">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-      <GreetingHeader
-        date={data ? longDate(data.schoolDate) : ''}
-        greeting={`${GREETING[greetingPart(nowMinutes)]}, ${greetingName(me.user.name)}`}
-      />
-      {canSeeAll && (
-        <div>
-        <SegmentedControl
-          label={t.scope}
-          value={scope}
-          onChange={setScope}
-          options={[
-            { value: 'mine', label: t.scopeMine },
-            { value: 'all', label: t.scopeAll },
-          ]}
+    <PageMain width={table ? 'full' : 'xl'}>
+      {table ? (
+        <PageHeader
+          title={t.pageTitle}
+          date={{ label: data ? longDate(data.schoolDate) : '' }}
+          actions={scopeControl}
         />
+      ) : (
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <GreetingHeader date={data ? longDate(data.schoolDate) : ''} greeting={`${GREETING[greetingPart(nowMinutes)]}, ${greetingName(me.user.name)}`} />
+          {scopeControl}
         </div>
       )}
-      </div>
       {copyFrom && (
         <Banner kind="offline">
           {t.offline.replace('{time}', copyFrom)}
@@ -182,24 +216,44 @@ export default function HariIniPage() {
       )}
       {data && !empty && groups && (
         // Laptop only: on a phone the teacher's screen stays one decision (the card in progress).
-        <ul aria-label={t.summary} className="m-0 hidden list-none grid-cols-4 gap-3 p-0 lg:grid">
+        <ul aria-label={t.summary} className="m-0 hidden list-none grid-cols-2 gap-4 p-0 lg:grid xl:grid-cols-4">
           <li className="flex">
-            <StatCard className="flex-1" title={t.statTotal} tone="papan" icon={ClipboardList} value={total} unit={t.sessionsUnit} meter={total > 0 ? (doneCount + waiting.length) / total : null} note={t.statFilledShare.replace('{n}', String(doneCount + waiting.length))} />
+            <SummaryCard
+              title={t.statDone}
+              icon={CircleCheck}
+              value={String(filled)}
+              unit={t.statOf.replace('{n}', String(total))}
+              bar={<ProgressBar bare label={t.statDone} value={filled} max={Math.max(total, 1)} unit={t.sessionsUnit} />}
+              note={total > 0 ? t.statShare.replace('{pct}', percentText(filled / total)) : t.statNoNext}
+            />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={t.statToFill} tone="telat" icon={Clock} value={fillCount} unit={t.sessionsUnit} note={missedCount > 0 ? t.statMissed.replace('{n}', String(missedCount)) : t.statToFillNote} />
+            <SummaryCard title={t.statToFill} icon={Clock} iconTone="telat" value={String(fillCount)} unit={t.sessionsUnit} note={missedCount > 0 ? t.statMissed.replace('{n}', String(missedCount)) : t.statToFillNote} />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={t.statNext} tone="izin" icon={Hourglass} value={groups.next.length} unit={t.sessionsUnit} note={groups.next[0]?.period ? t.statNextAt.replace('{time}', groups.next[0].period.startsAt.replace(':', '.')) : t.statNoNext} />
+            <SummaryCard
+              title={t.statNext}
+              icon={Hourglass}
+              iconTone="izin"
+              value={String(groups.next.length)}
+              unit={t.sessionsUnit}
+              note={groups.next[0]?.period ? t.statNextAt.replace('{time}', groups.next[0].period.startsAt.replace(':', '.')) : t.statNoNext}
+            />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={t.statDone} tone="hadir" icon={CircleCheck} value={doneCount + waiting.length} unit={t.sessionsUnit} note={waiting.length > 0 ? t.statWaiting.replace('{n}', String(waiting.length)) : t.statAbsent.replace('{n}', String(groups.done.reduce((n, s) => n + s.counts.absent, 0)))} />
+            <SummaryCard
+              title={t.statTotal}
+              icon={ClipboardList}
+              value={String(total)}
+              unit={t.sessionsUnit}
+              note={waiting.length > 0 ? t.statWaiting.replace('{n}', String(waiting.length)) : t.statAbsent.replace('{n}', String(groups.done.reduce((n, x) => n + x.counts.absent, 0)))}
+            />
           </li>
         </ul>
       )}
       {table && groups && !empty && (
         <div className="hidden lg:block">
-          <AllSessionsTable rows={allRows} />
+          <AllSessionsTable rows={allRows} view={view} onView={onView} />
         </div>
       )}
       <div className={`grid grid-cols-1 items-start gap-5 lg:grid-cols-[3fr_2fr] ${table ? 'lg:hidden' : ''}`}>

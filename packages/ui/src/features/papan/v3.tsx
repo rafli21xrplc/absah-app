@@ -443,3 +443,41 @@ export function ListCardList({ children, label }: { children: ReactNode; label?:
     </ul>
   );
 }
+
+// ---------------------------------------------------------------- SummaryCard
+
+export interface SummaryCardProps {
+  title: string;
+  icon: LucideIcon;
+  iconTone?: IconTone;
+  /** The number, already formatted, and its unit ("98", "dari 104 sesi"). */
+  value: string;
+  unit?: string;
+  /** Top right: a delta or a short badge. */
+  badge?: ReactNode;
+  /** A bar under the number (ProgressBar bare). */
+  bar?: ReactNode;
+  /** One line of context: every number has a denominator or a comparison. */
+  note: ReactNode;
+}
+
+/** v3 summary card (Presensi kelas): icon + title, 30 px number with its unit, optional bar, one line of context. */
+export function SummaryCard({ title, icon, iconTone = 'papan', value, unit, badge, bar, note }: SummaryCardProps) {
+  return (
+    <div className="card-surface box-border flex h-full w-full min-w-0 flex-col gap-3 rounded-kartu border border-transparent bg-kapur-raised p-5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-3">
+          <IconChip icon={icon} tone={iconTone} />
+          <h2 className="m-0 truncate text-isi-strong text-tinta">{title}</h2>
+        </div>
+        {badge}
+      </div>
+      <p className="m-0 flex items-baseline gap-2">
+        <span className="text-angka-ubin tabular-nums text-tinta">{value}</span>
+        {unit && <span className="text-isi text-tinta-muted">{unit}</span>}
+      </p>
+      {bar}
+      <p className="m-0 mt-auto text-small text-tinta-muted">{note}</p>
+    </div>
+  );
+}

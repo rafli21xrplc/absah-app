@@ -314,14 +314,14 @@ export function Pagination({ page, pageCount, total, size, onPage }: { page: num
   const from = (page - 1) * size + 1;
   const to = Math.min(total, page * size);
   const pages = pageList(page, pageCount);
-  const btn = 'inline-flex size-9 cursor-pointer items-center justify-center rounded-md border text-small font-semibold disabled:cursor-not-allowed disabled:opacity-40';
+  const btn = 'inline-flex size-9 cursor-pointer items-center justify-center rounded-kontrol border text-isi-strong tabular-nums disabled:cursor-not-allowed disabled:opacity-40';
   return (
-    <nav aria-label={t.pages} className="flex flex-wrap items-center justify-between gap-3 border-t border-garis pt-3">
+    <nav aria-label={t.pages} className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-3">
       <p className="m-0 text-small text-tinta-muted">{t.range.replace('{from}', String(from)).replace('{to}', String(to)).replace('{total}', String(total))}</p>
       {pageCount > 1 && (
         <ul className="m-0 flex list-none items-center gap-1 p-0">
           <li>
-            <button type="button" aria-label={t.previous} disabled={page === 1} onClick={() => onPage(page - 1)} className={cx(btn, 'border-garis bg-kapur-raised text-tinta')}>
+            <button type="button" aria-label={t.previous} disabled={page === 1} onClick={() => onPage(page - 1)} className={cx(btn, 'border-batas-lembut bg-kapur-raised text-tinta')}>
               <ChevronLeft aria-hidden strokeWidth={1.75} className="size-4" />
             </button>
           </li>
@@ -337,7 +337,7 @@ export function Pagination({ page, pageCount, total, size, onPage }: { page: num
                   aria-current={p === page ? 'page' : undefined}
                   aria-label={t.page.replace('{n}', String(p))}
                   onClick={() => onPage(p)}
-                  className={cx(btn, p === page ? 'border-papan bg-papan text-on-papan' : 'border-garis bg-kapur-raised text-tinta hover:border-garis-kuat')}
+                  className={cx(btn, p === page ? 'border-papan bg-papan text-on-papan' : 'border-batas-lembut bg-kapur-raised text-tinta hover:border-garis-kuat')}
                 >
                   {p}
                 </button>
@@ -345,7 +345,7 @@ export function Pagination({ page, pageCount, total, size, onPage }: { page: num
             ),
           )}
           <li>
-            <button type="button" aria-label={t.next} disabled={page === pageCount} onClick={() => onPage(page + 1)} className={cx(btn, 'border-garis bg-kapur-raised text-tinta')}>
+            <button type="button" aria-label={t.next} disabled={page === pageCount} onClick={() => onPage(page + 1)} className={cx(btn, 'border-batas-lembut bg-kapur-raised text-tinta')}>
               <ChevronRight aria-hidden strokeWidth={1.75} className="size-4" />
             </button>
           </li>
