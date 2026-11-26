@@ -1,10 +1,10 @@
 'use client';
 
 import { LeaveRequest, type LeaveRequestList } from '@absah/contracts';
-import { AlertRow, BoardSection, Button, Dialog, messages } from '@absah/ui';
+import { Avatar, BoardSection, Button, Chip, Dialog, ListCardList, ListCardRow, messages } from '@absah/ui';
+import { Paperclip, TriangleAlert } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
-import { leaveCode } from '@/lib/dashboard';
 import { dateRangeLabel, LEAVE_KIND_LABELS } from '@/lib/leave';
 import type { Section } from '@/lib/use-section';
 import { useWorkspace } from '@/lib/workspace';
@@ -51,32 +51,58 @@ export function LeaveSection({ section, onDecided }: { section: Section<LeaveReq
   const range = asking ? dateRangeLabel(asking.leave.startsOn, asking.leave.endsOn) : '';
   const name = asking?.leave.student.name ?? '';
   return (
-    <BoardSection title={t.leaveTitle} aside={t.leaveAside} state={section.state} emptyText={t.leaveEmpty} onRetry={section.reload}>
+    <BoardSection
+      title={t.leaveTitle}
+      subtitle={t.leaveAside}
+      {...(items.length > 0 ? { count: fill(t.leaveCount, { n: String(items.length) }) } : {})}
+      state={section.state}
+      emptyText={t.leaveEmpty}
+      onRetry={section.reload}
+    >
       {done && (
         <p role="status" className="m-0 text-small text-papan">
           {done}
         </p>
       )}
-      <ul className="m-0 flex list-none flex-col gap-2 p-0">
+      <ListCardList label={t.leaveTitle}>
         {items.map((l) => (
-          <AlertRow
+          <ListCardRow
             key={l.id}
-            code={leaveCode(l.kind)}
-            title={`${l.student.name} · ${l.student.className}`}
-            detail={`${LEAVE_KIND_LABELS[l.kind]} · ${dateRangeLabel(l.startsOn, l.endsOn)} · ${l.reason}${l.hasAttachment ? ' · ada lampiran' : ''}`}
-            actions={
+            lead={<Avatar name={l.student.name} seed={l.student.enrollmentId} size={38} />}
+            title={l.student.name}
+            tags={
               <>
-                <Button variant="secondary" aria-label={`${t.reject} izin ${l.student.name}`} onClick={() => { setFailed(null); setAsking({ leave: l, approve: false }); }}>
+                <span className="text-small text-tinta-muted">{l.student.className}</span>
+                <Chip tone={l.kind === 'sakit' ? 'sakit' : 'izin'}>{LEAVE_KIND_LABELS[l.kind]}</Chip>
+              </>
+            }
+            detail={`${dateRangeLabel(l.startsOn, l.endsOn)} · ${l.reason}`}
+            below={
+              <span>
+                {l.hasAttachment ? (
+                  <Chip tone="papan" icon={Paperclip}>
+                    {t.attachment}
+                  </Chip>
+                ) : (
+                  <Chip tone="stabilo" icon={TriangleAlert}>
+                    {t.noAttachment}
+                  </Chip>
+                )}
+              </span>
+            }
+            end={
+              <>
+                <Button variant="outline" size="40" aria-label={`${t.reject} izin ${l.student.name}`} onClick={() => { setFailed(null); setAsking({ leave: l, approve: false }); }}>
                   {t.reject}
                 </Button>
-                <Button aria-label={`${t.approve} izin ${l.student.name}`} onClick={() => { setFailed(null); setAsking({ leave: l, approve: true }); }}>
+                <Button size="40" aria-label={`${t.approve} izin ${l.student.name}`} onClick={() => { setFailed(null); setAsking({ leave: l, approve: true }); }}>
                   {t.approve}
                 </Button>
               </>
             }
           />
         ))}
-      </ul>
+      </ListCardList>
       <Dialog
         open={asking !== null}
         onOpenChange={(open) => !open && !busy && setAsking(null)}
