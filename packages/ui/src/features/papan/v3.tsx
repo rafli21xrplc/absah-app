@@ -128,12 +128,14 @@ export interface HeroRingCardProps {
   target?: number;
   /** A note under the chart, e.g. "0,8 poin di atas target sekolah". */
   note?: ReactNode;
+  /** Shares of the day under the ring (label, value), pinned to the bottom of the card. */
+  parts?: { label: string; value: string }[];
 }
 
 const RING = 2 * Math.PI * 44;
 
 /** One per page: the dark hero with the attendance ring. The ring is role="img" with the value in words. */
-export function HeroRingCard({ title, badge, rate, value, lines, spark, sparkLabel, target, note }: HeroRingCardProps) {
+export function HeroRingCard({ title, badge, rate, value, lines, spark, sparkLabel, target, note, parts }: HeroRingCardProps) {
   const clamped = Math.min(Math.max(rate, 0), 1);
   const pct = percentText(clamped);
   const id = `hero-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
@@ -176,6 +178,16 @@ export function HeroRingCard({ title, badge, rate, value, lines, spark, sparkLab
         </div>
       </div>
       {spark && spark.length >= 2 && <Sparkline values={spark} label={sparkLabel ?? t.trend} {...(target === undefined ? {} : { target })} />}
+      {parts && parts.length > 0 && (
+        <dl className="m-0 mt-auto grid grid-cols-3 gap-2">
+          {parts.map((p) => (
+            <div key={p.label} className="flex flex-col gap-1 rounded-ubin bg-on-papan-hero/10 px-3 py-2">
+              <dt className="text-mini text-papan-hero-muted">{p.label}</dt>
+              <dd className="m-0 text-isi-strong tabular-nums">{p.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
       {note && <p className="m-0 rounded-ubin bg-on-papan-hero/10 px-3 py-2 text-small font-semibold">{note}</p>}
     </section>
   );
