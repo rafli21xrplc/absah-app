@@ -1,7 +1,7 @@
 'use client';
 
 import { PklAssessmentAspectList } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import { useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { aspectsRequest, draftsFrom, moveRow, PKL_ASPECT_MAX, type AspectDraft } from '@/lib/pkl-assessment';
@@ -51,16 +51,16 @@ export function AspectsEditor({ schoolId, aspects, onSaved }: { schoolId: string
             <div className={styles.toolbar}>
               <label className={forms.field}>
                 <span className={forms.label}>Nama aspek {i + 1}</span>
-                <input className={forms.input} value={r.name} maxLength={80} onChange={(e) => edit(i, { name: e.target.value })} />
+                <Input value={r.name} maxLength={80} onChange={(e) => edit(i, { name: e.target.value })} />
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>Bobot aspek {i + 1}</span>
-                <input className={forms.input} type="number" min={1} max={10} value={r.weight} onChange={(e) => edit(i, { weight: Math.max(1, Math.min(10, Number(e.target.value) || 1)) })} />
+                <Input type="number" min={1} max={10} value={r.weight} onChange={(e) => edit(i, { weight: Math.max(1, Math.min(10, Number(e.target.value) || 1)) })} />
               </label>
             </div>
             <label className={forms.field}>
               <span className={forms.label}>Penjelasan aspek {i + 1} (boleh kosong)</span>
-              <input className={forms.input} value={r.description} maxLength={300} onChange={(e) => edit(i, { description: e.target.value })} />
+              <Input value={r.description} maxLength={300} onChange={(e) => edit(i, { description: e.target.value })} />
             </label>
             <div className={styles.toolbar}>
               <Button variant="secondary" disabled={i === 0} onClick={() => setRows((all) => moveRow(all, i, -1))}>

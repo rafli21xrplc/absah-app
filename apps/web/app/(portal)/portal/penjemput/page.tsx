@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatePickupPhotoResponse, PickupGuardian, PickupGuardianList, PortalAttendance, type PickupRelation } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
@@ -151,21 +151,21 @@ function AddPickup({ schoolId, studentId, onDone }: { schoolId: string; studentI
     <form className={forms.form} onSubmit={(e) => void submit(e)}>
       <label className={forms.field}>
         <span className={forms.label}>Nama penjemput</span>
-        <input className={forms.input} name="name" required maxLength={100} autoComplete="off" />
+        <Input name="name" required maxLength={100} autoComplete="off" />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Hubungan</span>
-        <select className={forms.input} value={relation} onChange={(e) => setRelation(e.target.value as PickupRelation)}>
+        <Select value={relation} onChange={(e) => setRelation(e.target.value as PickupRelation)}>
           {RELATIONS.map((r) => (
             <option key={r} value={r}>
               {RELATION_LABELS[r]}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Nomor WhatsApp penjemput</span>
-        <input className={forms.input} name="phone" type="tel" inputMode="tel" required placeholder="0812 3456 7890" autoComplete="off" />
+        <Input name="phone" type="tel" inputMode="tel" required placeholder="0812 3456 7890" autoComplete="off" />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Foto wajah penjemput</span>
@@ -173,7 +173,7 @@ function AddPickup({ schoolId, studentId, onDone }: { schoolId: string; studentI
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Berlaku sampai (kosongkan bila tetap)</span>
-        <input className={forms.input} name="validUntil" type="date" />
+        <Input name="validUntil" type="date" />
       </label>
       {message && (
         <p className={forms.error} role="alert">

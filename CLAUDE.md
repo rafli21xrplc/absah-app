@@ -832,6 +832,12 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - `AuthShell`: formulir di kiri (rata tengah, logo dalam kotak putih di atas judul, latar putih dengan kilau hijau tipis `.auth-sheen`), panel di kanan sebagai kartu (`BrandPanel`, latar titik `.auth-dots`) berisi diagram 8 bagian Absah di sekeliling logo. Panel bergerak (MA2, kelas `auth-*` di `base.css`): diagram tersusun sekali, lalu garis mengalir dan tiap bagian memancarkan cincin bergiliran (8 detik). Karena lebih dari 5 detik ada tombol jeda di kaki panel; dengan gerak dikurangi tidak ada yang bergerak dan tombolnya hilang. Pojok kanan atas formulir: `ThemeToggle`. Di HP hanya formulir (plus tombol tema).
 - Bagian diagram adalah daftar sungguhan (`Yang terhubung di Absah`), garisnya dekorasi.
 
+### Kontrol isian (IN1)
+
+- Pilihan SELALU `Select` dari `@absah/ui` (popover di laptop, pemilih bawaan di HP); `<select>` polos di `apps/web/app` sudah tidak ada. Isian teks `Input`, teks panjang `Textarea`. Kelas `forms.input`/`styles.input` hanya tersisa untuk `type="file"`.
+- `<select>` tersembunyi di dalam `Select` berpopover kini berada SETELAH tombolnya: `<label>` yang membungkus seluruh kontrol menamai anak pertamanya yang bisa diberi label, yaitu tombol. Helper e2e `choose()` mencari select di kedua sisi.
+- Kontrol yang ditulis polos (tanpa kelas apa pun) mendapat gaya yang sama dari `base.css` (tinggi 44 px, garis kuat, radius md); kotak centang dan radio memakai warna papan dan ukuran 20 px. Kontrol dengan kelas apa pun dibiarkan pada kelasnya.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

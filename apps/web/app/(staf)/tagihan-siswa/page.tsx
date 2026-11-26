@@ -1,7 +1,7 @@
 'use client';
 
 import { BillingClassList, FeeTypeList, StudentBill, StudentBillList, type BillStatus } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -90,36 +90,36 @@ function Bills() {
       <form className={styles.toolbar} aria-label="Saring tagihan" onSubmit={(e) => e.preventDefault()}>
         <label>
           Status{' '}
-          <select value={status} onChange={(e) => setStatus(e.target.value as BillStatus | '')}>
+          <Select value={status} onChange={(e) => setStatus(e.target.value as BillStatus | '')}>
             <option value="">Semua</option>
             {(['open', 'paid', 'void'] as const).map((s) => (
               <option key={s} value={s}>
                 {BILL_STATUS_LABELS[s]}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label>
           Jenis{' '}
-          <select value={feeTypeId} onChange={(e) => setFeeTypeId(e.target.value)}>
+          <Select value={feeTypeId} onChange={(e) => setFeeTypeId(e.target.value)}>
             <option value="">Semua jenis</option>
             {fees.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.name}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label>
           Rombel{' '}
-          <select value={classId} onChange={(e) => setClassId(e.target.value)}>
+          <Select value={classId} onChange={(e) => setClassId(e.target.value)}>
             <option value="">Semua rombel</option>
             {classes.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label>
           Periode <input value={period} maxLength={40} placeholder="2026-11" onChange={(e) => setPeriod(e.target.value)} />

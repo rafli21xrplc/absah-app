@@ -11,6 +11,7 @@ import { useWorkspace } from '@/lib/workspace';
 import forms from '../../forms.module.css';
 import styles from '../data.module.css';
 import ui from '../presensi.module.css';
+import { Select } from '@absah/ui';
 
 const RANGES = [7, 14, 30] as const;
 
@@ -40,13 +41,13 @@ export default function PeringatanDiniPage() {
         <h1 className={styles.title}>Peringatan dini</h1>
         <label className={forms.field}>
           Periode
-          <select value={days} onChange={(e) => setDays(Number(e.target.value) as (typeof RANGES)[number])}>
+          <Select value={days} onChange={(e) => setDays(Number(e.target.value) as (typeof RANGES)[number])}>
             {RANGES.map((d) => (
               <option key={d} value={d}>
                 {d} hari terakhir
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         {error && (
           <p className={forms.error} role="alert">

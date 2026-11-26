@@ -1,7 +1,7 @@
 'use client';
 
 import { Activity, ActivityList, SchoolMembersResponse, type ActivityKind, type ActivityLocation } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { ACTIVITY_MANAGERS, DAY_LABELS, DAYS, KIND_LABELS, KINDS, LOCATION_LABELS, LOCATIONS, scheduleLabel } from '@/lib/activities';
@@ -128,7 +128,7 @@ function NewActivity({ schoolId, onDone }: { schoolId: string | null; onDone: ()
       </label>
       <label className={forms.field}>
         Jenis
-        <select
+        <Select
           value={kind}
           onChange={(e) => {
             changed();
@@ -140,7 +140,7 @@ function NewActivity({ schoolId, onDone }: { schoolId: string | null; onDone: ()
               {k === 'ibadah' ? 'Ibadah berjamaah' : KIND_LABELS[k]}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       <fieldset className={forms.field}>
         <legend>Tempat</legend>

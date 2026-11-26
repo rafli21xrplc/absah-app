@@ -1,7 +1,7 @@
 'use client';
 
 import { ClassList, EligibilityList, ExamPeriod, ExamPeriodList } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Select } from '@absah/ui';
 import Link from 'next/link';
 import { use, useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -127,14 +127,14 @@ function Eligibility({ periodId }: { periodId: string }) {
         {seesAll && (
           <label>
             Rombel{' '}
-            <select value={classId} onChange={(e) => setClassId(e.target.value)}>
+            <Select value={classId} onChange={(e) => setClassId(e.target.value)}>
               <option value="">Semua rombel</option>
               {classes.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         )}
         <label>

@@ -1,7 +1,7 @@
 'use client';
 
 import { LearningGroup, LearningGroupDetail, ScheduleConflictDetail, StudentList, type LearningGroupDetail as Detail } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input, Select } from '@absah/ui';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { z } from 'zod';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -91,14 +91,14 @@ function MembersEditor({ groupId, data, canEdit, onSaved }: { groupId: string; d
         <>
           <label className={forms.field}>
             <span className={forms.label}>Tambah dari rombel</span>
-            <select className={forms.input} value={classId} onChange={(e) => setClassId(e.target.value)}>
+            <Select value={classId} onChange={(e) => setClassId(e.target.value)}>
               <option value="">Pilih rombel…</option>
               {data.classes.items.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           {classId && roster && (
             <fieldset>
@@ -197,28 +197,28 @@ export function GroupsTab({ data, canEdit, onChanged }: { data: ScheduleData; ca
           <h2>Kelompok baru</h2>
           <label className={forms.field}>
             <span className={forms.label}>Nama kelompok</span>
-            <input className={forms.input} name="name" required minLength={2} maxLength={80} placeholder="Fisika A" />
+            <Input name="name" required minLength={2} maxLength={80} placeholder="Fisika A" />
           </label>
           <label className={forms.field}>
             <span className={forms.label}>Mapel</span>
-            <select className={forms.input} name="subject" required>
+            <Select name="subject" required>
               {data.subjects.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className={forms.field}>
             <span className={forms.label}>Guru</span>
-            <select className={forms.input} name="teacher">
+            <Select name="teacher">
               <option value="">Belum ditentukan</option>
               {data.teachers.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           {data.subjects.length === 0 && <p className={styles.notice}>Tambahkan mapel dulu lewat tab Jadwal pelajaran.</p>}
           <Button type="submit" disabled={busy || data.subjects.length === 0}>

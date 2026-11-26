@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { AuthError, enableTwoFactor, verifyTotp } from '@/lib/auth';
@@ -41,7 +41,7 @@ export default function TwoFactorPage() {
           </p>
           <label className={styles.field}>
             <span className={styles.label}>Kata sandi Anda</span>
-            <input className={styles.input} name="password" type="password" autoComplete="current-password" required />
+            <Input name="password" type="password" autoComplete="current-password" required />
           </label>
           {error && <p className={styles.error} role="alert">{error}</p>}
           <Button type="submit" disabled={busy}>
@@ -75,7 +75,7 @@ export default function TwoFactorPage() {
           )}
           <label className={styles.field}>
             <span className={styles.label}>Kode 6 angka dari aplikasi</span>
-            <input className={styles.input} name="code" inputMode="numeric" autoComplete="one-time-code" required autoFocus />
+            <Input name="code" inputMode="numeric" autoComplete="one-time-code" required autoFocus />
           </label>
           {error && <p className={styles.error} role="alert">{error}</p>}
           <Button type="submit" disabled={busy}>

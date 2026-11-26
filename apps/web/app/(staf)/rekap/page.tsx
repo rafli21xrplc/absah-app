@@ -8,6 +8,7 @@ import { useWorkspace } from '@/lib/workspace';
 import styles from '../data.module.css';
 import { ExportButtons } from './export-buttons';
 import { PeriodPicker, usePeriod, useReport } from './period';
+import { Select } from '@absah/ui';
 
 /** Rekap S/I/A per rombel (RKP-01): every rombel for pimpinan, their own for a wali kelas. */
 function RekapList() {
@@ -35,14 +36,14 @@ function RekapList() {
         <p>
           <label>
             Jurusan{' '}
-            <select value={stream} onChange={(e) => setStream(e.target.value as ClassStream | '')}>
+            <Select value={stream} onChange={(e) => setStream(e.target.value as ClassStream | '')}>
               <option value="">Semua jurusan</option>
               {streams.map((s) => (
                 <option key={s} value={s}>
                   {STREAM_LABELS[s]}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         </p>
       )}

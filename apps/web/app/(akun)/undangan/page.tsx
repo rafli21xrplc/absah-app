@@ -1,7 +1,7 @@
 'use client';
 
 import { AcceptInvitationResponse, InvitationPreviewResponse } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError } from '@/lib/api';
@@ -84,7 +84,7 @@ export default function InvitationPage() {
           {preview.needsPassword && (
             <label className={styles.field}>
               <span className={styles.label}>Buat kata sandi</span>
-              <input className={styles.input} name="password" type="password" autoComplete="new-password" minLength={10} required />
+              <Input name="password" type="password" autoComplete="new-password" minLength={10} required />
               <span className={styles.hint}>Minimal 10 karakter.</span>
               {passwordError && <span className={styles.error}>{passwordError}</span>}
             </label>

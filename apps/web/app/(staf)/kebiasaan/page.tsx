@@ -9,6 +9,7 @@ import { addDays, HABIT_LABELS, HABITS, mondayOf, shortDay } from '@/lib/habits'
 import { todayIn } from '@/lib/leave';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../data.module.css';
+import { Select } from '@absah/ui';
 
 /**
  * Jurnal 7 KAIH, weekly summary per rombel (KEG-02): days filled and ticks per habit per student.
@@ -58,13 +59,13 @@ export default function Kebiasaan() {
         <p>
           <label>
             Rombel{' '}
-            <select value={classId} onChange={(e) => setClassId(e.target.value)}>
+            <Select value={classId} onChange={(e) => setClassId(e.target.value)}>
               {classes.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>{' '}
           <button type="button" onClick={() => setWeekStart((w) => addDays(w, -7))}>
             ← Minggu lalu

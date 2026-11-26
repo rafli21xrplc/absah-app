@@ -1,7 +1,7 @@
 'use client';
 
 import { TracerAlumniList, TracerClassList, TracerRecap } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
@@ -139,22 +139,22 @@ export default function TracerPage() {
           <div className={styles.toolbar}>
             <label>
               Angkatan{' '}
-              <select value={year} onChange={(e) => setYear(e.target.value ? Number(e.target.value) : '')}>
+              <Select value={year} onChange={(e) => setYear(e.target.value ? Number(e.target.value) : '')}>
                 <option value="">Semua</option>
                 {years.map((y) => (
                   <option key={y} value={y}>
                     {y}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Jawaban{' '}
-              <select value={answered} onChange={(e) => setAnswered(e.target.value as '' | 'yes' | 'no')}>
+              <Select value={answered} onChange={(e) => setAnswered(e.target.value as '' | 'yes' | 'no')}>
                 <option value="">Semua</option>
                 <option value="yes">Sudah mengisi</option>
                 <option value="no">Belum mengisi</option>
-              </select>
+              </Select>
             </label>
           </div>
           {!alumni && !error && <p role="status">Memuat…</p>}

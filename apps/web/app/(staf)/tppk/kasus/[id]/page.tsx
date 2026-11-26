@@ -1,7 +1,7 @@
 'use client';
 
 import { TppkCaseDetail } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Select, Textarea } from '@absah/ui';
 import Link from 'next/link';
 import { use, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -99,17 +99,16 @@ export default function KasusPage({ params }: { params: Promise<{ id: string }> 
             {!closed && (
               <label className={forms.field}>
                 <span className={forms.label}>Jenis</span>
-                <select className={forms.input} value={action} onChange={(e) => setAction(e.target.value as Action)}>
+                <Select value={action} onChange={(e) => setAction(e.target.value as Action)}>
                   <option value="langkah">Langkah yang diambil</option>
                   <option value="catatan">Catatan</option>
                   <option value="tutup">Tutup kasus</option>
-                </select>
+                </Select>
               </label>
             )}
             <label className={forms.field}>
               <span className={forms.label}>{effective === 'tutup' ? 'Hasil penanganan' : effective === 'buka' ? 'Alasan dibuka kembali' : 'Isi'}</span>
-              <textarea
-                className={forms.input}
+              <Textarea
                 style={{ minHeight: 100, paddingTop: 8 }}
                 value={note}
                 maxLength={4000}

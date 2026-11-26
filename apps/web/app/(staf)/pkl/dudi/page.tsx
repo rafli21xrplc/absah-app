@@ -1,7 +1,7 @@
 'use client';
 
 import { DudiPartner, DudiPartnerList, PKL_DEFAULT_RADIUS_M, type DudiWorkDay } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { DAY_LABELS, DAYS } from '@/lib/activities';
@@ -144,20 +144,20 @@ function PartnerForm({ schoolId, partner, onDone }: { schoolId: string; partner:
       <h2 id="dudi-form">{partner ? `Ubah ${partner.name}` : 'DUDI baru'}</h2>
       <label className={forms.field}>
         <span className={forms.label}>Nama DUDI</span>
-        <input className={forms.input} name="name" defaultValue={partner?.name} required minLength={2} maxLength={150} />
+        <Input name="name" defaultValue={partner?.name} required minLength={2} maxLength={150} />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Alamat</span>
-        <input className={forms.input} name="address" defaultValue={partner?.address} required minLength={5} maxLength={300} />
+        <Input name="address" defaultValue={partner?.address} required minLength={5} maxLength={300} />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Titik lokasi</span>
-        <input className={forms.input} name="point" defaultValue={partner ? `${partner.latitude}, ${partner.longitude}` : ''} required placeholder="-6.2383, 106.9756" />
+        <Input name="point" defaultValue={partner ? `${partner.latitude}, ${partner.longitude}` : ''} required placeholder="-6.2383, 106.9756" />
         <span className={forms.hint}>Di Google Maps, tekan lama titik gerbang DUDI, lalu salin angkanya ke sini.</span>
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Radius check-in (meter)</span>
-        <input className={forms.input} name="radiusM" type="number" inputMode="numeric" min={25} max={2000} defaultValue={partner?.radiusM ?? PKL_DEFAULT_RADIUS_M} required />
+        <Input name="radiusM" type="number" inputMode="numeric" min={25} max={2000} defaultValue={partner?.radiusM ?? PKL_DEFAULT_RADIUS_M} required />
       </label>
       <fieldset className={forms.field}>
         <legend className={forms.label}>Hari dan jam kerja</legend>
@@ -170,8 +170,8 @@ function PartnerForm({ schoolId, partner, onDone }: { schoolId: string; partner:
               </label>
               {h && (
                 <>
-                  <input className={forms.input} type="time" aria-label={`Mulai ${DAY_LABELS[day]}`} value={h.startsAt} onChange={(e) => setDay(day, { startsAt: e.target.value })} />
-                  <input className={forms.input} type="time" aria-label={`Selesai ${DAY_LABELS[day]}`} value={h.endsAt} onChange={(e) => setDay(day, { endsAt: e.target.value })} />
+                  <Input type="time" aria-label={`Mulai ${DAY_LABELS[day]}`} value={h.startsAt} onChange={(e) => setDay(day, { startsAt: e.target.value })} />
+                  <Input type="time" aria-label={`Selesai ${DAY_LABELS[day]}`} value={h.endsAt} onChange={(e) => setDay(day, { endsAt: e.target.value })} />
                 </>
               )}
             </div>

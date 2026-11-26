@@ -1,7 +1,7 @@
 'use client';
 
 import { PklPlacement, PklPlacementList } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, Input, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
@@ -68,10 +68,10 @@ export default function PklPage() {
         </nav>
         <label className={forms.field}>
           <span className={forms.label}>Tampilkan</span>
-          <select className={forms.input} value={scope} onChange={(e) => setScope(e.target.value === 'all' ? 'all' : 'current')}>
+          <Select value={scope} onChange={(e) => setScope(e.target.value === 'all' ? 'all' : 'current')}>
             <option value="current">PKL berjalan dan akan datang</option>
             <option value="all">Semua, termasuk selesai dan batal</option>
-          </select>
+          </Select>
         </label>
         {error && <p role="alert">{error}</p>}
         {editing && schoolId && (
@@ -176,15 +176,15 @@ function PlacementForm({ schoolId, placement, onDone }: { schoolId: string; plac
       </h2>
       <label className={forms.field}>
         <span className={forms.label}>Tanggal selesai</span>
-        <input className={forms.input} name="endsOn" type="date" defaultValue={placement.endsOn} min={placement.startsOn} required />
+        <Input name="endsOn" type="date" defaultValue={placement.endsOn} min={placement.startsOn} required />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Nama pembimbing industri</span>
-        <input className={forms.input} name="mentorName" defaultValue={placement.industryMentor?.name ?? ''} maxLength={100} />
+        <Input name="mentorName" defaultValue={placement.industryMentor?.name ?? ''} maxLength={100} />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Nomor WhatsApp pembimbing industri</span>
-        <input className={forms.input} name="mentorPhone" type="tel" inputMode="tel" placeholder={placement.industryMentor?.phone ?? '0812…'} />
+        <Input name="mentorPhone" type="tel" inputMode="tel" placeholder={placement.industryMentor?.phone ?? '0812…'} />
         <span className={forms.hint}>Kosongkan untuk tetap memakai nomor yang tersimpan.</span>
       </label>
       {placement.industryMentor && (

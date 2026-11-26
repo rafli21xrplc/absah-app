@@ -9,6 +9,7 @@ import { periodFrom, semesterLabel, type Period } from '@/lib/report';
 import { useWorkspace } from '@/lib/workspace';
 import forms from '../../forms.module.css';
 import styles from '../data.module.css';
+import { Input, Select } from '@absah/ui';
 
 /** Semesters of the active year and the period chosen in the URL (null while loading). */
 export function usePeriod(): { period: Period | null; semesters: ReportSemesterList['items'] } {
@@ -56,8 +57,7 @@ export function PeriodPicker({ period, semesters }: { period: Period; semesters:
     <div className={styles.toolbar}>
       <label className={forms.field}>
         <span className={forms.label}>Periode</span>
-        <select
-          className={forms.input}
+        <Select
           value={value}
           onChange={(e) => {
             const v = e.target.value;
@@ -73,14 +73,13 @@ export function PeriodPicker({ period, semesters }: { period: Period; semesters:
           ))}
           <option value="day">Satu hari</option>
           <option value="custom">Rentang tanggal</option>
-        </select>
+        </Select>
       </label>
       {!period.semesterId && (
         <>
           <label className={forms.field}>
             <span className={forms.label}>{custom ? 'Dari' : 'Tanggal'}</span>
-            <input
-              className={forms.input}
+            <Input
               type="date"
               value={period.from}
               onChange={(e) => e.target.value && go(`from=${e.target.value}&to=${custom && e.target.value <= period.to ? period.to : e.target.value}`)}
@@ -89,7 +88,7 @@ export function PeriodPicker({ period, semesters }: { period: Period; semesters:
           {custom && (
             <label className={forms.field}>
               <span className={forms.label}>Sampai</span>
-              <input className={forms.input} type="date" min={period.from} value={period.to} onChange={(e) => e.target.value && go(`from=${period.from}&to=${e.target.value}`)} />
+              <Input type="date" min={period.from} value={period.to} onChange={(e) => e.target.value && go(`from=${period.from}&to=${e.target.value}`)} />
             </label>
           )}
         </>
