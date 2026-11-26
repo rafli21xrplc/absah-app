@@ -4,6 +4,7 @@ import { ChevronsUpDown } from 'lucide-react';
 import { lazy, Suspense, useState, type ComponentProps, type ReactNode } from 'react';
 import { messages } from '../../messages/id';
 import { cx } from '../cx';
+import { Avatar } from './avatar';
 import { useWideScreen } from './use-wide-screen';
 
 // The two menus in the side column (school and account) open as popovers. Radix popover is a separate chunk (~35 kB): the
@@ -20,23 +21,12 @@ export const menuItemStyles =
 /** The first letter of a name in a circle: a picture only, the name is always written next to it. */
 export type Tone = 'light' | 'sidebar';
 
-export function Avatar({ name, tone = 'light', className }: { name: string; tone?: Tone; className?: string }) {
-  const initial = name.trim().charAt(0).toUpperCase() || '?';
-  return (
-    <span
-      aria-hidden
-      className={cx('inline-flex size-9 shrink-0 items-center justify-center rounded-full text-body-strong', tone === 'sidebar' ? 'bg-sidebar-aktif text-on-sidebar' : 'bg-papan-soft text-papan', className)}
-    >
-      {initial}
-    </span>
-  );
-}
 
 /** Who is signed in: avatar, name and the role(s) under it. Used by the account button and by the phone's menu sheet. */
 export function AccountSummary({ name, detail, email, tone = 'light' }: { name: string; detail?: string; email?: string | null; tone?: Tone }) {
   return (
     <span className="flex min-w-0 items-center gap-3">
-      <Avatar name={name} tone={tone} />
+      <Avatar name={name} size={36} />
       <span className="flex min-w-0 flex-col">
         <span className="truncate text-body-strong">{name}</span>
         {(detail || email) && <span className={cx('truncate text-small', tone === 'sidebar' ? 'text-sidebar-muted' : 'text-tinta-muted')}>{detail ?? email}</span>}

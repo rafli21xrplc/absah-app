@@ -7,9 +7,9 @@ import { cx } from '../cx';
 import { buttonStyles } from './button-styles';
 import { Spinner } from './motion/spinner';
 
-export type ButtonVariant = 'primary' | 'stabilo' | 'secondary' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'stabilo' | 'secondary' | 'soft' | 'outline' | 'ghost' | 'danger';
 /** Minimum height in px: 44 web, 48 quiet actions on a phone, 52 the main action on a phone, 64 the kiosk. */
-export type ButtonSize = '44' | '48' | '52' | '64';
+export type ButtonSize = '36' | '40' | '44' | '48' | '52' | '64';
 
 const button = buttonStyles;
 

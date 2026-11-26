@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectNoAxeViolations } from '../../test/axe';
-import { ChildTabs, CountsRow, LinkRow, StatusChip } from './portal-parts';
+import { ChildTabs, CountsRow, LinkRow, PortalStatusChip } from './portal-parts';
 
 describe('ChildTabs', () => {
   it('is a named navigation of buttons; the child on screen is pressed', async () => {
@@ -17,12 +17,12 @@ describe('ChildTabs', () => {
   });
 });
 
-describe('StatusChip and CountsRow', () => {
+describe('PortalStatusChip and CountsRow', () => {
   it('writes the letter and the word, and says "belum tercatat" in words', async () => {
     const { container } = render(
       <div>
-        <StatusChip code="T" />
-        <StatusChip code={null} />
+        <PortalStatusChip code="T" />
+        <PortalStatusChip code={null} />
         <CountsRow label="30 hari terakhir" counts={{ H: 20, A: 1 }} />
       </div>,
     );

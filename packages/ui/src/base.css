@@ -83,7 +83,7 @@ input[type='radio'] {
 /* Cards (Card, BoardSection, Table, status boxes): a hairline shadow under the border so white cards lift off the warm page.
    Black at low opacity in both themes: no token exists for shadows, and a tinted one would glow in the dark theme. */
 .card-surface {
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.03);
+  box-shadow: var(--shadow-kartu);
 }
 
 /* Sign-in (MA1): white that is not flat. The form side has a faint green sheen from the top; the panel beside it is a dot grid

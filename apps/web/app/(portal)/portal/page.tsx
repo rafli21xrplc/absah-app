@@ -1,7 +1,7 @@
 'use client';
 
 import { CardDeviceKeys, LeaveRequestList, MyCards, PortalAttendance } from '@absah/contracts';
-import { Banner, Button, Card, CountsRow, ErrorState, LinkRow, PageMain, SegmentedControl, SkeletonRows, StatusChip, messages, type StatusCode } from '@absah/ui';
+import { Banner, Button, Card, CountsRow, ErrorState, LinkRow, PageMain, SegmentedControl, SkeletonRows, PortalStatusChip, messages, type StatusCode } from '@absah/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -135,7 +135,7 @@ export default function PortalHome() {
             {s.name} · {s.className}
           </h2>
           <p className="m-0 flex flex-wrap items-center gap-2 text-body">
-            {t.today}: <StatusChip code={s.today.status as StatusCode | null} empty={t.notRecorded} />
+            {t.today}: <PortalStatusChip code={s.today.status as StatusCode | null} empty={t.notRecorded} />
             {s.today.arrivedAt && <span className="text-tinta-muted"> · {fill(t.arrived, { time: timeIn(timezone, s.today.arrivedAt) })}</span>}
           </p>
           <CountsRow label={fill(t.countsOf, { n: days })} counts={s.counts} />
@@ -146,7 +146,7 @@ export default function PortalHome() {
               {s.days.map((d) => (
                 <li key={d.date} className="flex min-h-11 items-center justify-between gap-3 border-b border-garis py-1 last:border-b-0">
                   <span>{dayLabel(d.date)}</span>
-                  <StatusChip code={d.status as StatusCode} />
+                  <PortalStatusChip code={d.status as StatusCode} />
                 </li>
               ))}
             </ul>
