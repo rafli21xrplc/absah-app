@@ -279,3 +279,17 @@ Keputusan (bisa diubah):
 
 Bukti: `docs/ui/pg2/*.png`; e2e izin, kegiatan, rekap, portal, presensi, a11y, tema di laptop dan HP: 26 lolos.
 
+## 18. PG3: halaman CMS padat, tanpa ruang kosong (2026-11-26)
+
+Permintaan: Dasbor, Presensi, Izin siswa, dan Kegiatan lebih ringkas, informatif, dan "penuh", tidak banyak ruang kosong.
+
+Keputusan (bisa diubah):
+- Satu tata letak untuk keempat halaman: konten utama kiri, kolom samping 288 px dengan ringkasan. Kolom samping lebar tetap supaya tabel mendapat sisa lebar (sebelumnya 1/3 layar).
+- Dasbor: dua kolom mengalir sendiri (komposisi + sesi belum diisi kiri; Perlu tindakan + rombel + guru kanan), sehingga tidak ada celah di bawah kartu pendek. Tren hanya tampil bila ada data dua hari atau lebih.
+- Presensi kelas: kolom Siswa dan Tidak hadir digabung jadi "Hadir" (21/25); panel progres per jam dan sesi dengan tidak hadir terbanyak (dari daftar sesi yang sama).
+- Izin: filter status, jenis, dan waktu dalam satu baris; jenis dan tanggal digabung dalam satu kolom; panel siswa izin hari ini dan izin per rombel.
+- Kegiatan: kartu dua kolom; panel jadwal pekan ini (hari ini disorot) dan peserta terbanyak.
+- `Table dense`, `BarList dense`, `CountList` baru; judul `DataCard` memakai `text-body-strong`, jarak dalam kartu 12 px.
+
+Bukti: `docs/ui/pg3/*.png`; e2e izin, kegiatan, rekap, portal, presensi, a11y, tema di laptop dan HP: 26 lolos; lebar dokumen HP 390 px di keempat halaman.
+

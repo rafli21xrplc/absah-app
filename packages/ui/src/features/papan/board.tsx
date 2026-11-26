@@ -140,11 +140,11 @@ export interface BarItem {
 }
 
 /** A list of horizontal bars (rombel today, the last school days). The bar is decoration: the number and the flag say it. */
-export function BarList({ items, label, columns = 3 }: { items: readonly BarItem[]; label: string; columns?: 1 | 3 }) {
+export function BarList({ items, label, columns = 3, dense = false }: { items: readonly BarItem[]; label: string; columns?: 1 | 3; dense?: boolean }) {
   return (
-    <ul aria-label={label} className={cx('m-0 grid list-none grid-cols-1 gap-2 p-0', columns === 3 && 'sm:grid-cols-2 lg:grid-cols-3')}>
+    <ul aria-label={label} className={cx('m-0 grid list-none grid-cols-1 p-0', dense ? 'gap-1' : 'gap-2', columns === 3 && 'sm:grid-cols-2 lg:grid-cols-3')}>
       {items.map((b) => (
-        <li key={b.key} className={cx('flex items-center gap-3 rounded-md border px-3 py-2', b.flag ? 'border-alpa-soft bg-alpa-soft' : 'border-garis bg-kapur')}>
+        <li key={b.key} className={cx('flex items-center gap-3 rounded-md border px-3', dense ? 'py-1' : 'py-2', b.flag ? 'border-alpa-soft bg-alpa-soft' : 'border-garis bg-kapur')}>
           <span className="w-20 shrink-0 truncate text-body-strong">{b.label}</span>
           <span role="img" aria-label={b.name} className="block h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-garis">
             <span className="block h-full rounded-full bg-papan" style={{ width: `${b.value === null ? 0 : Math.round(Math.max(0, Math.min(1, b.value)) * 100)}%` }} />
