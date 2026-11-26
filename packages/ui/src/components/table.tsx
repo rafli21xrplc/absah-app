@@ -17,7 +17,7 @@ export interface TableProps {
  */
 export function Table({ caption, children, className, bare = false }: TableProps) {
   return (
-    <div role="region" aria-label={caption} tabIndex={0} className={cx('overflow-x-auto', bare ? 'rounded-md' : 'card-surface rounded-lg border border-garis bg-kapur-raised')}>
+    <div role="region" aria-label={caption} tabIndex={0} className={cx('relative overflow-x-auto', bare ? 'rounded-md' : 'card-surface rounded-lg border border-garis bg-kapur-raised')}>
       <table className={cx('w-full border-collapse text-left text-body text-tinta', className)}>
         <caption className="sr-only">{caption}</caption>
         {children}

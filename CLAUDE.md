@@ -838,13 +838,15 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - `<select>` tersembunyi di dalam `Select` berpopover kini berada SETELAH tombolnya: `<label>` yang membungkus seluruh kontrol menamai anak pertamanya yang bisa diberi label, yaitu tombol. Helper e2e `choose()` mencari select di kedua sisi.
 - Kontrol yang ditulis polos (tanpa kelas apa pun) mendapat gaya yang sama dari `base.css` (tinggi 44 px, garis kuat, radius md); kotak centang dan radio memakai warna papan dan ukuran 20 px. Kontrol dengan kelas apa pun dibiarkan pada kelasnya.
 
-### Halaman CMS bergaya kartu (PG1)
+### Halaman CMS bergaya kartu (PG1, ringkas PG2)
 
-- Dasbor sekolah, Presensi kelas, Izin siswa, dan Kegiatan mengikuti satu pola: baris `StatCard` (pita berwarna + ikon + kata, angka besar, rincian di bawah), lalu `DataCard` (judul kiri; `SearchBox`, filter `Select`, `SegmentedControl` kanan) berisi `Table bare` atau grid kartu, dan `Pagination` (`usePaged`, 10 per halaman) di kaki. Semuanya di `packages/ui/src/features/dashboard/dashboard-parts.tsx`.
-- Angka di kartu hanya dari API atau hitungan sederhana atas daftar yang sudah dimuat (jumlah per status/jenis); tidak ada rekap yang dihitung klien. Pencarian dan filter berjalan di klien atas daftar yang sudah dimuat (izin dimuat `status=all` sekali).
-- `StackedBars` menggambar tren dan menyertakan tabel `sr-only` dengan angka yang sama; gambarnya `aria-hidden`.
-- Presensi kelas: di HP tetap satu kolom dan satu keputusan (kartu yang sedang berlangsung); baris statistik dan dua kolom (perlu diisi | berikutnya + selesai) hanya mulai 1024 px.
-- Kegiatan baru dibuat di `Dialog` (tombol "Simpan kegiatan" di kaki dialog memakai `form=`), bukan formulir di bawah daftar.
+- Dasbor sekolah, Presensi kelas, Izin siswa, dan Kegiatan memakai satu pola dari `packages/ui/src/features/dashboard/dashboard-parts.tsx`: baris `StatCard` ringkas (chip ikon + judul, angka, meter tipis opsional, satu baris rincian; sekitar 120 px, lima muat sebaris), lalu `DataCard` (judul kiri; `SearchBox`, filter `Select`, `SegmentedControl` dengan `count` di kanan) berisi `Table bare` atau grid kartu, dan `Pagination` (`usePaged`) di kaki.
+- Dasbor (atas ke bawah): 5 KPI (Kehadiran %, Telat, Izin dan sakit, Alpa, Sesi terisi) | `CompositionBar` H/T/I/S/A + tren (2/3) dan "Perlu tindakan" (`TaskRow`, 1/3) | tabel sesi belum diisi (2/3) dan rombel terendah + "Guru belum mengisi" (1/3). Kartu izin menunggu dan peringatan dini hanya tampil bila ada isinya; jumlahnya selalu ada di "Perlu tindakan".
+- Angka di kartu hanya dari API atau hitungan atas daftar yang sudah dimuat (jumlah per status, per guru, persen bagian H/T/I/S/A dari `days`). Klien tidak menghitung rekap.
+- Presensi kelas: HP dan "Sesi saya" tetap kartu (satu keputusan). "Semua sesi" di laptop = `AllSessionsTable` (`hari-ini/all-sessions.tsx`) dengan filter Perlu diisi / Belum mulai / Selesai / Semua; status baris dari `groupToday`.
+- Izin: dimuat sekali `status=all`; status (dengan jumlah), jenis, waktu (hari ini / akan datang / lewat), dan cari menyaring di klien. Pembukaan: Menunggu bila ada yang menunggu, selain itu Semua.
+- Kegiatan: chip hari Sen–Min per kartu, penanda "Hari ini" (`meetsOn`), filter Aktif/Tidak aktif/Semua; subjudul dan teks kosong mengikuti `ACTIVITY_OVERSEERS`, bukan hanya pengelola.
+- `Table` membungkus tabel dengan `relative overflow-x-auto`: tanpa `relative`, teks `sr-only` (absolute) di dalam sel lolos dari kotak gulir dan melebarkan halaman HP. `SegmentedControl` menggulir ke samping bila tidak muat.
 
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan

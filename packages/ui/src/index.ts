@@ -59,4 +59,4 @@ export { AuthShell, type AuthShellProps } from './features/auth/auth-shell';
 export { CodeInput, type CodeInputProps } from './features/auth/code-input';
 export { PasswordField, type PasswordFieldProps } from './features/auth/password-field';
 export { RoleTabs, type RoleTab, type RoleTabsProps } from './features/auth/role-tabs';
-export { Badge, DataCard, Pagination, PersonCell, SearchBox, StackedBars, StatCard, pageList, usePaged, type BarSegment, type DataCardProps, type StackedBar, type StatCardProps, type StatPart, type Tone } from './features/dashboard/dashboard-parts';
+export { Badge, CompositionBar, DataCard, FILL, TaskRow, type CompositionItem, Pagination, PersonCell, SearchBox, StackedBars, StatCard, pageList, usePaged, type BarSegment, type DataCardProps, type StackedBar, type StatCardProps, type StatPart, type Tone } from './features/dashboard/dashboard-parts';

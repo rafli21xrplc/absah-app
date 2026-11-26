@@ -28,11 +28,11 @@ import {
   usePaged,
   type Tone,
 } from '@absah/ui';
-import { CircleCheck, Clock, HeartPulse, FileText } from 'lucide-react';
+import { CalendarCheck, CalendarClock, CircleSlash, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
-import { dateRangeLabel, LEAVE_KIND_LABELS, LEAVE_STAFF, LEAVE_STATUS_LABELS } from '@/lib/leave';
+import { dateRangeLabel, LEAVE_KIND_LABELS, LEAVE_STAFF, LEAVE_STATUS_LABELS, todayIn } from '@/lib/leave';
 import { useWorkspace } from '@/lib/workspace';
 
 const t = messages.leavePage;
@@ -43,7 +43,11 @@ const TONE: Record<LeaveRequest['status'], Tone> = { pending: 'telat', approved:
 export default function IzinPage() {
   const { schoolId, hasRole, me } = useWorkspace();
   const staff = hasRole(...LEAVE_STAFF);
-  const [status, setStatus] = useState<'pending' | 'all'>('pending');
+  const timezone = me.schools.find((x) => x.id === schoolId)?.timezone ?? 'Asia/Jakarta';
+  const today = todayIn(timezone);
+  // null = not chosen yet: open on Menunggu when something waits, otherwise on Semua (an empty first table says nothing).
+  const [chosen, setStatus] = useState<StatusFilter | null>(null);
+  const [when, setWhen] = useState<When>('');
   const [kind, setKind] = useState<'' | LeaveKind>('');
   const [query, setQuery] = useState('');
   const [items, setItems] = useState<LeaveRequest[] | null>(null);
@@ -87,13 +91,23 @@ export default function IzinPage() {
     }
   }
 
+  const status: StatusFilter = chosen ?? ((items ?? []).some((l) => l.status === 'pending') ? 'pending' : 'all');
   const q = query.trim().toLowerCase();
   const shown = useMemo(
-    () => (items ?? []).filter((l) => (status === 'all' || l.status === 'pending') && (!kind || l.kind === kind) && (!q || l.student.name.toLowerCase().includes(q) || l.student.className.toLowerCase().includes(q))),
-    [items, status, kind, q],
+    () =>
+      (items ?? []).filter(
+        (l) =>
+          statusMatch(l, status) &&
+          (!kind || l.kind === kind) &&
+          (!when || whenOf(l, today) === when) &&
+          (!q || l.student.name.toLowerCase().includes(q) || l.student.className.toLowerCase().includes(q)),
+      ),
+    [items, status, kind, when, q, today],
   );
   const paged = usePaged(shown, PAGE);
   const count = (f: (l: LeaveRequest) => boolean) => (items ?? []).filter(f).length;
+
+  const onToday = (items ?? []).filter((l) => l.status === 'approved' && whenOf(l, today) === 'today');
 
   return (
     <PageMain width="xl">
@@ -101,25 +115,36 @@ export default function IzinPage() {
         title={t.title}
         subtitle={t.subtitle}
         actions={
-          <Link href="/izin/baru" className={cx(buttonStyles({ size: '48' }), 'no-underline')}>
+          <Link href="/izin/baru" className={cx(buttonStyles(), 'no-underline')}>
             {t.new}
           </Link>
         }
       />
 
       {items && (
-        <ul aria-label={t.summary} className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 xl:grid-cols-4">
+        <ul aria-label={t.summary} className="m-0 grid list-none grid-cols-2 gap-3 p-0 xl:grid-cols-4">
+          <li className="flex">
+            <StatCard
+              className="flex-1"
+              title={t.statToday}
+              tone="izin"
+              icon={CalendarCheck}
+              value={onToday.length}
+              unit={t.students}
+              parts={[
+                { value: onToday.filter((l) => l.kind === 'sakit').length, label: 'sakit' },
+                { value: onToday.filter((l) => l.kind === 'izin').length, label: 'izin' },
+              ]}
+            />
+          </li>
           <li className="flex">
             <StatCard className="flex-1" title={t.pending} tone="telat" icon={Clock} value={count((l) => l.status === 'pending')} unit={t.requests} note={t.pendingNote} />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={LEAVE_KIND_LABELS.sakit} tone="sakit" icon={HeartPulse} value={count((l) => l.kind === 'sakit')} unit={t.requests} />
+            <StatCard className="flex-1" title={t.statUpcoming} tone="papan" icon={CalendarClock} value={count((l) => l.status === 'approved' && whenOf(l, today) === 'upcoming')} unit={t.requests} note={t.upcomingNote} />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={LEAVE_KIND_LABELS.izin} tone="izin" icon={FileText} value={count((l) => l.kind === 'izin')} unit={t.requests} />
-          </li>
-          <li className="flex">
-            <StatCard className="flex-1" title={t.approved} tone="hadir" icon={CircleCheck} value={count((l) => l.status === 'approved')} unit={t.requests} />
+            <StatCard className="flex-1" title={t.statClosed} tone="netral" icon={CircleSlash} value={count((l) => l.status === 'rejected' || l.status === 'cancelled')} unit={t.requests} parts={[{ value: count((l) => l.status === 'rejected'), label: 'ditolak' }, { value: count((l) => l.status === 'cancelled'), label: 'dibatalkan' }]} />
           </li>
         </ul>
       )}
@@ -129,7 +154,7 @@ export default function IzinPage() {
         {...(items ? { aside: t.count.replace('{n}', String(shown.length)) } : {})}
         toolbar={
           <>
-            <SearchBox label={t.search} value={query} onChange={setQuery} className="w-72" />
+            <SearchBox label={t.search} value={query} onChange={setQuery} className="w-64" />
             <label className="flex items-center gap-2 text-small text-tinta-muted">
               {t.kind}
               <Select value={kind} onChange={(e) => setKind(e.target.value as '' | LeaveKind)}>
@@ -138,24 +163,32 @@ export default function IzinPage() {
                 <option value="izin">{LEAVE_KIND_LABELS.izin}</option>
               </Select>
             </label>
-            <SegmentedControl
-              label={t.show}
-              value={status}
-              onChange={setStatus}
-              options={[
-                { value: 'pending', label: t.pending },
-                { value: 'all', label: t.all },
-              ]}
-            />
+            <label className="flex items-center gap-2 text-small text-tinta-muted">
+              {t.when}
+              <Select value={when} onChange={(e) => setWhen(e.target.value as When)}>
+                <option value="">{t.whenAll}</option>
+                <option value="today">{t.whenToday}</option>
+                <option value="upcoming">{t.whenUpcoming}</option>
+                <option value="past">{t.whenPast}</option>
+              </Select>
+            </label>
           </>
         }
         footer={<Pagination page={paged.page} pageCount={paged.pageCount} total={paged.total} size={PAGE} onPage={paged.setPage} />}
       >
+        <div className="max-w-full self-start">
+        <SegmentedControl
+          label={t.show}
+          value={status}
+          onChange={setStatus}
+          options={STATUS_FILTERS.map((f) => ({ value: f, label: f === 'all' ? t.all : LEAVE_STATUS_LABELS[f], count: count((l) => statusMatch(l, f)) }))}
+        />
+        </div>
         {error && <ErrorState headingLevel="h3" title={error} onRetry={() => setAttempt((n) => n + 1)} />}
         {!items && !error && <SkeletonRows count={4} />}
-        {items && shown.length === 0 && <EmptyState bare headingLevel="h3" title={q || kind ? t.noMatch : status === 'pending' ? t.emptyPending : t.empty} />}
+        {items && shown.length === 0 && <EmptyState bare headingLevel="h3" title={q || kind || when ? t.noMatch : status === 'pending' ? t.emptyPending : t.empty} />}
         {shown.length > 0 && (
-          <Table bare caption={t.table} className="min-w-200">
+          <Table bare caption={t.table} className="min-w-220">
             <TableHead>
               <TableRow>
                 <Th>{t.colStudent}</Th>
@@ -163,57 +196,71 @@ export default function IzinPage() {
                 <Th>{t.colDates}</Th>
                 <Th>{t.colReason}</Th>
                 <Th>{t.colStatus}</Th>
-                <Th>{t.colAction}</Th>
+                <Th>
+                  <span className="sr-only">{t.colAction}</span>
+                </Th>
               </TableRow>
             </TableHead>
             <TableBody>
-              {paged.slice.map((l) => (
-                <TableRow key={l.id} aria-label={`Izin ${l.student.name}`}>
-                  <Th scope="row" className="font-normal">
-                    <PersonCell name={l.student.name} detail={l.student.className} />
-                  </Th>
-                  <Td>
-                    <Badge tone={l.kind === 'sakit' ? 'sakit' : 'izin'}>{LEAVE_KIND_LABELS[l.kind]}</Badge>
-                  </Td>
-                  <Td className="whitespace-nowrap">{dateRangeLabel(l.startsOn, l.endsOn)}</Td>
-                  <Td>
-                    <span className="flex max-w-80 flex-col">
-                      <span className="line-clamp-2">“{l.reason}”</span>
-                      <span className="text-small text-tinta-muted">{t.by.replace('{name}', l.requestedBy?.name ?? '-')}</span>
-                    </span>
-                  </Td>
-                  <Td>
-                    <span className="flex flex-col items-start gap-1">
+              {paged.slice.map((l) => {
+                const days = dayCount(l.startsOn, l.endsOn);
+                return (
+                  <TableRow key={l.id} aria-label={`Izin ${l.student.name}`}>
+                    <Th scope="row" className="font-normal">
+                      <PersonCell name={l.student.name} detail={l.student.className} />
+                    </Th>
+                    <Td>
+                      <Badge tone={l.kind === 'sakit' ? 'sakit' : 'izin'}>{LEAVE_KIND_LABELS[l.kind]}</Badge>
+                    </Td>
+                    <Td className="whitespace-nowrap">
+                      {dateRangeLabel(l.startsOn, l.endsOn)}
+                      <span className="block text-small text-tinta-muted">
+                        {t.days.replace('{n}', String(days))}
+                        {whenOf(l, today) === 'today' ? ` · ${t.whenTodayShort}` : ''}
+                      </span>
+                    </Td>
+                    <Td>
+                      <span className="flex max-w-72 flex-col">
+                        <span className="truncate" title={l.reason}>
+                          “{l.reason}”
+                        </span>
+                        <span className="truncate text-small text-tinta-muted">
+                          {t.by.replace('{name}', l.requestedBy?.name ?? '-')}
+                          {l.hasAttachment ? ` · ${t.hasAttachment}` : ''}
+                        </span>
+                      </span>
+                    </Td>
+                    <Td>
                       <Badge tone={TONE[l.status]}>{LEAVE_STATUS_LABELS[l.status]}</Badge>
-                      {l.decidedBy && l.status !== 'pending' && <span className="text-small text-tinta-muted">{l.decidedBy.name}</span>}
-                    </span>
-                  </Td>
-                  <Td>
-                    <span className="flex flex-wrap gap-2">
-                      {l.status === 'pending' && staff && l.requestedBy?.id !== me.user.id && (
-                        <>
-                          <Button size="44" disabled={busy === l.id} onClick={() => void act(l, 'decide', { approve: true })}>
-                            {t.approve}
+                      {l.decidedBy && l.status !== 'pending' && <span className="block truncate text-small text-tinta-muted">{l.decidedBy.name}</span>}
+                    </Td>
+                    <Td>
+                      <span className="flex flex-wrap justify-end gap-1">
+                        {l.status === 'pending' && staff && l.requestedBy?.id !== me.user.id && (
+                          <>
+                            <Button disabled={busy === l.id} onClick={() => void act(l, 'decide', { approve: true })}>
+                              {t.approve}
+                            </Button>
+                            <Button variant="secondary" disabled={busy === l.id} onClick={() => void act(l, 'decide', { approve: false })}>
+                              {t.reject}
+                            </Button>
+                          </>
+                        )}
+                        {l.hasAttachment && (
+                          <Button variant="ghost" onClick={() => void openAttachment(l)}>
+                            {t.attachment}
                           </Button>
-                          <Button size="44" variant="secondary" disabled={busy === l.id} onClick={() => void act(l, 'decide', { approve: false })}>
-                            {t.reject}
+                        )}
+                        {(l.status === 'pending' || l.status === 'approved') && (
+                          <Button variant="ghost" disabled={busy === l.id} onClick={() => void act(l, 'cancel')}>
+                            {t.cancel}
                           </Button>
-                        </>
-                      )}
-                      {l.hasAttachment && (
-                        <Button size="44" variant="ghost" onClick={() => void openAttachment(l)}>
-                          {t.attachment}
-                        </Button>
-                      )}
-                      {(l.status === 'pending' || l.status === 'approved') && (
-                        <Button size="44" variant="ghost" disabled={busy === l.id} onClick={() => void act(l, 'cancel')}>
-                          {t.cancel}
-                        </Button>
-                      )}
-                    </span>
-                  </Td>
-                </TableRow>
-              ))}
+                        )}
+                      </span>
+                    </Td>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         )}
@@ -221,3 +268,11 @@ export default function IzinPage() {
     </PageMain>
   );
 }
+
+type StatusFilter = LeaveRequest['status'] | 'all';
+type When = '' | 'today' | 'upcoming' | 'past';
+const STATUS_FILTERS: StatusFilter[] = ['pending', 'approved', 'rejected', 'cancelled', 'all'];
+const statusMatch = (l: LeaveRequest, f: StatusFilter) => f === 'all' || l.status === f;
+/** ISO dates compare as strings; `today` is the school's date. */
+const whenOf = (l: LeaveRequest, today: string): Exclude<When, ''> => (l.endsOn < today ? 'past' : l.startsOn > today ? 'upcoming' : 'today');
+const dayCount = (from: string, to: string) => Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000) + 1;

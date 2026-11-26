@@ -3,6 +3,7 @@
 import { SessionDetail, TodayResponse, type SessionSummary } from '@absah/contracts';
 import { Banner, EmptyState, ErrorState, GreetingHeader, PageMain, SegmentedControl, SessionGroup, SessionHero, SessionItem, SkeletonRows, StatCard, messages } from '@absah/ui';
 import { CircleCheck, ClipboardList, Clock, Hourglass } from 'lucide-react';
+import { AllSessionsTable, type RowState } from './all-sessions';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
@@ -128,15 +129,31 @@ export default function HariIniPage() {
   const doneCount = groups?.done.filter((s) => s.status !== 'missed').length ?? 0;
   const missedCount = groups?.done.filter((s) => s.status === 'missed').length ?? 0;
   const fillCount = (hero ? 1 : 0) + inProgress.length + toFill.length;
+  const total = data?.sessions.length ?? 0;
+  const allRows = useMemo<{ session: SessionSummary; state: RowState }[]>(
+    () =>
+      groups
+        ? [
+            ...waiting.map((session) => ({ session, state: 'waiting' as const })),
+            ...groups.current.map((session) => ({ session, state: 'now' as const })),
+            ...groups.unfilled.map((session) => ({ session, state: 'fill' as const })),
+            ...groups.next.map((session) => ({ session, state: 'next' as const })),
+            ...groups.done.map((session) => ({ session, state: session.status === 'missed' ? ('missed' as const) : session.status === 'locked' ? ('locked' as const) : ('done' as const) })),
+          ]
+        : [],
+    [groups, waiting],
+  );
+  const table = scope === 'all';
 
   return (
     <PageMain width="xl">
+      <div className="flex flex-wrap items-end justify-between gap-3">
       <GreetingHeader
         date={data ? longDate(data.schoolDate) : ''}
         greeting={`${GREETING[greetingPart(nowMinutes)]}, ${greetingName(me.user.name)}`}
       />
       {canSeeAll && (
-        <div className="self-start">
+        <div>
         <SegmentedControl
           label={t.scope}
           value={scope}
@@ -148,6 +165,7 @@ export default function HariIniPage() {
         />
         </div>
       )}
+      </div>
       {copyFrom && (
         <Banner kind="offline">
           {t.offline.replace('{time}', copyFrom)}
@@ -164,22 +182,27 @@ export default function HariIniPage() {
       )}
       {data && !empty && groups && (
         // Laptop only: on a phone the teacher's screen stays one decision (the card in progress).
-        <ul aria-label={t.summary} className="m-0 hidden list-none grid-cols-4 gap-4 p-0 lg:grid">
+        <ul aria-label={t.summary} className="m-0 hidden list-none grid-cols-4 gap-3 p-0 lg:grid">
           <li className="flex">
-            <StatCard className="flex-1" title={t.statTotal} tone="netral" icon={ClipboardList} value={data.sessions.length} unit={t.sessionsUnit} />
+            <StatCard className="flex-1" title={t.statTotal} tone="papan" icon={ClipboardList} value={total} unit={t.sessionsUnit} meter={total > 0 ? (doneCount + waiting.length) / total : null} note={t.statFilledShare.replace('{n}', String(doneCount + waiting.length))} />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={t.statToFill} tone="telat" icon={Clock} value={fillCount} unit={t.sessionsUnit} {...(missedCount > 0 ? { note: t.statMissed.replace('{n}', String(missedCount)) } : {})} />
+            <StatCard className="flex-1" title={t.statToFill} tone="telat" icon={Clock} value={fillCount} unit={t.sessionsUnit} note={missedCount > 0 ? t.statMissed.replace('{n}', String(missedCount)) : t.statToFillNote} />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={t.statNext} tone="izin" icon={Hourglass} value={groups.next.length} unit={t.sessionsUnit} />
+            <StatCard className="flex-1" title={t.statNext} tone="izin" icon={Hourglass} value={groups.next.length} unit={t.sessionsUnit} note={groups.next[0]?.period ? t.statNextAt.replace('{time}', groups.next[0].period.startsAt.replace(':', '.')) : t.statNoNext} />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={t.statDone} tone="hadir" icon={CircleCheck} value={doneCount + waiting.length} unit={t.sessionsUnit} {...(waiting.length > 0 ? { note: t.statWaiting.replace('{n}', String(waiting.length)) } : {})} />
+            <StatCard className="flex-1" title={t.statDone} tone="hadir" icon={CircleCheck} value={doneCount + waiting.length} unit={t.sessionsUnit} note={waiting.length > 0 ? t.statWaiting.replace('{n}', String(waiting.length)) : t.statAbsent.replace('{n}', String(groups.done.reduce((n, s) => n + s.counts.absent, 0)))} />
           </li>
         </ul>
       )}
-      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[3fr_2fr]">
+      {table && groups && !empty && (
+        <div className="hidden lg:block">
+          <AllSessionsTable rows={allRows} />
+        </div>
+      )}
+      <div className={`grid grid-cols-1 items-start gap-5 lg:grid-cols-[3fr_2fr] ${table ? 'lg:hidden' : ''}`}>
       <div className="flex min-w-0 flex-col gap-5">
       {waiting.length > 0 && (
         <SessionGroup title={t.waitingGroup}>
