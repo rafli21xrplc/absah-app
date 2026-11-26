@@ -31,8 +31,8 @@ export const Kerangka: Story = {
 export const PanelMerek: Story = {
   name: 'Panel merek (layar lebar)',
   render: () => (
-    <div className="flex min-h-dvh">
-      <BrandPanel className="flex w-full" />
+    <div className="flex min-h-dvh bg-kapur-raised">
+      <BrandPanel className="m-3 flex w-full" />
     </div>
   ),
 };

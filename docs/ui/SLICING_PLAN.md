@@ -235,3 +235,12 @@ Permintaan: rombak tata letak CMS agar rapi, fungsional, segar; riset Dribbble a
 - **Keputusan (mudah dibalik)**: HP tetap bilah atas terang (hijau tua di HP memakan layar kecil); item menu 40 px di laptop, 44 px di HP.
 - Tangkapan layar: `docs/ui/cms1/` (terang dan gelap).
 
+
+
+## 14. MA1: halaman masuk mengikuti referensi pengguna
+
+Permintaan: tata letak seperti gambar referensi (formulir kiri, kartu ilustrasi kanan dengan latar titik), warna utama papan, putih yang tidak membosankan.
+- Panel hijau dengan papan kedatangan beranimasi diganti kartu terang dengan diagram fitur; animasi 14 detik dan tombol Jeda dihapus (Motion-UI 9 tidak dipakai lagi di layar masuk).
+- Keputusan (mudah dibalik): tanpa titik karusel (hanya satu slide); tanpa tombol masuk Google/GitHub (Absah tidak punya login pihak ketiga).
+- Tangkapan layar: `docs/ui/ma1/`.
+\n
