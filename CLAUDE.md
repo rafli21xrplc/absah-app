@@ -43,6 +43,12 @@ frontend. Full design: docs/architecture.md. Prompt sequence: docs/prompts.md.
 - Works on cheap Android phones: small bundles, no heavy animation, large text and 44px tap targets.
 - Colors only through tokens in @absah/ui/tokens.css (light + dark).
 
+## UI v3 (V0–V6, docs/ui-v3-audit.md, design/reference/*-v3.png)
+- Staff pages on a laptop use `PageMain width="full"` (max 1440 px), `PageHeader` (title, `DateSwitcher`, "Diperbarui", actions) or `DataHeader` on data pages, and cards from `@absah/ui`: `BoardSection` (title, subtitle, count badge), `StatGroupCard`, `HeroRingCard`, `SummaryCard`, `TrendBarChart`, `ListCardRow`. Card radius `rounded-kartu`, tile `rounded-ubin`, control `rounded-kontrol`; surface `bg-latar-app`, tiles `bg-ubin`, lines `border-hairline`.
+- Every number has a denominator or comparison ("130 dari 308 sesi", "+2,1 poin"). People get an `Avatar` (seed = a stable ID), rombel a square `Chip tone="papan"`, status a `Chip` with icon or `StatusChip` (never colour alone). Row actions are `soft`/`outline` buttons at size 36/40; the page keeps one primary.
+- Long lists: `Table sticky` (head and first column stay), `Pagination` ("Menampilkan a–b dari n"), and filter/search/page in the URL via `lib/url-state.ts` (`useUrlState`, page wrapped in `<Suspense>`).
+- A board block whose data the API does not send stays out of the page (no fixture, no dead button). Its component lives in `@absah/ui` with a story, and the need is listed as TODO(api) in docs/ui-v3-audit.md.
+
 ## Session and workspace in the web
 - Staff pages live in app/(staf) under <WorkspaceProvider> (lib/workspace.tsx): it loads /me/context,
   remembers the chosen school (localStorage, best effort), redirects to /masuk without a session and

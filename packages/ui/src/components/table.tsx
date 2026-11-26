@@ -26,7 +26,7 @@ export function Table({ caption, children, className, bare = false, dense = fals
   return (
     <div role="region" aria-label={caption} tabIndex={0} className={cx(
         'relative overflow-x-auto',
-        bare ? 'rounded-md' : 'card-surface rounded-lg border border-garis bg-kapur-raised',
+        bare ? 'rounded-md' : 'card-surface rounded-kartu border border-transparent bg-kapur-raised',
         dense && '[&_td]:py-2 [&_th]:py-2 [&_thead_th]:whitespace-nowrap',
         sticky &&
           'max-h-[calc(100dvh-10rem)] overflow-y-auto [&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-ubin [&_tbody_tr>*:first-child]:sticky [&_tbody_tr>*:first-child]:left-0 [&_tbody_tr>*:first-child]:z-10 [&_tbody_tr>*:first-child]:bg-kapur-raised [&_thead_th:first-child]:left-0 [&_thead_th:first-child]:z-30',
@@ -40,7 +40,7 @@ export function Table({ caption, children, className, bare = false, dense = fals
 }
 
 export function TableHead({ children }: { children: ReactNode }) {
-  return <thead className="bg-kapur">{children}</thead>;
+  return <thead className="bg-ubin">{children}</thead>;
 }
 
 export function TableBody({ children }: { children: ReactNode }) {
@@ -56,12 +56,12 @@ export function Th({ scope = 'col', className, ...props }: ThHTMLAttributes<HTML
   return (
     <th
       scope={scope}
-      className={cx('border-b border-garis px-3 py-3 text-left', scope === 'row' ? 'text-body-strong' : 'text-small font-semibold text-tinta-muted', className)}
+      className={cx('border-b border-hairline px-4 py-3 text-left', scope === 'row' ? 'text-isi-strong' : 'text-small font-semibold text-tinta-muted', className)}
       {...props}
     />
   );
 }
 
 export function Td({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={cx('border-b border-garis px-3 py-3 align-middle', className)} {...props} />;
+  return <td className={cx('border-b border-hairline px-4 py-3 align-middle text-isi', className)} {...props} />;
 }

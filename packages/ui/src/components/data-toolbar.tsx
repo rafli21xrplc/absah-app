@@ -21,7 +21,7 @@ export interface DataToolbarProps {
 export function DataToolbar({ search, children, actions, className }: DataToolbarProps) {
   return (
     <div className={cx('flex flex-wrap items-center gap-3', className)}>
-      <label className="flex min-h-11 min-w-60 flex-1 items-center gap-2 rounded-md border border-garis-kuat bg-kapur-raised px-3">
+      <label className="flex min-h-11 min-w-60 max-w-120 flex-1 items-center gap-2 rounded-kontrol border border-garis-kuat bg-kapur-raised px-3">
         <Search aria-hidden strokeWidth={1.75} className="size-5 shrink-0 text-tinta-muted" />
         <span className="shrink-0 text-small font-bold text-tinta-muted">{search.label}</span>
         <input
@@ -29,7 +29,7 @@ export function DataToolbar({ search, children, actions, className }: DataToolba
           value={search.value}
           placeholder={search.placeholder}
           onChange={(e) => search.onChange(e.target.value)}
-          className="min-w-0 flex-1 border-0 bg-transparent text-body text-tinta placeholder:text-tinta-muted"
+          className="min-w-0 flex-1 border-0 bg-transparent text-isi text-tinta placeholder:text-tinta-muted"
         />
       </label>
       {children}

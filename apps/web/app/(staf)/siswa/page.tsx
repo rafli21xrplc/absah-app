@@ -1,7 +1,8 @@
 'use client';
 
 import { ClassList, StudentList, StudentListItem } from '@absah/contracts';
-import { Banner, Button, buttonStyles, DataHeader, DataToolbar, EmptyState, ErrorState, ExitDialog, Field, PageMain, SegmentedControl, Select, SkeletonRows, Table, TableBody, TableHead, TableRow, Td, Th, cx, messages } from '@absah/ui';
+import { Avatar, Banner, Button, buttonStyles, Chip, DataHeader, DataToolbar, EmptyState, ErrorState, ExitDialog, Field, PageMain, SegmentedControl, Select, SkeletonRows, Table, TableBody, TableHead, TableRow, Td, Th, cx, messages } from '@absah/ui';
+import { CircleCheck, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
@@ -147,7 +148,7 @@ function StudentsView() {
 
   if (!allowed) {
     return (
-      <PageMain width="xl">
+      <PageMain width="full">
         <h1 className="m-0 text-h1">{t.title}</h1>
         <p role="alert" className="m-0 text-body">
           {d.forbidden}
@@ -158,13 +159,13 @@ function StudentsView() {
 
   const showAction = canManage;
   return (
-    <PageMain width="xl">
+    <PageMain width="full">
       <DataHeader
         title={t.title}
         subtitle={classes.length > 0 ? fill(t.subtitle, { n: classes.length }) : undefined}
         actions={
           canManage && (
-            <Link href="/import" className={cx(buttonStyles({ variant: 'secondary', size: '48' }), 'no-underline')}>
+            <Link href="/import" className={cx(buttonStyles({ variant: 'outline', size: '40' }), 'no-underline')}>
               {t.importAction}
             </Link>
           )
@@ -213,18 +214,33 @@ function StudentsView() {
               {items.map((s) => (
                 <TableRow key={s.id}>
                   <Th scope="row" className="font-normal">
-                    <span className="flex flex-col">
-                      <span className="text-body-strong text-tinta">{s.name}</span>
-                      <span className="text-small text-tinta-muted">{s.nisn ? `NISN ${s.nisn}` : t.noNisn}</span>
+                    <span className="flex items-center gap-3">
+                      <Avatar name={s.name} seed={s.id} size={36} />
+                      <span className="flex min-w-0 flex-col">
+                        <span className="text-isi-strong text-tinta">{s.name}</span>
+                        <span className="text-mini text-tinta-muted">{s.nisn ? `NISN ${s.nisn}` : t.noNisn}</span>
+                      </span>
                     </span>
                   </Th>
-                  <Td className={s.enrollment ? undefined : 'text-tinta-muted'}>{s.enrollment?.className ?? t.noClass}</Td>
+                  <Td>
+                    {s.enrollment ? (
+                      <Chip tone="papan" square>
+                        {s.enrollment.className}
+                      </Chip>
+                    ) : (
+                      <span className="text-tinta-muted">{t.noClass}</span>
+                    )}
+                  </Td>
                   <Td>{s.gender === 'L' ? t.male : s.gender === 'P' ? t.female : '–'}</Td>
                   <Td>
                     {s.enrollment?.missingSince ? (
-                      <span className="text-body-strong text-telat">{t.pillMissing}</span>
+                      <Chip tone="telat" icon={TriangleAlert}>
+                        {t.pillMissing}
+                      </Chip>
                     ) : s.enrollment ? (
-                      <span className="text-body-strong text-hadir">{t.pillActive}</span>
+                      <Chip tone="hadir" icon={CircleCheck}>
+                        {t.pillActive}
+                      </Chip>
                     ) : (
                       <span className="text-tinta-muted">{t.inactive}</span>
                     )}
@@ -232,16 +248,16 @@ function StudentsView() {
                   {showAction && (
                     <Td>
                       <span className="flex flex-wrap items-center gap-2">
-                        <Link href={`/siswa/kontak?id=${s.id}`} aria-label={fill(t.contactOf, { name: s.name })} className="text-body-strong text-papan">
+                        <Link href={`/siswa/kontak?id=${s.id}`} aria-label={fill(t.contactOf, { name: s.name })} className={cx(buttonStyles({ variant: 'soft', size: '36' }), 'no-underline')}>
                           {t.contact}
                         </Link>
                         {s.enrollment?.missingSince && (
-                          <Button variant="secondary" disabled={busy} aria-label={fill(t.stayOf, { name: s.name })} onClick={() => void settle(s, 'active')}>
+                          <Button variant="outline" size="36" disabled={busy} aria-label={fill(t.stayOf, { name: s.name })} onClick={() => void settle(s, 'active')}>
                             {t.stay}
                           </Button>
                         )}
                         {s.enrollment && (
-                          <Button variant="secondary" aria-label={fill(t.exitOf, { name: s.name })} onClick={() => { setFailed(null); setLeaving(s); }}>
+                          <Button variant="outline" size="36" aria-label={fill(t.exitOf, { name: s.name })} onClick={() => { setFailed(null); setLeaving(s); }}>
                             {t.exit}
                           </Button>
                         )}

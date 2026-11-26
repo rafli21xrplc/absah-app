@@ -1,7 +1,7 @@
 'use client';
 
 import { CreateSubjectRequest, Subject, SubjectList } from '@absah/contracts';
-import { Banner, Button, DataHeader, DataToolbar, Drawer, EmptyState, ErrorState, Field, Input, PageMain, SkeletonRows, Table, TableBody, TableHead, TableRow, Td, Th, messages } from '@absah/ui';
+import { Banner, Button, Chip, DataHeader, DataToolbar, Drawer, EmptyState, ErrorState, Field, Input, PageMain, SkeletonRows, Table, TableBody, TableHead, TableRow, Td, Th, messages } from '@absah/ui';
 import { useMemo, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { SCHEDULE_MANAGERS, SCHEDULE_PAGE_READERS } from '@/lib/schedule-access';
@@ -68,7 +68,7 @@ export default function MapelPage() {
 
   if (!allowed) {
     return (
-      <PageMain width="xl">
+      <PageMain width="full">
         <h1 className="m-0 text-h1">{t.title}</h1>
         <p role="alert" className="m-0 text-body">
           {d.forbidden}
@@ -78,7 +78,7 @@ export default function MapelPage() {
   }
 
   return (
-    <PageMain width="xl">
+    <PageMain width="full">
       <DataHeader title={t.title} subtitle={items && items.length > 0 ? fill(t.subtitle, { n: items.length }) : undefined} />
       <DataToolbar
         search={{ label: t.searchLabel, value: q, onChange: setQ, placeholder: t.searchPlaceholder }}
@@ -110,7 +110,7 @@ export default function MapelPage() {
             {shown.map((s) => (
               <TableRow key={s.id}>
                 <Th scope="row">{s.name}</Th>
-                <Td className={s.code ? undefined : 'text-tinta-muted'}>{s.code ?? t.noCode}</Td>
+                <Td>{s.code ? <Chip square>{s.code}</Chip> : <span className="text-tinta-muted">{t.noCode}</span>}</Td>
               </TableRow>
             ))}
           </TableBody>

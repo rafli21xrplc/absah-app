@@ -22,9 +22,9 @@ describe('WeekGrid', () => {
   it('is a table named for the week; every cell is a button that says what is in it', async () => {
     const { container } = render(<WeekGrid label="Jadwal mingguan" days={DAYS} rows={ROWS} onPick={() => undefined} />);
     expect(screen.getByRole('table', { name: 'Jadwal mingguan' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Senin jam 1: Matematika' }).textContent).toContain('Bu Sari D.');
+    expect(screen.getByRole('button', { name: /^Senin jam 1: Matematika,/ }).textContent).toContain('Bu Sari D.');
     // An empty slot says "kosong" in its name, not only in a dashed border.
-    expect(screen.getByRole('button', { name: 'Selasa jam 1: kosong' }).textContent).toContain('—');
+    expect(screen.getByRole('button', { name: /^Selasa jam 1: kosong,/ }).textContent).toContain('—');
     // Friday has no jam 8: no button, not a dead one.
     expect(screen.getAllByRole('button')).toHaveLength(5);
     await expectNoAxeViolations(container);
@@ -33,8 +33,8 @@ describe('WeekGrid', () => {
   it('marks the chosen cell and reports day and jam on a tap', async () => {
     const onPick = vi.fn();
     render(<WeekGrid label="Jadwal mingguan" days={DAYS} rows={ROWS} onPick={onPick} />);
-    expect(screen.getByRole('button', { name: 'Senin jam 8: kosong' }).getAttribute('aria-pressed')).toBe('true');
-    await userEvent.click(screen.getByRole('button', { name: 'Selasa jam 8: kosong' }));
+    expect(screen.getByRole('button', { name: /^Senin jam 8: kosong,/ }).getAttribute('aria-pressed')).toBe('true');
+    await userEvent.click(screen.getByRole('button', { name: /^Selasa jam 8: kosong,/ }));
     expect(onPick).toHaveBeenCalledWith(1, 8);
   });
 

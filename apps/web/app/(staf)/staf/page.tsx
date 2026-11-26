@@ -1,7 +1,9 @@
 'use client';
 
 import { InvitationResponse, SchoolMember, SchoolMembersResponse, STAFF_ROLES, type MembershipStatus, type StaffRole } from '@absah/contracts';
-import { Banner, Button, DataHeader, DataToolbar, Dialog, Drawer, EmptyState, ErrorState, Field, Input, PageMain, SegmentedControl, Select, SkeletonRows, Table, TableBody, TableHead, TableRow, Td, Th, messages } from '@absah/ui';
+import { Avatar, Banner, Button, Chip, DataHeader, DataToolbar, Dialog, Drawer, EmptyState, ErrorState, Field, Input, PageMain, SegmentedControl, Select, SkeletonRows, Table, TableBody, TableHead, TableRow, Td, Th, messages } from '@absah/ui';
+import type { ChipTone } from '@absah/ui';
+import { CircleCheck, CircleSlash, Mail, type LucideIcon } from 'lucide-react';
 import { useMemo, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
 import { toE164 } from '@/lib/phone';
@@ -21,10 +23,10 @@ const FILTERS = [
   { value: 'invited', label: t.statusInvited },
   { value: 'suspended', label: t.statusSuspended },
 ] as const;
-const PILL: Record<MembershipStatus, { text: string; look: string }> = {
-  active: { text: t.pillActive, look: 'text-hadir' },
-  invited: { text: t.pillInvited, look: 'text-telat' },
-  suspended: { text: t.pillSuspended, look: 'text-tinta-muted' },
+const PILL: Record<MembershipStatus, { text: string; tone: ChipTone; icon: LucideIcon }> = {
+  active: { text: t.pillActive, tone: 'hadir', icon: CircleCheck },
+  invited: { text: t.pillInvited, tone: 'telat', icon: Mail },
+  suspended: { text: t.pillSuspended, tone: 'neutral', icon: CircleSlash },
 };
 /** Pembimbing industri comes from the PKL partner flow, not from this list. */
 const INVITE_ROLES = STAFF_ROLES.filter((r) => r !== 'pembimbing_industri');
@@ -56,7 +58,7 @@ export default function StafPage() {
 
   if (!allowed) {
     return (
-      <PageMain width="xl">
+      <PageMain width="full">
         <h1 className="m-0 text-h1">{t.title}</h1>
         <p role="alert" className="m-0 text-body">
           {d.forbidden}
@@ -71,7 +73,7 @@ export default function StafPage() {
       : undefined;
 
   return (
-    <PageMain width="xl">
+    <PageMain width="full">
       <DataHeader title={t.title} subtitle={subtitle} actions={canManage && <Button onClick={() => { setInviteRound((n) => n + 1); setInviteOpen(true); }}>{t.invite}</Button>} />
       {members.length > 0 && (
         <DataToolbar search={{ label: t.searchLabel, value: q, onChange: setQ, placeholder: t.searchPlaceholder }}>
@@ -292,28 +294,33 @@ function MemberTable({ members, canManage, myUserId, onChanged }: { members: Sch
             return (
               <TableRow key={m.membershipId}>
                 <Th scope="row" className="font-normal">
-                  <span className="flex flex-col">
-                    <span className="text-body-strong text-tinta">
-                      {m.name}
-                      {mine && <span className="ml-2 text-small font-normal text-tinta-muted">({t.you})</span>}
+                  <span className="flex items-center gap-3">
+                    <Avatar name={m.name} seed={m.membershipId} size={36} />
+                    <span className="flex min-w-0 flex-col">
+                      <span className="text-isi-strong text-tinta">
+                        {m.name}
+                        {mine && <span className="ml-2 text-small font-normal text-tinta-muted">({t.you})</span>}
+                      </span>
+                      <span className="text-mini text-tinta-muted">{m.email ?? t.noEmail}</span>
                     </span>
-                    <span className="text-small text-tinta-muted">{m.email ?? t.noEmail}</span>
                   </span>
                 </Th>
                 <Td>{role}</Td>
                 <Td>
-                  <span className={`text-body-strong ${pill.look}`}>{pill.text}</span>
+                  <Chip tone={pill.tone} icon={pill.icon}>
+                    {pill.text}
+                  </Chip>
                 </Td>
                 {canManage && (
                   <Td>
                     {/* The API refuses to change one's own membership, and an invitation is not yet an account to switch. */}
                     {!mine && m.status === 'active' && (
-                      <Button variant="secondary" aria-label={fill(t.suspendOf, { name: m.name, role })} onClick={() => { setFailed(null); setAsking(m); }}>
+                      <Button variant="outline" size="36" aria-label={fill(t.suspendOf, { name: m.name, role })} onClick={() => { setFailed(null); setAsking(m); }}>
                         {t.suspend}
                       </Button>
                     )}
                     {!mine && m.status === 'suspended' && (
-                      <Button variant="secondary" disabled={busy} aria-label={fill(t.activateOf, { name: m.name, role })} onClick={() => void change(m, 'active')}>
+                      <Button variant="outline" size="36" disabled={busy} aria-label={fill(t.activateOf, { name: m.name, role })} onClick={() => void change(m, 'active')}>
                         {t.activate}
                       </Button>
                     )}
