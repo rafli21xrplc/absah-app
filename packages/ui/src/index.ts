@@ -65,3 +65,4 @@ export { Chip, StatusChip, type ChipProps, type ChipTone, type StatusChipProps }
 export { DeltaPill, deltaOf, type DeltaDirection, type DeltaMeaning, type DeltaPillProps } from './components/delta-pill';
 export { StackBar, stackLabel, type StackBarProps, type StackPart, type StackTone } from './components/stack-bar';
 export { DateSwitcher, PageHeader, type DateSwitcherProps, type PageHeaderProps } from './components/page-header';
+export { ActivityFeed, Histogram, HeroRingCard, IconChip, ListCardList, ListCardRow, StatGroupCard, TrendBarChart, percentText, trendSummary, type ActivityItem, type HeroRingCardProps, type HistogramBin, type IconTone, type ListCardRowProps, type StatGroupCardProps, type StatTileData, type TrendBarChartProps, type TrendPoint } from './features/papan/v3';

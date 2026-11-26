@@ -53,6 +53,10 @@ export interface BoardSectionProps {
   title: string;
   /** Small line next to the title ("6 sesi", "Peringatan dini dari pola kehadiran"). */
   aside?: ReactNode;
+  /** v3: a line under the title ("Diurutkan dari yang paling lama terlewat"). */
+  subtitle?: ReactNode;
+  /** v3: the list's count as a badge next to the action ("6 sesi"). Lists always say how many. */
+  count?: string;
   /** A button or link at the right of the title. */
   action?: ReactNode;
   state: SectionState;
@@ -64,7 +68,7 @@ export interface BoardSectionProps {
 }
 
 /** One part of the board. A slow or broken part shows its own state and never holds back the others. */
-export function BoardSection({ title, aside, action, state, emptyText, onRetry, children, className }: BoardSectionProps) {
+export function BoardSection({ title, aside, subtitle, count, action, state, emptyText, onRetry, children, className }: BoardSectionProps) {
   const id = `sec-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   const retry = onRetry && (
     <Button variant="secondary" onClick={onRetry}>
@@ -72,15 +76,23 @@ export function BoardSection({ title, aside, action, state, emptyText, onRetry, 
     </Button>
   );
   return (
-    <section aria-labelledby={id} aria-busy={state === 'loading'} className={cx('card-surface box-border flex min-w-0 flex-col gap-3 rounded-lg border border-garis bg-kapur-raised p-5', className)}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h2 id={id} className="m-0 text-body-strong">
-            {title}
-          </h2>
-          {aside && <span className="text-small text-tinta-muted">{aside}</span>}
+    <section aria-labelledby={id} aria-busy={state === 'loading'} className={cx('card-surface box-border flex min-w-0 flex-col gap-4 rounded-kartu border border-transparent bg-kapur-raised p-5', className)}>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="flex min-w-0 flex-col gap-0">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h2 id={id} className="m-0 text-judul-kartu text-tinta">
+              {title}
+            </h2>
+            {aside && <span className="text-small text-tinta-muted">{aside}</span>}
+          </div>
+          {subtitle && <p className="m-0 text-small text-tinta-muted">{subtitle}</p>}
         </div>
-        {state === 'ready' && action}
+        {(count || (state === 'ready' && action)) && (
+          <div className="flex shrink-0 items-center gap-2">
+            {count && <span className="inline-flex h-6 items-center rounded-full bg-stabilo-soft px-2 text-mini font-bold text-on-stabilo-soft">{count}</span>}
+            {state === 'ready' && action}
+          </div>
+        )}
       </div>
       {state === 'loading' && <SkeletonRows count={2} />}
       {state === 'empty' && <EmptyState bare title={emptyText ?? ''} headingLevel="h3" />}
