@@ -3,6 +3,7 @@
 import { LeaveAttachmentLink, LeaveRequest, LeaveRequestList, type LeaveKind } from '@absah/contracts';
 import {
   Badge,
+  CountList,
   Button,
   buttonStyles,
   cx,
@@ -37,6 +38,7 @@ import { useWorkspace } from '@/lib/workspace';
 
 const t = messages.leavePage;
 const PAGE = 10;
+const TODAY_PREVIEW = 6;
 const TONE: Record<LeaveRequest['status'], Tone> = { pending: 'telat', approved: 'hadir', rejected: 'alpa', cancelled: 'netral' };
 
 /** Izin siswa: the wali kelas decides parents' requests and can enter one for them (IZN). PG1: stat cards + one table card. */
@@ -108,6 +110,11 @@ export default function IzinPage() {
   const count = (f: (l: LeaveRequest) => boolean) => (items ?? []).filter(f).length;
 
   const onToday = (items ?? []).filter((l) => l.status === 'approved' && whenOf(l, today) === 'today');
+  // Requests that count (waiting or approved) per rombel, most first.
+  const perClass = [...(items ?? []).filter((l) => l.status === 'pending' || l.status === 'approved').reduce((m, l) => m.set(l.student.className, (m.get(l.student.className) ?? 0) + 1), new Map<string, number>())]
+    .sort((x, y) => y[1] - x[1])
+    .slice(0, 8)
+    .map(([name, n]) => ({ key: name, label: name, value: n, text: t.count.replace('{n}', String(n)) }));
 
   return (
     <PageMain width="xl">
@@ -149,12 +156,27 @@ export default function IzinPage() {
         </ul>
       )}
 
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
       <DataCard
         title={t.listTitle}
         {...(items ? { aside: t.count.replace('{n}', String(shown.length)) } : {})}
         toolbar={
           <>
-            <SearchBox label={t.search} value={query} onChange={setQuery} className="w-64" />
+            <SearchBox label={t.search} value={query} onChange={setQuery} className="w-56" />
+          </>
+        }
+        footer={<Pagination page={paged.page} pageCount={paged.pageCount} total={paged.total} size={PAGE} onPage={paged.setPage} />}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="max-w-full">
+        <SegmentedControl
+          label={t.show}
+          value={status}
+          onChange={setStatus}
+          options={STATUS_FILTERS.map((f) => ({ value: f, label: f === 'all' ? t.all : LEAVE_STATUS_LABELS[f], count: count((l) => statusMatch(l, f)) }))}
+        />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
             <label className="flex items-center gap-2 text-small text-tinta-muted">
               {t.kind}
               <Select value={kind} onChange={(e) => setKind(e.target.value as '' | LeaveKind)}>
@@ -172,28 +194,17 @@ export default function IzinPage() {
                 <option value="past">{t.whenPast}</option>
               </Select>
             </label>
-          </>
-        }
-        footer={<Pagination page={paged.page} pageCount={paged.pageCount} total={paged.total} size={PAGE} onPage={paged.setPage} />}
-      >
-        <div className="max-w-full self-start">
-        <SegmentedControl
-          label={t.show}
-          value={status}
-          onChange={setStatus}
-          options={STATUS_FILTERS.map((f) => ({ value: f, label: f === 'all' ? t.all : LEAVE_STATUS_LABELS[f], count: count((l) => statusMatch(l, f)) }))}
-        />
+        </div>
         </div>
         {error && <ErrorState headingLevel="h3" title={error} onRetry={() => setAttempt((n) => n + 1)} />}
         {!items && !error && <SkeletonRows count={4} />}
         {items && shown.length === 0 && <EmptyState bare headingLevel="h3" title={q || kind || when ? t.noMatch : status === 'pending' ? t.emptyPending : t.empty} />}
         {shown.length > 0 && (
-          <Table bare caption={t.table} className="min-w-220">
+          <Table bare dense caption={t.table} className="min-w-160">
             <TableHead>
               <TableRow>
                 <Th>{t.colStudent}</Th>
-                <Th>{t.colKind}</Th>
-                <Th>{t.colDates}</Th>
+                <Th>{t.colKindDates}</Th>
                 <Th>{t.colReason}</Th>
                 <Th>{t.colStatus}</Th>
                 <Th>
@@ -209,18 +220,18 @@ export default function IzinPage() {
                     <Th scope="row" className="font-normal">
                       <PersonCell name={l.student.name} detail={l.student.className} />
                     </Th>
-                    <Td>
-                      <Badge tone={l.kind === 'sakit' ? 'sakit' : 'izin'}>{LEAVE_KIND_LABELS[l.kind]}</Badge>
-                    </Td>
                     <Td className="whitespace-nowrap">
-                      {dateRangeLabel(l.startsOn, l.endsOn)}
+                      <span className="flex items-center gap-2">
+                        <Badge tone={l.kind === 'sakit' ? 'sakit' : 'izin'}>{LEAVE_KIND_LABELS[l.kind]}</Badge>
+                        {dateRangeLabel(l.startsOn, l.endsOn)}
+                      </span>
                       <span className="block text-small text-tinta-muted">
                         {t.days.replace('{n}', String(days))}
                         {whenOf(l, today) === 'today' ? ` · ${t.whenTodayShort}` : ''}
                       </span>
                     </Td>
                     <Td>
-                      <span className="flex max-w-72 flex-col">
+                      <span className="flex max-w-56 flex-col">
                         <span className="truncate" title={l.reason}>
                           “{l.reason}”
                         </span>
@@ -238,22 +249,22 @@ export default function IzinPage() {
                       <span className="flex flex-wrap justify-end gap-1">
                         {l.status === 'pending' && staff && l.requestedBy?.id !== me.user.id && (
                           <>
-                            <Button disabled={busy === l.id} onClick={() => void act(l, 'decide', { approve: true })}>
+                            <Button aria-label={`${t.approveFull} ${l.student.name}`} disabled={busy === l.id} onClick={() => void act(l, 'decide', { approve: true })}>
                               {t.approve}
                             </Button>
-                            <Button variant="secondary" disabled={busy === l.id} onClick={() => void act(l, 'decide', { approve: false })}>
+                            <Button variant="secondary" aria-label={`${t.rejectFull} ${l.student.name}`} disabled={busy === l.id} onClick={() => void act(l, 'decide', { approve: false })}>
                               {t.reject}
                             </Button>
                           </>
                         )}
                         {l.hasAttachment && (
-                          <Button variant="ghost" onClick={() => void openAttachment(l)}>
-                            {t.attachment}
+                          <Button variant="ghost" aria-label={`${t.attachment} ${l.student.name}`} onClick={() => void openAttachment(l)}>
+                            {t.attachmentShort}
                           </Button>
                         )}
                         {(l.status === 'pending' || l.status === 'approved') && (
-                          <Button variant="ghost" disabled={busy === l.id} onClick={() => void act(l, 'cancel')}>
-                            {t.cancel}
+                          <Button variant="ghost" aria-label={`${t.cancel} ${l.student.name}`} disabled={busy === l.id} onClick={() => void act(l, 'cancel')}>
+                            {t.cancelShort}
                           </Button>
                         )}
                       </span>
@@ -265,6 +276,39 @@ export default function IzinPage() {
           </Table>
         )}
       </DataCard>
+
+      <div className="order-first flex min-w-0 flex-col gap-4 lg:order-none">
+        <DataCard title={t.todayTitle} {...(items ? { aside: t.count.replace('{n}', String(onToday.length)) } : {})}>
+          {onToday.length === 0 ? (
+            <p className="m-0 text-small text-tinta-muted">{t.todayNone}</p>
+          ) : (
+            <ul aria-label={t.todayTitle} className="m-0 flex list-none flex-col p-0">
+              {onToday.slice(0, TODAY_PREVIEW).map((l) => (
+                <li key={l.id} className="flex items-center justify-between gap-2 border-b border-garis py-1 last:border-b-0">
+                  <PersonCell name={l.student.name} detail={`${l.student.className} · ${l.endsOn === today ? t.untilToday : t.until.replace('{date}', dateRangeLabel(l.endsOn, l.endsOn))}`} />
+                  <Badge tone={l.kind === 'sakit' ? 'sakit' : 'izin'}>{LEAVE_KIND_LABELS[l.kind]}</Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+          {onToday.length > TODAY_PREVIEW && (
+            <button
+              type="button"
+              onClick={() => {
+                setStatus('approved');
+                setWhen('today');
+              }}
+              className="cursor-pointer self-start border-0 bg-transparent p-0 text-small font-bold text-papan"
+            >
+              {t.todayAll.replace('{n}', String(onToday.length))}
+            </button>
+          )}
+        </DataCard>
+        <DataCard title={t.perClassTitle} aside={t.perClassAside}>
+          {perClass.length > 0 ? <CountList label={t.perClassTitle} rows={perClass} tone="izin" /> : <p className="m-0 text-small text-tinta-muted">{t.empty}</p>}
+        </DataCard>
+      </div>
+      </div>
     </PageMain>
   );
 }

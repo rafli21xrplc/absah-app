@@ -211,7 +211,8 @@ export default function DasborPage() {
       )}
 
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
-        <DataCard className="lg:col-span-2" title={t.compositionTitle} aside={todayCounts ? fill(t.compositionAside, { n: todayCounts.days }) : undefined}>
+        <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
+        <DataCard title={t.compositionTitle} aside={todayCounts ? fill(t.compositionAside, { n: todayCounts.days }) : undefined}>
           {todayCounts && todayCounts.days > 0 ? (
             <CompositionBar
               label={t.compositionTitle}
@@ -226,16 +227,65 @@ export default function DasborPage() {
           ) : (
             <p className="m-0 text-body text-tinta-muted">{principal.state === 'ready' ? t.noRecapYet : t.loading}</p>
           )}
-          <div className="flex flex-col gap-2 border-t border-garis pt-3">
-            <h3 className="m-0 text-small font-semibold text-tinta-muted">{fill(t.trendTitle, { n: trendBars.length })}</h3>
-            {trendBars.length >= 2 ? (
+          {trendBars.length >= 2 && (
+            <div className="flex flex-col gap-2 border-t border-garis pt-3">
+              <h3 className="m-0 text-small font-semibold text-tinta-muted">{fill(t.trendTitle, { n: trendBars.length })}</h3>
               <StackedBars compact title={fill(t.trendTitle, { n: trendBars.length })} bars={trendBars} legend={[{ label: t.trendPresent, fill: 'bg-papan' }, { label: t.trendAbsent, fill: 'bg-alpa-soft' }]} />
-            ) : (
-              <p className="m-0 text-small text-tinta-muted">{trendBars.length === 1 ? t.trendOne : t.trendEmpty}</p>
-            )}
-          </div>
+            </div>
+          )}
         </DataCard>
-
+        <div id="sesi-belum-diisi" className="flex min-w-0 flex-col">
+          {sessionsState === 'ready' ? (
+            <DataCard
+              title={t.sessionsTitle}
+              aside={[fill(t.sessionsCount, { n: late.length }), principal.data ? sessionsLine(principal.data.sessions) : null].filter(Boolean).join(' · ')}
+              toolbar={<SearchBox label={t.sessionsSearch} value={lateQuery.query} onChange={lateQuery.setQuery} className="w-64" />}
+              footer={<Pagination page={lateQuery.paged.page} pageCount={lateQuery.paged.pageCount} total={lateQuery.paged.total} size={PAGE} onPage={lateQuery.paged.setPage} />}
+            >
+              <Table bare dense caption={t.sessionsTable} className="min-w-140">
+                <TableHead>
+                  <TableRow>
+                    <Th>{t.colTime}</Th>
+                    <Th>{t.colClassSubject}</Th>
+                    <Th>{t.colTeacher}</Th>
+                    <Th>{t.colLate}</Th>
+                    <Th>
+                      <span className="sr-only">{t.colAction}</span>
+                    </Th>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {lateQuery.paged.slice.map((s) => (
+                    <TableRow key={s.id}>
+                      <Td className="whitespace-nowrap">
+                        <span className="text-body-strong">{s.period ? `Jam ${s.period.number}` : '–'}</span>
+                        {s.period && <span className="block text-small text-tinta-muted">{`${dotted(s.period.startsAt)}–${dotted(s.period.endsAt)}`}</span>}
+                      </Td>
+                      <Td>
+                        <span className="text-body-strong">{s.owner.name}</span>
+                        <span className="block text-small text-tinta-muted">{s.subject?.name ?? '–'}</span>
+                      </Td>
+                      <Td>{s.teacher?.name ?? t.noTeacher}</Td>
+                      <Td className="whitespace-nowrap">
+                        <Badge tone="telat">{s.period ? (overdueText(s.period.endsAt, nowMinutes) ?? '–') : '–'}</Badge>
+                      </Td>
+                      <Td className="text-right">
+                        <Link href={`/sesi/${s.id}`} aria-label={`${t.open} ${s.owner.name}${s.subject ? ` · ${s.subject.name}` : ''}`} className="text-body-strong text-papan">
+                          {t.open}
+                        </Link>
+                      </Td>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <p className="m-0 text-small text-tinta-muted">{t.sessionsNote}</p>
+            </DataCard>
+          ) : (
+            <BoardSection title={t.sessionsTitle} aside={principal.data ? sessionsLine(principal.data.sessions) : undefined} state={sessionsState} emptyText={t.sessionsEmpty} onRetry={sessions.reload} />
+          )}
+        </div>
+        </div>
+        <div className="order-first flex min-w-0 flex-col gap-4 lg:order-none">
         <DataCard title={t.tasksTitle}>
           <ul aria-label={t.tasksTitle} className="m-0 flex list-none flex-col p-0">
             <TaskRow
@@ -283,63 +333,8 @@ export default function DasborPage() {
             )}
           </ul>
         </DataCard>
-      </div>
-
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
-        <div id="sesi-belum-diisi" className="flex min-w-0 flex-col lg:col-span-2">
-          {sessionsState === 'ready' ? (
-            <DataCard
-              title={t.sessionsTitle}
-              aside={[fill(t.sessionsCount, { n: late.length }), principal.data ? sessionsLine(principal.data.sessions) : null].filter(Boolean).join(' · ')}
-              toolbar={<SearchBox label={t.sessionsSearch} value={lateQuery.query} onChange={lateQuery.setQuery} className="w-64" />}
-              footer={<Pagination page={lateQuery.paged.page} pageCount={lateQuery.paged.pageCount} total={lateQuery.paged.total} size={PAGE} onPage={lateQuery.paged.setPage} />}
-            >
-              <Table bare caption={t.sessionsTable} className="min-w-140">
-                <TableHead>
-                  <TableRow>
-                    <Th>{t.colTime}</Th>
-                    <Th>{t.colClassSubject}</Th>
-                    <Th>{t.colTeacher}</Th>
-                    <Th>{t.colLate}</Th>
-                    <Th>
-                      <span className="sr-only">{t.colAction}</span>
-                    </Th>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {lateQuery.paged.slice.map((s) => (
-                    <TableRow key={s.id}>
-                      <Td className="whitespace-nowrap">
-                        <span className="text-body-strong">{s.period ? `Jam ${s.period.number}` : '–'}</span>
-                        {s.period && <span className="block text-small text-tinta-muted">{`${dotted(s.period.startsAt)}–${dotted(s.period.endsAt)}`}</span>}
-                      </Td>
-                      <Td>
-                        <span className="text-body-strong">{s.owner.name}</span>
-                        <span className="block text-small text-tinta-muted">{s.subject?.name ?? '–'}</span>
-                      </Td>
-                      <Td>{s.teacher?.name ?? t.noTeacher}</Td>
-                      <Td className="whitespace-nowrap">
-                        <Badge tone="telat">{s.period ? (overdueText(s.period.endsAt, nowMinutes) ?? '–') : '–'}</Badge>
-                      </Td>
-                      <Td className="text-right">
-                        <Link href={`/sesi/${s.id}`} aria-label={`${t.open} ${s.owner.name}${s.subject ? ` · ${s.subject.name}` : ''}`} className="text-body-strong text-papan">
-                          {t.open}
-                        </Link>
-                      </Td>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <p className="m-0 text-small text-tinta-muted">{t.sessionsNote}</p>
-            </DataCard>
-          ) : (
-            <BoardSection title={t.sessionsTitle} aside={principal.data ? sessionsLine(principal.data.sessions) : undefined} state={sessionsState} emptyText={t.sessionsEmpty} onRetry={sessions.reload} />
-          )}
-        </div>
-
-        <div className="flex min-w-0 flex-col gap-4">
           <BoardSection title={t.classesTitle} aside={allClasses ? t.classesAside : t.classesLowest} state={classes.state} emptyText={t.classesEmpty} onRetry={classes.reload}>
-            <BarList columns={1} label={t.classesTitle} items={shownClasses} />
+            <BarList dense columns={1} label={t.classesTitle} items={shownClasses} />
             {ranked.length > CLASS_PREVIEW && (
               <button type="button" onClick={() => setAllClasses((v) => !v)} aria-expanded={allClasses} className="cursor-pointer self-start border-0 bg-transparent p-0 text-small font-bold text-papan">
                 {allClasses ? t.classesFewer : fill(t.classesAll, { n: ranked.length })}
@@ -395,7 +390,7 @@ export default function DasborPage() {
 }
 
 const CLASS_PREVIEW = 6;
-const PAGE = 8;
+const PAGE = 10;
 
 /** Search over the late sessions (rombel, mapel, guru) and pages of ten. */
 function useLateFilter<T extends { owner: { name: string }; subject: { name: string } | null; teacher: { name: string } | null }>(items: T[]) {

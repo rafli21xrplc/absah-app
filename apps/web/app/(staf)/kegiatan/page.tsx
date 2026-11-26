@@ -1,7 +1,7 @@
 'use client';
 
 import { Activity, ActivityList, SchoolMembersResponse, type ActivityKind, type ActivityLocation } from '@absah/contracts';
-import { Badge, Button, cx, DataCard, SegmentedControl, DataHeader, Dialog, EmptyState, ErrorState, Input, messages, PageMain, Pagination, SearchBox, Select, SkeletonRows, StatCard, usePaged } from '@absah/ui';
+import { Badge, Button, CountList, cx, DataCard, SegmentedControl, DataHeader, Dialog, EmptyState, ErrorState, Input, messages, PageMain, Pagination, SearchBox, Select, SkeletonRows, StatCard, usePaged } from '@absah/ui';
 import { CalendarCheck, MapPin, Sparkles, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
@@ -13,7 +13,7 @@ import { todayIn } from '@/lib/leave';
 import { useWorkspace } from '@/lib/workspace';
 
 const t = messages.activityPage;
-const PAGE = 9;
+const PAGE = 8;
 const FORM_ID = 'kegiatan-baru';
 
 /** Kegiatan (KEG-01): managers see and create all; a pembina sees the activities they coach. PG1: stat cards + card grid. */
@@ -92,12 +92,13 @@ export default function KegiatanPage() {
         </ul>
       )}
 
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
       <DataCard
         title={t.listTitle}
         {...(list ? { aside: t.count.replace('{n}', String(shown.length)) } : {})}
         toolbar={
           <>
-            <SearchBox label={t.search} value={query} onChange={setQuery} className="w-64" />
+            <SearchBox label={t.search} value={query} onChange={setQuery} className="w-56" />
             <label className="flex items-center gap-2 text-small text-tinta-muted">
               {t.kind}
               <Select value={kind} onChange={(e) => setKind(e.target.value as '' | ActivityKind)}>
@@ -127,7 +128,7 @@ export default function KegiatanPage() {
         {!list && !error && <SkeletonRows count={3} />}
         {list && shown.length === 0 && <EmptyState bare headingLevel="h3" title={items.length === 0 ? (overseer ? t.emptyManager : t.emptyCoach) : t.noMatch} />}
         {shown.length > 0 && (
-          <ul aria-label={t.listLabel} className="m-0 grid list-none grid-cols-1 gap-3 p-0 md:grid-cols-2 xl:grid-cols-3">
+          <ul aria-label={t.listLabel} className="m-0 grid list-none grid-cols-1 gap-3 p-0 md:grid-cols-2">
             {paged.slice.map((a) => {
               const isToday = a.active && meetsOn(a, today);
               return (
@@ -179,6 +180,43 @@ export default function KegiatanPage() {
           </ul>
         )}
       </DataCard>
+
+      <div className="flex min-w-0 flex-col gap-4">
+        <DataCard title={t.weekTitle} aside={t.weekAside}>
+          <ul aria-label={t.weekTitle} className="m-0 flex list-none flex-col p-0">
+            {DAYS.map((d) => {
+              const on = active.filter((a) => a.days.includes(d));
+              const isToday = d === weekdayOf(today);
+              return (
+                <li key={d} className={cx('flex items-start gap-3 border-b border-garis py-2 last:border-b-0', isToday && 'rounded-md bg-papan-tipis px-2')}>
+                  <span className={cx('w-10 shrink-0 text-small font-bold', isToday ? 'text-papan' : 'text-tinta')}>
+                    {DAY_LABELS[d]}
+                    {isToday && <span className="sr-only"> ({t.todayBadge})</span>}
+                  </span>
+                  <span className="flex min-w-0 flex-1 flex-wrap gap-1">
+                    {on.length === 0 ? <span className="text-small text-tinta-muted">–</span> : on.map((a) => <Badge key={a.id} tone={isToday ? 'papan' : 'netral'}>{a.name}</Badge>)}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </DataCard>
+        <DataCard title={t.topTitle}>
+          {active.length > 0 ? (
+            <CountList
+              label={t.topTitle}
+              tone="izin"
+              rows={[...active]
+                .sort((x, y) => y.memberCount - x.memberCount)
+                .slice(0, 6)
+                .map((a) => ({ key: a.id, label: a.name, detail: KIND_LABELS[a.kind], value: a.memberCount, text: `${a.memberCount} siswa` }))}
+            />
+          ) : (
+            <p className="m-0 text-small text-tinta-muted">{manager ? t.emptyManager : t.emptyCoach}</p>
+          )}
+        </DataCard>
+      </div>
+      </div>
 
       {manager && (
         <Dialog
@@ -374,9 +412,11 @@ function NewActivity({ schoolId, onDone }: { schoolId: string | null; onDone: ()
 function meetsOn(a: { days: number[]; startsOn: string | null; endsOn: string | null }, date: string): boolean {
   if ((a.startsOn && date < a.startsOn) || (a.endsOn && date > a.endsOn)) return false;
   if (a.days.length === 0) return Boolean(a.startsOn || a.endsOn);
-  const weekday = new Date(`${date}T00:00:00Z`).getUTCDay() || 7;
-  return a.days.includes(weekday);
+  return a.days.includes(weekdayOf(date));
 }
+
+/** ISO weekday (1 = Senin) of a school date. */
+const weekdayOf = (date: string) => new Date(`${date}T00:00:00Z`).getUTCDay() || 7;
 
 const FIELD = 'flex flex-col gap-1 text-body-strong';
 const SET = 'm-0 flex flex-wrap gap-2 border-0 p-0';

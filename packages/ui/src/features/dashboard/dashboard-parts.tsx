@@ -263,10 +263,10 @@ export interface DataCardProps {
 /** A white card with a header row (title left, search/filter right), the content, and an optional footer (pagination). */
 export function DataCard({ title, aside, toolbar, footer, children, className }: DataCardProps) {
   return (
-    <section aria-label={title} className={cx('card-surface flex min-w-0 flex-col gap-4 rounded-lg border border-garis bg-kapur-raised p-4 text-tinta lg:p-5', className)}>
+    <section aria-label={title} className={cx('card-surface flex min-w-0 flex-col gap-3 rounded-lg border border-garis bg-kapur-raised p-4 text-tinta', className)}>
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
-          <h2 className="m-0 text-h2">{title}</h2>
+          <h2 className="m-0 text-body-strong">{title}</h2>
           {aside && <span className="text-small text-tinta-muted">{aside}</span>}
         </div>
         {toolbar && <div className="flex flex-wrap items-center gap-2">{toolbar}</div>}
@@ -386,5 +386,40 @@ export function PersonCell({ name, detail }: { name: string; detail?: string }) 
         {detail && <span className="truncate text-small text-tinta-muted">{detail}</span>}
       </span>
     </span>
+  );
+}
+
+export interface CountRow {
+  key: string;
+  label: string;
+  detail?: string;
+  value: number;
+  /** Written next to the bar ("12 izin"); defaults to the number. */
+  text?: string;
+  /** When set, the bar is value / of (20 of 36 filled) instead of a share of the largest row. */
+  of?: number;
+}
+
+/**
+ * A short ranked list with a thin bar per row, scaled to the largest value (per rombel, per jam, per hari). Rows are 36 px; the
+ * numbers are text, the bars decoration.
+ */
+export function CountList({ label, rows, tone = 'papan', max }: { label: string; rows: CountRow[]; tone?: Tone; max?: number }) {
+  const top = max ?? Math.max(1, ...rows.map((r) => r.value));
+  return (
+    <ul aria-label={label} className="m-0 flex list-none flex-col p-0">
+      {rows.map((r) => (
+        <li key={r.key} className="flex min-h-9 items-center gap-3 border-b border-garis py-1 last:border-b-0">
+          <span className="flex w-20 min-w-0 shrink-0 flex-col">
+            <span className="truncate text-small font-semibold">{r.label}</span>
+            {r.detail && <span className="truncate text-small text-tinta-muted">{r.detail}</span>}
+          </span>
+          <span aria-hidden className="block h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-kapur">
+            <span className={cx('block h-full rounded-full', FILL[tone])} style={{ width: `${Math.round((r.value / (r.of && r.of > 0 ? r.of : top)) * 100)}%` }} />
+          </span>
+          <span className="min-w-12 shrink-0 whitespace-nowrap text-right text-small font-bold tabular-nums">{r.text ?? r.value}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
