@@ -1,9 +1,10 @@
 'use client';
 
 import { ClassRecapList, CollectionDashboardList, LeaveRequestList, MbgDaily, MbgForecast, PrincipalDashboard, ReportSemesterList, TodayResponse } from '@absah/contracts';
-import { AlertRow, BarList, BoardSection, buttonStyles, cx, PageMain, StatusBoard, Table, TableBody, TableHead, TableRow, Td, Th, messages, type BarItem, type StatusBoxData } from '@absah/ui';
+import { AlertRow, BarList, BoardSection, buttonStyles, cx, DataCard, PageMain, Pagination, SearchBox, StackedBars, StatCard, Table, TableBody, TableHead, TableRow, Td, Th, messages, usePaged, type BarItem, type StackedBar } from '@absah/ui';
+import { CircleAlert, CircleCheck, ClipboardCheck, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { useCapability } from '@/lib/capabilities';
 import { DASHBOARD_READERS, kindsLine, mbgLine, presentCaption, sessionsLine, warningCode } from '@/lib/dashboard';
@@ -80,6 +81,7 @@ export default function DasborPage() {
   const nowMinutes = minutesOfDay(new Date(tick + offset), timezone);
   const late = sessions.data ? groupToday(sessions.data.sessions, nowMinutes).unfilled : [];
   const sessionsState = sessions.state === 'ready' && late.length === 0 ? 'empty' : sessions.state;
+  const lateQuery = useLateFilter(late);
 
   if (!allowed) {
     return (
@@ -97,16 +99,12 @@ export default function DasborPage() {
 
   const todayCounts = principal.data?.attendance.today;
   const pendingLeave = leave.data?.items.length;
-  const boxes: StatusBoxData[] | null = todayCounts
-    ? [
-        { code: 'H', count: todayCounts.counts.H, ...captionOf(presentCaption(todayCounts, percent) ?? (todayCounts.days === 0 ? t.noRecapYet : undefined)) },
-        { code: 'T', count: todayCounts.counts.T },
-        { code: 'I', count: todayCounts.counts.I, ...captionOf(pendingLeave ? fill(t.pendingLeave, { n: pendingLeave }) : undefined) },
-        { code: 'S', count: todayCounts.counts.S },
-        { code: 'A', count: todayCounts.counts.A },
-      ]
-    : null;
-
+  const trend = principal.data?.attendance.trend ?? [];
+  // "vs kemarin": today's present against the previous school date with a rekap, when today has one.
+  const last = trend.at(-1);
+  const before = trend.at(-2);
+  const delta = last && before && last.date === today ? last.present - before.present : null;
+  const fillRate = principal.data?.sessions;
   const classBars: BarItem[] = (classes.data?.items ?? []).map((c) => ({
     key: c.id,
     label: c.name,
@@ -115,12 +113,13 @@ export default function DasborPage() {
     ...(c.counts.A > 0 ? { flag: `A ${c.counts.A}` } : {}),
     name: c.presentRate === null ? `${c.name}: belum ada presensi` : `${c.name}: ${percent(c.presentRate)} hadir${c.counts.A > 0 ? `, ${c.counts.A} alpa` : ''}`,
   }));
-  const trendBars: BarItem[] = (principal.data?.attendance.trend ?? []).map((p) => ({
+  const trendBars: StackedBar[] = trend.map((p) => ({
     key: p.date,
     label: shortDate(p.date),
-    value: p.presentRate,
-    text: percent(p.presentRate),
-    name: `Kehadiran ${shortDate(p.date)}: ${percent(p.presentRate)}`,
+    segments: [
+      { value: p.present, fill: 'bg-papan', label: t.trendPresent },
+      { value: p.days - p.present, fill: 'bg-alpa-soft', label: t.trendAbsent },
+    ],
   }));
   const atRisk = principal.data?.atRisk;
   const showMbg = Boolean(mbgOn) && hasRole(...MBG_READERS);
@@ -151,52 +150,66 @@ export default function DasborPage() {
         </nav>
       </header>
 
-      {boxes ? (
-        <StatusBoard items={boxes} />
+      {todayCounts ? (
+        <ul aria-label={t.summaryLabel} className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 xl:grid-cols-4">
+          <li className="flex">
+            <StatCard
+              className="flex-1"
+              title={t.cardPresent}
+              tone="hadir"
+              icon={CircleCheck}
+              value={todayCounts.counts.H + todayCounts.counts.T}
+              unit={t.students}
+              {...(delta !== null ? { delta: { text: `${delta > 0 ? '+' : ''}${delta}`, label: t.vsYesterday } } : {})}
+              parts={[
+                { value: todayCounts.counts.H, label: t.onTime },
+                { value: todayCounts.counts.T, label: t.late },
+              ]}
+              note={presentCaption(todayCounts, percent) ?? (todayCounts.days === 0 ? t.noRecapYet : undefined)}
+            />
+          </li>
+          <li className="flex">
+            <StatCard
+              className="flex-1"
+              title={t.cardExcused}
+              tone="izin"
+              icon={FileText}
+              value={todayCounts.counts.I + todayCounts.counts.S}
+              unit={t.students}
+              parts={[
+                { value: todayCounts.counts.I, label: 'Izin' },
+                { value: todayCounts.counts.S, label: 'Sakit' },
+              ]}
+              {...(pendingLeave ? { note: fill(t.pendingLeave, { n: pendingLeave }) } : {})}
+            />
+          </li>
+          <li className="flex">
+            <StatCard className="flex-1" title={t.cardAbsent} tone="alpa" icon={CircleAlert} value={todayCounts.counts.A} unit={t.students} note={t.absentNote} />
+          </li>
+          <li className="flex">
+            <StatCard
+              className="flex-1"
+              title={t.cardSessions}
+              tone="netral"
+              icon={ClipboardCheck}
+              value={fillRate ? `${fillRate.filled}/${fillRate.total}` : '–'}
+              unit={t.sessionsUnit}
+              {...(fillRate ? { parts: [{ value: fillRate.missed, label: t.missed }, { value: fillRate.open, label: t.notDue }] } : {})}
+            />
+          </li>
+        </ul>
       ) : (
         <BoardSection title={t.summaryLabel} state={principal.state === 'ready' ? 'empty' : principal.state} emptyText={t.noRecapYet} onRetry={principal.reload} />
       )}
 
       <div className={cx('grid grid-cols-1 gap-4', showMbg && 'lg:grid-cols-[2fr_1fr]')}>
-        <BoardSection title={t.sessionsTitle} aside={[late.length > 0 ? fill(t.sessionsCount, { n: late.length }) : null, principal.data ? sessionsLine(principal.data.sessions) : null].filter(Boolean).join(' · ') || undefined} state={sessionsState} emptyText={t.sessionsEmpty} onRetry={sessions.reload}>
-          <Table caption={t.sessionsTable} className="min-w-160">
-            <TableHead>
-              <TableRow>
-                <Th>{t.colTime}</Th>
-                <Th>{t.colClass}</Th>
-                <Th>{t.colSubject}</Th>
-                <Th>{t.colTeacher}</Th>
-                <Th>{t.colLate}</Th>
-                <Th>{t.colAction}</Th>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {late.map((s) => (
-                <TableRow key={s.id}>
-                  <Td>
-                    <span className="flex flex-col">
-                      <span className="text-body-strong">{s.period ? `Jam ke-${s.period.number}` : '–'}</span>
-                      {s.period && <span className="whitespace-nowrap text-small text-tinta-muted">{`${dotted(s.period.startsAt)}–${dotted(s.period.endsAt)}`}</span>}
-                    </span>
-                  </Td>
-                  <Td>{s.owner.name}</Td>
-                  <Td>{s.subject?.name ?? '–'}</Td>
-                  <Td>{s.teacher?.name ?? t.noTeacher}</Td>
-                  <Td className="whitespace-nowrap">{s.period ? (overdueText(s.period.endsAt, nowMinutes) ?? '–') : '–'}</Td>
-                  <Td>
-                    <Link href={`/sesi/${s.id}`} aria-label={`${t.open} ${s.owner.name}${s.subject ? ` · ${s.subject.name}` : ''}`} className="text-body-strong text-papan">
-                      {t.open}
-                    </Link>
-                  </Td>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <p className="m-0 text-small text-tinta-muted">
-            {t.sessionsNote}
-          </p>
-        </BoardSection>
-
+        {principal.state === 'ready' && trendBars.length > 0 ? (
+          <DataCard title={fill(t.trendTitle, { n: trendBars.length })} aside={t.trendAside}>
+            <StackedBars title={fill(t.trendTitle, { n: trendBars.length })} bars={trendBars} legend={[{ label: t.trendPresent, fill: 'bg-papan' }, { label: t.trendAbsent, fill: 'bg-alpa-soft' }]} />
+          </DataCard>
+        ) : (
+          <BoardSection title={fill(t.trendTitle, { n: trendBars.length })} state={principal.state === 'ready' ? 'empty' : principal.state} emptyText={t.trendEmpty} onRetry={principal.reload} />
+        )}
         {showMbg && (
           <BoardSection
             title={t.mbgTitle}
@@ -229,6 +242,53 @@ export default function DasborPage() {
           </BoardSection>
         )}
       </div>
+
+
+      {sessionsState === 'ready' ? (
+        <DataCard
+          title={t.sessionsTitle}
+          aside={[fill(t.sessionsCount, { n: late.length }), principal.data ? sessionsLine(principal.data.sessions) : null].filter(Boolean).join(' · ')}
+          toolbar={<SearchBox label={t.sessionsSearch} value={lateQuery.query} onChange={lateQuery.setQuery} className="w-64" />}
+          footer={<Pagination page={lateQuery.paged.page} pageCount={lateQuery.paged.pageCount} total={lateQuery.paged.total} size={PAGE} onPage={lateQuery.paged.setPage} />}
+        >
+          <Table bare caption={t.sessionsTable} className="min-w-160">
+            <TableHead>
+              <TableRow>
+                <Th>{t.colTime}</Th>
+                <Th>{t.colClass}</Th>
+                <Th>{t.colSubject}</Th>
+                <Th>{t.colTeacher}</Th>
+                <Th>{t.colLate}</Th>
+                <Th>{t.colAction}</Th>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {lateQuery.paged.slice.map((s) => (
+                <TableRow key={s.id}>
+                  <Td>
+                    <span className="flex flex-col">
+                      <span className="text-body-strong">{s.period ? `Jam ke-${s.period.number}` : '–'}</span>
+                      {s.period && <span className="whitespace-nowrap text-small text-tinta-muted">{`${dotted(s.period.startsAt)}–${dotted(s.period.endsAt)}`}</span>}
+                    </span>
+                  </Td>
+                  <Td>{s.owner.name}</Td>
+                  <Td>{s.subject?.name ?? '–'}</Td>
+                  <Td>{s.teacher?.name ?? t.noTeacher}</Td>
+                  <Td className="whitespace-nowrap">{s.period ? (overdueText(s.period.endsAt, nowMinutes) ?? '–') : '–'}</Td>
+                  <Td>
+                    <Link href={`/sesi/${s.id}`} aria-label={`${t.open} ${s.owner.name}${s.subject ? ` · ${s.subject.name}` : ''}`} className="text-body-strong text-papan">
+                      {t.open}
+                    </Link>
+                  </Td>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <p className="m-0 text-small text-tinta-muted">{t.sessionsNote}</p>
+        </DataCard>
+      ) : (
+        <BoardSection title={t.sessionsTitle} aside={principal.data ? sessionsLine(principal.data.sessions) : undefined} state={sessionsState} emptyText={t.sessionsEmpty} onRetry={sessions.reload} />
+      )}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {atRisk !== null && (
@@ -268,16 +328,20 @@ export default function DasborPage() {
         <BarList label={t.classesTitle} items={classBars} />
       </BoardSection>
 
-      <BoardSection
-        title={fill(t.trendTitle, { n: trendBars.length })}
-        state={principal.state === 'ready' && trendBars.length === 0 ? 'empty' : principal.state}
-        emptyText={t.trendEmpty}
-        onRetry={principal.reload}
-      >
-        <BarList label={fill(t.trendTitle, { n: trendBars.length })} items={trendBars} />
-      </BoardSection>
     </PageMain>
   );
 }
 
-const captionOf = (caption: string | undefined) => (caption ? { caption } : {});
+const PAGE = 10;
+
+/** Search over the late sessions (rombel, mapel, guru) and pages of ten. */
+function useLateFilter<T extends { owner: { name: string }; subject: { name: string } | null; teacher: { name: string } | null }>(items: T[]) {
+  const [query, setQuery] = useState('');
+  const q = query.trim().toLowerCase();
+  const shown = useMemo(
+    () => (q ? items.filter((s) => [s.owner.name, s.subject?.name, s.teacher?.name].some((v) => v?.toLowerCase().includes(q))) : items),
+    [items, q],
+  );
+  const paged = usePaged(shown, PAGE);
+  return { query, setQuery, paged };
+}

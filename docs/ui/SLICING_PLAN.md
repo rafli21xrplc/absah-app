@@ -251,3 +251,17 @@ Permintaan: tata letak seperti gambar referensi (formulir kiri, kartu ilustrasi 
 - IN1: 35 `<select>` polos (23 berkas) diganti `Select` berpopover; 22 berkas berpindah dari `forms.input` ke `Input`/`Textarea`; kontrol polos sisanya diberi gaya dasar yang sama.
 - Belum (fase berikut, IN2): pemilih tanggal berpopover (kalender) untuk 22 isian `type="date"` dan bulan/jam; kotak centang gaya kustom bila gaya bawaan berwarna papan dirasa kurang; tombol unggah berkas.
 
+## 16. PG1: halaman CMS bergaya kartu (2026-11-26)
+
+Permintaan: sesuaikan Dasbor sekolah, Presensi kelas, Izin siswa, dan Kegiatan dengan referensi (kartu statistik berpita warna, grafik batang bertumpuk, kartu tabel dengan cari/filter/urut, paginasi).
+
+Keputusan (bisa diubah):
+- Komponen baru di `@absah/ui`: `StatCard`, `StackedBars`, `DataCard`, `SearchBox`, `Badge`, `Pagination` + `usePaged`, `PersonCell`; `Table` mendapat `bare`.
+- Dasbor: lima kotak status diganti empat kartu (Hadir = H+T dengan rincian tepat waktu/telat dan "dibanding hari sekolah sebelumnya" dari tren API; Izin dan sakit; Alpa; Sesi terisi). Tren 14 hari menjadi batang bertumpuk hadir/tidak hadir. Tabel sesi belum diisi bisa dicari dan berhalaman.
+- Izin: dimuat sekali dengan `status=all`; Menunggu/Semua, jenis, dan cari menyaring di klien. Kartu daftar menjadi tabel (baris bernama "Izin <nama>").
+- Kegiatan: grid kartu (jenis, nama, tempat, jadwal, pembina, peserta) + dialog "Kegiatan baru".
+- Presensi kelas: HP tidak berubah; laptop mendapat baris statistik dan dua kolom.
+- Tidak dibuat (tidak ada data API): avatar foto, "Work model", filter urut per kolom di server, footer tautan sosial dari referensi.
+
+Bukti: `docs/ui/pg1/*.png` (data contoh dari `pilot:seed` di DB lokal).
+

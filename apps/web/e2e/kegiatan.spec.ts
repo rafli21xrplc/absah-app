@@ -28,6 +28,7 @@ test('Kegiatan: admin membuat ekskul, pembina mengatur peserta dan mengisi prese
 
   // The admin creates Pramuka and appoints the coach.
   await page.goto('/kegiatan');
+  await page.getByRole('button', { name: 'Kegiatan baru' }).click();
   await page.getByLabel('Nama kegiatan').fill('Pramuka');
   await page.getByRole('checkbox', { name: 'Jum' }).check();
   await page.getByRole('button', { name: 'Simpan kegiatan' }).click();

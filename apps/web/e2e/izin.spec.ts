@@ -34,7 +34,7 @@ test('Izin dari wali kelas mengisi sesi; dibatalkan, siswa kembali bisa dipilih'
 
   await page.goto('/izin');
   await page.getByRole('button', { name: 'Semua' }).click();
-  const card = page.getByRole('listitem', { name: 'Izin ADITYA PRATAMA' });
+  const card = page.getByRole('row', { name: 'Izin ADITYA PRATAMA' });
   await card.getByRole('button', { name: 'Batalkan izin' }).click();
   await expect(card).toContainText('Dibatalkan');
 

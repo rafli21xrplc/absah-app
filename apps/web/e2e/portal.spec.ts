@@ -66,7 +66,7 @@ test('Orang tua membuka tautan aksi, mengajukan izin, wali kelas menyetujui, sta
   // The same request, as the wali kelas sees it on /izin.
   await page.goto('/izin');
   await page.getByRole('button', { name: 'Semua' }).click();
-  const request = page.getByRole('listitem', { name: 'Izin ADITYA PRATAMA' });
+  const request = page.getByRole('row', { name: 'Izin ADITYA PRATAMA' });
   await expect(request).toContainText('Disetujui');
 
   // The worker applies the izin: the session shows Sakit, and so does the parent's page.
