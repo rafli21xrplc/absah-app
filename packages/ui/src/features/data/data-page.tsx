@@ -16,7 +16,7 @@ export function DataHeader({ title, subtitle, actions, className }: DataHeaderPr
     <header className={cx('flex flex-wrap items-start justify-between gap-3', className)}>
       <div className="flex min-w-0 flex-col gap-1">
         <h1 className="m-0 text-h1">{title}</h1>
-        {subtitle && <p className="m-0 text-body text-tinta-muted">{subtitle}</p>}
+        {subtitle && <p className="m-0 text-isi text-tinta-muted">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </header>

@@ -64,7 +64,6 @@ export function WeekGrid({ label, days, rows, disabled = false, onPick }: WeekGr
                       type="button"
                       disabled={disabled}
                       aria-pressed={c.selected ?? false}
-                      aria-label={c.label}
                       onClick={() => onPick(i, r.number)}
                       className={cx(
                         CELL,
@@ -72,6 +71,8 @@ export function WeekGrid({ label, days, rows, disabled = false, onPick }: WeekGr
                         c.selected ? 'border-2 border-papan bg-kapur' : c.subject ? 'border-garis bg-kapur-raised' : 'border-dashed border-garis-kuat bg-kapur-raised',
                       )}
                     >
+                      {/* Day and jam first, then what is on screen: the name keeps the visible text (WCAG 2.5.3). */}
+                      <span className="sr-only">{`${c.label}, `}</span>
                       <span className="whitespace-nowrap text-small text-tinta-muted">{c.time}</span>
                       <span className={c.subject ? 'text-body-strong' : 'text-tinta-muted'}>{c.subject ?? '—'}</span>
                       {c.teacher && <span className="text-small text-tinta-muted">{c.teacher}</span>}

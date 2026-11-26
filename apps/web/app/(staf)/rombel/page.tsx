@@ -1,7 +1,7 @@
 'use client';
 
 import { ClassList } from '@absah/contracts';
-import { Banner, buttonStyles, cx, DataHeader, DataToolbar, EmptyState, ErrorState, Field, PageMain, Select, SkeletonRows, Table, TableBody, TableHead, TableRow, Td, Th, messages } from '@absah/ui';
+import { Avatar, Banner, buttonStyles, Chip, cx, DataHeader, DataToolbar, EmptyState, ErrorState, Field, PageMain, Select, SkeletonRows, Table, TableBody, TableHead, TableRow, Td, Th, messages } from '@absah/ui';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { api } from '@/lib/api';
@@ -31,7 +31,7 @@ export default function RombelPage() {
 
   if (!allowed) {
     return (
-      <PageMain width="xl">
+      <PageMain width="full">
         <h1 className="m-0 text-h1">{t.title}</h1>
         <p role="alert" className="m-0 text-body">
           {d.forbidden}
@@ -42,13 +42,13 @@ export default function RombelPage() {
 
   const year = section.data?.academicYear?.name;
   return (
-    <PageMain width="xl">
+    <PageMain width="full">
       <DataHeader
         title={year ? `${t.title} ${year}` : t.title}
         subtitle={items && items.length > 0 ? fill(t.subtitle, { n: items.length }) : undefined}
         actions={
           canManage && (
-            <Link href="/import" className={cx(buttonStyles({ variant: 'secondary', size: '48' }), 'no-underline')}>
+            <Link href="/import" className={cx(buttonStyles({ variant: 'outline', size: '40' }), 'no-underline')}>
               {t.importAction}
             </Link>
           )
@@ -102,17 +102,28 @@ export default function RombelPage() {
             {shown.map((c) => (
               <TableRow key={c.id}>
                 <Th scope="row">
-                  <Link href={`/siswa?rombel=${c.id}`} className="text-papan">
-                    {c.name}
+                  <Link href={`/siswa?rombel=${c.id}`} className="no-underline">
+                    <Chip tone="papan" square className="min-w-14 justify-center">
+                      {c.name}
+                    </Chip>
                   </Link>
                 </Th>
                 <Td>
                   {c.grade}
                   {c.stream ? ` · ${t.streams[c.stream] ?? c.stream}` : ''}
                 </Td>
-                <Td className={c.homeroomTeacher ? undefined : 'text-tinta-muted'}>{c.homeroomTeacher?.name ?? t.noHomeroom}</Td>
-                <Td className="text-right tabular-nums">{c.activeStudents}</Td>
-                <Td className="text-right tabular-nums">{c.missingStudents > 0 ? <span className="text-body-strong text-telat">{c.missingStudents}</span> : 0}</Td>
+                <Td>
+                  {c.homeroomTeacher ? (
+                    <span className="flex items-center gap-2">
+                      <Avatar name={c.homeroomTeacher.name} seed={c.homeroomTeacher.name} size={30} />
+                      {c.homeroomTeacher.name}
+                    </span>
+                  ) : (
+                    <span className="text-tinta-muted">{t.noHomeroom}</span>
+                  )}
+                </Td>
+                <Td className="text-right text-isi-strong tabular-nums">{c.activeStudents}</Td>
+                <Td className="text-right tabular-nums">{c.missingStudents > 0 ? <Chip tone="telat">{c.missingStudents}</Chip> : 0}</Td>
               </TableRow>
             ))}
           </TableBody>

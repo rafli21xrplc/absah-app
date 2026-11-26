@@ -65,7 +65,7 @@ export default function JadwalPage() {
 
   if (!allowed) {
     return (
-      <PageMain width="xl">
+      <PageMain width="full">
         <h1 className="m-0 text-h1">{t.title}</h1>
         <p role="alert" className="m-0 text-body">
           {d.forbidden}
@@ -86,7 +86,7 @@ export default function JadwalPage() {
   const year = data?.classes.academicYear?.name;
 
   return (
-    <PageMain width="xl">
+    <PageMain width="full">
       <DataHeader title={year ? `${t.title} ${year}` : t.title} />
       {daily && <Banner kind="info">{t.dailyNote}</Banner>}
       {section.state === 'offline' && <Banner kind="offline">{d.offlineBody}</Banner>}
