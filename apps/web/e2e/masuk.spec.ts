@@ -142,7 +142,7 @@ test('alamat WhatsApp lama membuka tab Orang tua', async ({ page }) => {
   await expect(page.getByRole('tab', { name: 'Orang tua' })).toHaveAttribute('aria-selected', 'true');
 });
 
-test('layar lebar: panel di samping formulir menyebut bagian Absah yang terhubung, tanpa animasi', async ({ page, isMobile }, info) => {
+test('layar lebar: panel di samping formulir menyebut bagian Absah yang terhubung, bergerak, dan bisa dijeda', async ({ page, isMobile }, info) => {
   test.skip(isMobile, 'panel hanya ada di layar lebar');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/masuk');
@@ -153,10 +153,43 @@ test('layar lebar: panel di samping formulir menyebut bagian Absah yang terhubun
   const form = await page.getByRole('main').boundingBox();
   const side = await panel.boundingBox();
   expect((form?.x ?? 0) < (side?.x ?? 0)).toBe(true);
-  // Only the card's entrance may move; the panel itself is still.
-  const moving = await page.evaluate(() => document.getAnimations().filter((a) => (a.effect as KeyframeEffect | null)?.target?.closest('aside')).length);
+  const states = () =>
+    page.evaluate(() =>
+      document
+        .getAnimations()
+        .filter((a) => ((a.effect as KeyframeEffect | null)?.target as Element | null)?.closest?.('aside'))
+        .filter((a) => a.effect?.getTiming().iterations === Infinity)
+        .map((a) => a.playState),
+    );
+  await expect.poll(async () => (await states()).includes('running')).toBe(true);
+  await page.getByRole('button', { name: 'Jeda animasi panel' }).click();
+  await expect.poll(async () => (await states()).every((s) => s === 'paused')).toBe(true);
+  await page.getByRole('button', { name: 'Putar animasi panel' }).click();
+  await expect.poll(async () => (await states()).includes('running')).toBe(true);
+  if (process.env.SHOTS) {
+    await page.waitForTimeout(2500);
+    await page.screenshot({ path: `${process.env.SHOTS}/masuk-${info.project.name}.png` });
+  }
+});
+
+test('dengan gerak dikurangi, panel diam dan tombol jeda tidak ada', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'panel hanya ada di layar lebar');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/masuk');
+  await expect(page.getByRole('list', { name: 'Yang terhubung di Absah' }).getByRole('listitem')).toHaveCount(8);
+  const moving = await page.evaluate(() => document.getAnimations().filter((a) => ((a.effect as KeyframeEffect | null)?.target as Element | null)?.closest?.('aside')).length);
   expect(moving).toBe(0);
-  if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/masuk-${info.project.name}.png` });
+  await expect(page.getByRole('button', { name: 'Jeda animasi panel' })).toBeHidden();
+});
+
+test('tombol tema di halaman masuk mengganti terang dan gelap', async ({ page }, info) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/masuk');
+  await page.getByRole('button', { name: 'Ganti ke tema gelap' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/masuk-gelap-${info.project.name}.png` });
+  await page.getByRole('button', { name: 'Ganti ke tema terang' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });
 
 test('HP: formulir saja, tanpa panel', async ({ page, isMobile }, info) => {

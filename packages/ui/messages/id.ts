@@ -711,6 +711,8 @@ export const messages = {
     headline: 'Satu sekolah, semua tercatat.',
     headlineBody: 'Presensi, gerbang, izin, dan kabar ke orang tua terhubung di satu tempat.',
     connectLabel: 'Yang terhubung di Absah',
+    pausePanel: 'Jeda animasi panel',
+    playPanel: 'Putar animasi panel',
     connect: ['Kios gerbang', 'Presensi kelas', 'Kabar WhatsApp', 'Izin siswa', 'Rekap', 'Portal orang tua', 'Jadwal', 'Ujian'],
     footerNote: 'Akun dibuat oleh admin sekolah Anda.',
     skip: 'Lewati ke formulir',

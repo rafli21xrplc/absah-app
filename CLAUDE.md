@@ -829,7 +829,7 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 
 ### Halaman masuk (MA1)
 
-- `AuthShell`: formulir di kiri (rata tengah, logo dalam kotak putih di atas judul, latar putih dengan kilau hijau tipis `.auth-sheen`), panel di kanan sebagai kartu (`BrandPanel`, latar titik `.auth-dots`) berisi diagram 8 bagian Absah di sekeliling logo. Panel statis: tidak ada animasi, jadi tidak ada tombol Jeda. Di HP hanya formulir.
+- `AuthShell`: formulir di kiri (rata tengah, logo dalam kotak putih di atas judul, latar putih dengan kilau hijau tipis `.auth-sheen`), panel di kanan sebagai kartu (`BrandPanel`, latar titik `.auth-dots`) berisi diagram 8 bagian Absah di sekeliling logo. Panel bergerak (MA2, kelas `auth-*` di `base.css`): diagram tersusun sekali, lalu garis mengalir dan tiap bagian memancarkan cincin bergiliran (8 detik). Karena lebih dari 5 detik ada tombol jeda di kaki panel; dengan gerak dikurangi tidak ada yang bergerak dan tombolnya hilang. Pojok kanan atas formulir: `ThemeToggle`. Di HP hanya formulir (plus tombol tema).
 - Bagian diagram adalah daftar sungguhan (`Yang terhubung di Absah`), garisnya dekorasi.
 
 ### Selesai berarti

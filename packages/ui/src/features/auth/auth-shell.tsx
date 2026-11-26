@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { messages } from '../../../messages/id';
 import { cx } from '../../cx';
+import { ThemeToggle } from '../../components/theme-toggle';
 import { BrandMark, BrandPanel } from './brand';
 
 export interface AuthShellProps {
@@ -24,8 +25,12 @@ export function AuthShell({ children, panel = true, footer, className }: AuthShe
           {messages.auth.skip}
         </a>
       </nav>
-      <main id="isi-masuk" className="auth-sheen box-border flex min-w-0 flex-1 flex-col items-center px-4 py-8 lg:px-8">
-        <div className="flex w-full flex-1 flex-col items-center justify-center">
+      <main id="isi-masuk" className="auth-sheen relative box-border flex min-w-0 flex-1 flex-col items-center px-4 py-8 lg:px-8">
+        {/* Light or dark before signing in: the same choice as in the account menu (saved on this device). */}
+        <div className="absolute right-4 top-4 lg:right-6 lg:top-6">
+          <ThemeToggle />
+        </div>
+        <div className="flex w-full flex-1 flex-col items-center justify-center pt-10 lg:pt-0">
           <div className={cx('motion-card-in flex w-full max-w-100 flex-col gap-6', className)}>
             <span className="card-surface mx-auto flex size-14 items-center justify-center rounded-lg border border-garis bg-kapur-raised">
               <BrandMark size={36} />

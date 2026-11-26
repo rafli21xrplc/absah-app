@@ -92,7 +92,7 @@ describe('RoleTabs and AuthShell', () => {
     expect(onValueChange).toHaveBeenCalledWith('b');
   });
 
-  it('has the form as its main landmark, names what Absah connects, and passes axe', async () => {
+  it('has the form as its main landmark, names what Absah connects, can pause the panel, offers the theme, and passes axe', async () => {
     const { container } = render(
       <AuthShell>
         <h1>Masuk ke Absah</h1>
@@ -102,7 +102,12 @@ describe('RoleTabs and AuthShell', () => {
     const parts = screen.getByRole('list', { name: 'Yang terhubung di Absah' });
     expect(parts.querySelectorAll('li')).toHaveLength(8);
     expect(parts.textContent).toContain('Kios gerbang');
-    expect(screen.queryByRole('button', { name: 'Jeda animasi' })).toBeNull();
+    const pause = screen.getByRole('button', { name: 'Jeda animasi panel' });
+    await userEvent.click(pause);
+    expect(container.querySelector('.auth-paused')).not.toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Putar animasi panel' }));
+    expect(container.querySelector('.auth-paused')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Ganti ke tema gelap' })).toBeTruthy();
     await expectNoAxeViolations(container);
   });
 });

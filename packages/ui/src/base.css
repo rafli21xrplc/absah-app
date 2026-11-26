@@ -216,7 +216,73 @@ a {
   animation: absah-caret 1s steps(1) infinite;
 }
 
+/* Sign-in panel (MA1/MA2, takes the place of Motion-UI 9 Auth-masuk). Once: the lines fade in, the eight parts pop in one
+   after another, the mark last. Then, looping: the dashes flow and one part after another sends a soft ring, 8 s around. The
+   loop runs longer than 5 s, so the panel has a pause button (class auth-paused); with reduced motion nothing moves and the
+   button is gone. */
+@keyframes absah-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes absah-flow {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+@keyframes absah-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  12% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+.auth-line {
+  animation:
+    absah-fade 600ms var(--ease-masuk) both,
+    absah-flow 1.4s linear 600ms infinite;
+}
+.auth-node {
+  animation: absah-pop var(--motion-masuk) var(--ease-masuk) both;
+  animation-delay: calc(300ms + var(--n, 0) * 90ms);
+}
+.auth-node::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 2px solid var(--papan);
+  opacity: 0;
+  pointer-events: none;
+  animation: absah-ping 8s var(--ease-masuk) infinite;
+  animation-delay: calc(1.4s + var(--n, 0) * 1s);
+}
+.auth-hub {
+  animation: absah-pop var(--motion-rayakan) var(--ease-masuk) 1.1s both;
+}
+.auth-paused,
+.auth-paused *,
+.auth-paused *::after {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .auth-line,
+  .auth-node,
+  .auth-node::after,
+  .auth-hub {
+    animation: none !important;
+  }
+  .auth-pause {
+    display: none !important;
+  }
   .motion-caret {
     animation: none !important;
   }
