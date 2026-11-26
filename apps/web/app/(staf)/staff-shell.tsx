@@ -179,9 +179,9 @@ export function StaffShell({ children }: { children: ReactNode }) {
       }
       sidebarHeader={
         <>
-          <span className="flex items-center gap-2 px-1">
-            <BrandMark size={28} tone="on-papan" />
-            <span className="text-h2 font-bold text-on-sidebar">{t.brand}</span>
+          <span className="flex items-center gap-2 px-1 lg:max-xl:px-0">
+            <BrandMark size={32} />
+            <span className="text-h2 font-bold text-on-sidebar lg:max-xl:sr-only">{t.brand}</span>
           </span>
           <SchoolSwitcher schools={choices} activeId={school.id} onSelect={selectSchool} />
         </>
@@ -191,7 +191,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
           <div className="min-w-0 flex-1">
             <Breadcrumbs items={crumbs} linkAs={MenuLink} />
           </div>
-          <SearchTrigger className="max-w-sm" onClick={() => setPaletteOpen(true)} />
+          <SearchTrigger className="max-w-80" onClick={() => setPaletteOpen(true)} />
           <ThemeToggle />
         </>
       }

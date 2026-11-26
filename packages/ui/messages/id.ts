@@ -882,6 +882,12 @@ export const messages = {
     next: 'Halaman berikutnya',
     page: 'Halaman {n}',
   },
+  pageHeader: {
+    date: 'Tanggal',
+    prevDay: 'Hari sebelumnya',
+    nextDay: 'Hari berikutnya',
+    updated: 'Diperbarui',
+  },
   breadcrumb: {
     label: 'Lokasi',
     home: 'Beranda',

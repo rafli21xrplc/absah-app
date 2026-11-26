@@ -44,10 +44,18 @@ describe('SideNav', () => {
 
   it('marks the current item bold, filled and with a bar, not by colour alone', () => {
     render(<SideNav groups={groups('hari-ini')} />);
-    const cls = screen.getByRole('link', { name: 'Presensi kelas' }).className;
-    expect(cls).toContain('font-bold');
-    expect(cls).toContain('border-papan');
-    expect(cls).toContain('bg-papan-soft');
+    const link = screen.getByRole('link', { name: 'Presensi kelas' });
+    expect(link.className).toContain('font-bold');
+    expect(link.className).toContain('bg-papan-soft');
+    // The 4 px bar on the left edge (v3).
+    expect(link.querySelector('.bg-papan.w-1')).toBeTruthy();
+  });
+
+  it('names a count badge in words and keeps the label as the link name', () => {
+    const base = groups('hari-ini');
+    const withBadge = base.map((g) => ({ ...g, items: g.items.map((i, n) => (n === 0 ? { ...i, badge: { count: 4, tone: 'stabilo' as const, label: '4 izin menunggu' } } : i)) }));
+    render(<SideNav groups={withBadge} />);
+    expect(screen.getAllByText('4 izin menunggu').length).toBeGreaterThan(0);
   });
 
   it('every link is at least 44 px high', () => {

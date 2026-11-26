@@ -5,6 +5,7 @@ import { lazy, Suspense, useState, type ComponentProps, type ReactNode } from 'r
 import { messages } from '../../messages/id';
 import { cx } from '../cx';
 import { Avatar } from './avatar';
+import { initials } from './initials';
 import { useWideScreen } from './use-wide-screen';
 
 // The two menus in the side column (school and account) open as popovers. Radix popover is a separate chunk (~35 kB): the
@@ -27,9 +28,9 @@ export function AccountSummary({ name, detail, email, tone = 'light' }: { name: 
   return (
     <span className="flex min-w-0 items-center gap-3">
       <Avatar name={name} size={36} />
-      <span className="flex min-w-0 flex-col">
-        <span className="truncate text-body-strong">{name}</span>
-        {(detail || email) && <span className={cx('truncate text-small', tone === 'sidebar' ? 'text-sidebar-muted' : 'text-tinta-muted')}>{detail ?? email}</span>}
+      <span className={cx('flex min-w-0 flex-col', tone === 'sidebar' && 'lg:max-xl:sr-only')}>
+        <span className="truncate text-isi-strong">{name}</span>
+        {(detail || email) && <span className={cx('truncate text-mini', tone === 'sidebar' ? 'text-sidebar-muted' : 'text-tinta-muted')}>{detail ?? email}</span>}
       </span>
     </span>
   );
@@ -47,16 +48,23 @@ interface SchoolSwitcherProps {
   onSelect: (id: string) => void;
 }
 
-// The school card only lives on the dark green column (the phone sheet keeps a Select).
-const cardStyles = 'box-border flex w-full min-h-14 items-center justify-between gap-2 rounded-md border border-sidebar-garis bg-sidebar-hover px-3 py-2 text-left text-on-sidebar';
+// The school card only lives in the side column (the phone sheet keeps a Select). v3: tinted card, initials, name over detail.
+// In the icon rail (1024-1279 px) only the initials show; the name stays for screen readers.
+const cardStyles =
+  'box-border flex w-full min-h-14 items-center justify-between gap-2 rounded-ubin border-0 bg-sidebar-hover px-2 py-2 text-left text-on-sidebar lg:max-xl:justify-center lg:max-xl:bg-transparent lg:max-xl:p-0';
 
-/** The school card as plain content: name over level. */
+/** The school card as plain content: initials, name over level. */
 export function SchoolCard({ school, children }: { school: SchoolChoice; children?: ReactNode }) {
   return (
     <>
-      <span className="flex min-w-0 flex-col">
-        <span className="truncate text-body-strong">{school.name}</span>
-        {school.detail && <span className="truncate text-small text-sidebar-muted">{school.detail}</span>}
+      <span className="flex min-w-0 items-center gap-3">
+        <span aria-hidden className="inline-flex size-9 shrink-0 items-center justify-center rounded-md bg-papan text-mini font-bold text-on-papan">
+          {initials(school.name)}
+        </span>
+        <span className="flex min-w-0 flex-col lg:max-xl:sr-only">
+          <span className="truncate text-isi-strong">{school.name}</span>
+          {school.detail && <span className="truncate text-mini text-sidebar-muted">{school.detail}</span>}
+        </span>
       </span>
       {children}
     </>
@@ -67,7 +75,7 @@ export function SchoolTrigger({ school, ...props }: ComponentProps<'button'> & {
   return (
     <button type="button" aria-haspopup="dialog" {...props} className={cx(cardStyles, 'cursor-pointer hover:border-sidebar-muted')}>
       <SchoolCard school={school}>
-        <ChevronsUpDown aria-hidden strokeWidth={1.75} className="size-4 shrink-0 text-sidebar-muted" />
+        <ChevronsUpDown aria-hidden strokeWidth={1.75} className="size-4 shrink-0 text-sidebar-muted lg:max-xl:hidden" />
       </SchoolCard>
       <span className="sr-only">{t.switchSchool}</span>
     </button>
@@ -105,10 +113,10 @@ export function AccountTrigger({ name, detail, ...props }: ComponentProps<'butto
       type="button"
       aria-haspopup="dialog"
       {...props}
-      className="box-border flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border-0 bg-transparent p-2 text-left text-on-sidebar hover:bg-sidebar-hover"
+      className="box-border flex w-full cursor-pointer items-center justify-between gap-2 rounded-ubin border-0 bg-sidebar-hover p-2 text-left text-on-sidebar hover:bg-sidebar-aktif lg:max-xl:justify-center lg:max-xl:bg-transparent lg:max-xl:p-0"
     >
       <AccountSummary name={name} tone="sidebar" {...(detail ? { detail } : {})} />
-      <ChevronsUpDown aria-hidden strokeWidth={1.75} className="size-4 shrink-0 text-sidebar-muted" />
+      <ChevronsUpDown aria-hidden strokeWidth={1.75} className="size-4 shrink-0 text-sidebar-muted lg:max-xl:hidden" />
       <span className="sr-only">{t.accountMenu}</span>
     </button>
   );

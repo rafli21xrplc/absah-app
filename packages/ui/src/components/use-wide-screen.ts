@@ -16,3 +16,18 @@ function subscribe(onChange: () => void) {
 export function useWideScreen(): boolean {
   return useSyncExternalStore(subscribe, () => typeof matchMedia === 'function' && matchMedia(WIDE).matches, () => false);
 }
+
+/** 1024 to 1279 px: the side menu shrinks to a 72 px column of icons (labels as tooltips and accessible names). */
+export const RAIL = '(min-width: 1024px) and (max-width: 1279px)';
+
+function subscribeRail(onChange: () => void) {
+  if (typeof matchMedia !== 'function') return () => undefined;
+  const query = matchMedia(RAIL);
+  query.addEventListener('change', onChange);
+  return () => query.removeEventListener('change', onChange);
+}
+
+/** True while the side menu is the icon rail. False on the server (the CSS still draws the rail; this only opens every group). */
+export function useRailScreen(): boolean {
+  return useSyncExternalStore(subscribeRail, () => typeof matchMedia === 'function' && matchMedia(RAIL).matches, () => false);
+}
