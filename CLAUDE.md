@@ -838,6 +838,14 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - `<select>` tersembunyi di dalam `Select` berpopover kini berada SETELAH tombolnya: `<label>` yang membungkus seluruh kontrol menamai anak pertamanya yang bisa diberi label, yaitu tombol. Helper e2e `choose()` mencari select di kedua sisi.
 - Kontrol yang ditulis polos (tanpa kelas apa pun) mendapat gaya yang sama dari `base.css` (tinggi 44 px, garis kuat, radius md); kotak centang dan radio memakai warna papan dan ukuran 20 px. Kontrol dengan kelas apa pun dibiarkan pada kelasnya.
 
+### Halaman CMS bergaya kartu (PG1)
+
+- Dasbor sekolah, Presensi kelas, Izin siswa, dan Kegiatan mengikuti satu pola: baris `StatCard` (pita berwarna + ikon + kata, angka besar, rincian di bawah), lalu `DataCard` (judul kiri; `SearchBox`, filter `Select`, `SegmentedControl` kanan) berisi `Table bare` atau grid kartu, dan `Pagination` (`usePaged`, 10 per halaman) di kaki. Semuanya di `packages/ui/src/features/dashboard/dashboard-parts.tsx`.
+- Angka di kartu hanya dari API atau hitungan sederhana atas daftar yang sudah dimuat (jumlah per status/jenis); tidak ada rekap yang dihitung klien. Pencarian dan filter berjalan di klien atas daftar yang sudah dimuat (izin dimuat `status=all` sekali).
+- `StackedBars` menggambar tren dan menyertakan tabel `sr-only` dengan angka yang sama; gambarnya `aria-hidden`.
+- Presensi kelas: di HP tetap satu kolom dan satu keputusan (kartu yang sedang berlangsung); baris statistik dan dua kolom (perlu diisi | berikutnya + selesai) hanya mulai 1024 px.
+- Kegiatan baru dibuat di `Dialog` (tombol "Simpan kegiatan" di kaki dialog memakai `form=`), bukan formulir di bawah daftar.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

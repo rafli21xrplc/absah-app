@@ -1,7 +1,8 @@
 'use client';
 
 import { SessionDetail, TodayResponse, type SessionSummary } from '@absah/contracts';
-import { Banner, EmptyState, ErrorState, GreetingHeader, PageMain, SegmentedControl, SessionGroup, SessionHero, SessionItem, SkeletonRows, messages } from '@absah/ui';
+import { Banner, EmptyState, ErrorState, GreetingHeader, PageMain, SegmentedControl, SessionGroup, SessionHero, SessionItem, SkeletonRows, StatCard, messages } from '@absah/ui';
+import { CircleCheck, ClipboardList, Clock, Hourglass } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
@@ -124,14 +125,18 @@ export default function HariIniPage() {
   const link = (s: SessionSummary) => `/sesi/${s.id}`;
   const showTeacher = scope === 'all';
   const empty = data?.sessions.length === 0;
+  const doneCount = groups?.done.filter((s) => s.status !== 'missed').length ?? 0;
+  const missedCount = groups?.done.filter((s) => s.status === 'missed').length ?? 0;
+  const fillCount = (hero ? 1 : 0) + inProgress.length + toFill.length;
 
   return (
-    <PageMain>
+    <PageMain width="xl">
       <GreetingHeader
         date={data ? longDate(data.schoolDate) : ''}
         greeting={`${GREETING[greetingPart(nowMinutes)]}, ${greetingName(me.user.name)}`}
       />
       {canSeeAll && (
+        <div className="self-start">
         <SegmentedControl
           label={t.scope}
           value={scope}
@@ -141,6 +146,7 @@ export default function HariIniPage() {
             { value: 'all', label: t.scopeAll },
           ]}
         />
+        </div>
       )}
       {copyFrom && (
         <Banner kind="offline">
@@ -156,6 +162,25 @@ export default function HariIniPage() {
       {empty && (
         <EmptyState title={scope === 'mine' ? t.empty : t.emptyAll}>{scope === 'mine' ? t.emptyBody : t.emptyAllBody}</EmptyState>
       )}
+      {data && !empty && groups && (
+        // Laptop only: on a phone the teacher's screen stays one decision (the card in progress).
+        <ul aria-label={t.summary} className="m-0 hidden list-none grid-cols-4 gap-4 p-0 lg:grid">
+          <li className="flex">
+            <StatCard className="flex-1" title={t.statTotal} tone="netral" icon={ClipboardList} value={data.sessions.length} unit={t.sessionsUnit} />
+          </li>
+          <li className="flex">
+            <StatCard className="flex-1" title={t.statToFill} tone="telat" icon={Clock} value={fillCount} unit={t.sessionsUnit} {...(missedCount > 0 ? { note: t.statMissed.replace('{n}', String(missedCount)) } : {})} />
+          </li>
+          <li className="flex">
+            <StatCard className="flex-1" title={t.statNext} tone="izin" icon={Hourglass} value={groups.next.length} unit={t.sessionsUnit} />
+          </li>
+          <li className="flex">
+            <StatCard className="flex-1" title={t.statDone} tone="hadir" icon={CircleCheck} value={doneCount + waiting.length} unit={t.sessionsUnit} {...(waiting.length > 0 ? { note: t.statWaiting.replace('{n}', String(waiting.length)) } : {})} />
+          </li>
+        </ul>
+      )}
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[3fr_2fr]">
+      <div className="flex min-w-0 flex-col gap-5">
       {waiting.length > 0 && (
         <SessionGroup title={t.waitingGroup}>
           {waiting.map((s) => (
@@ -178,6 +203,8 @@ export default function HariIniPage() {
           ))}
         </SessionGroup>
       )}
+      </div>
+      <div className="flex min-w-0 flex-col gap-5">
       {groups && groups.next.length > 0 && (
         <SessionGroup title={t.next}>
           {groups.next.map((s) => (
@@ -200,6 +227,8 @@ export default function HariIniPage() {
           ))}
         </SessionGroup>
       )}
+      </div>
+      </div>
     </PageMain>
   );
 }

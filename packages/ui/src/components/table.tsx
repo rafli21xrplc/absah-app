@@ -7,15 +7,17 @@ export interface TableProps {
   children: ReactNode;
   /** On the <table>, e.g. a minimum width so a wide table scrolls instead of squeezing. */
   className?: string;
+  /** Inside a card that already has the border and shadow (DataCard): no second card around the table. */
+  bare?: boolean;
 }
 
 /**
  * A real <table> in a rounded card. The wrapper scrolls sideways when the table is wider than the screen, so it is a named
  * region that can take focus (keyboard users can scroll it).
  */
-export function Table({ caption, children, className }: TableProps) {
+export function Table({ caption, children, className, bare = false }: TableProps) {
   return (
-    <div role="region" aria-label={caption} tabIndex={0} className="card-surface overflow-x-auto rounded-lg border border-garis bg-kapur-raised">
+    <div role="region" aria-label={caption} tabIndex={0} className={cx('overflow-x-auto', bare ? 'rounded-md' : 'card-surface rounded-lg border border-garis bg-kapur-raised')}>
       <table className={cx('w-full border-collapse text-left text-body text-tinta', className)}>
         <caption className="sr-only">{caption}</caption>
         {children}
