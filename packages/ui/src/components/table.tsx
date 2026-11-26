@@ -11,15 +11,26 @@ export interface TableProps {
   bare?: boolean;
   /** Rows 8 px shorter (py-2 instead of py-3): for the dense lists of the CMS pages (PG3). */
   dense?: boolean;
+  /**
+   * v3 DataTable: the head stays on top and the first column stays at the left while the table scrolls inside its own box
+   * (at most the screen's height), so long text is never cut off and the names stay in view.
+   */
+  sticky?: boolean;
 }
 
 /**
  * A real <table> in a rounded card. The wrapper scrolls sideways when the table is wider than the screen, so it is a named
  * region that can take focus (keyboard users can scroll it).
  */
-export function Table({ caption, children, className, bare = false, dense = false }: TableProps) {
+export function Table({ caption, children, className, bare = false, dense = false, sticky = false }: TableProps) {
   return (
-    <div role="region" aria-label={caption} tabIndex={0} className={cx('relative overflow-x-auto', bare ? 'rounded-md' : 'card-surface rounded-lg border border-garis bg-kapur-raised', dense && '[&_td]:py-2 [&_th]:py-2 [&_thead_th]:whitespace-nowrap')}>
+    <div role="region" aria-label={caption} tabIndex={0} className={cx(
+        'relative overflow-x-auto',
+        bare ? 'rounded-md' : 'card-surface rounded-lg border border-garis bg-kapur-raised',
+        dense && '[&_td]:py-2 [&_th]:py-2 [&_thead_th]:whitespace-nowrap',
+        sticky &&
+          'max-h-[calc(100dvh-10rem)] overflow-y-auto [&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-ubin [&_tbody_tr>*:first-child]:sticky [&_tbody_tr>*:first-child]:left-0 [&_tbody_tr>*:first-child]:z-10 [&_tbody_tr>*:first-child]:bg-kapur-raised [&_thead_th:first-child]:left-0 [&_thead_th:first-child]:z-30',
+      )}>
       <table className={cx('w-full border-collapse text-left text-body text-tinta', className)}>
         <caption className="sr-only">{caption}</caption>
         {children}
