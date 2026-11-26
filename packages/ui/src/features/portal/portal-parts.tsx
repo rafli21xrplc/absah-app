@@ -38,7 +38,7 @@ export function ChildTabs({ items, selectedKey, onSelect, children }: { items: r
 const CHIP = 'inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-small font-bold';
 
 /** A small status for a list of days: letter, word and colour. `null` = nothing recorded, said in words. */
-export function StatusChip({ code, empty = 'Belum tercatat' }: { code: StatusCode | null; empty?: string }) {
+export function PortalStatusChip({ code, empty = 'Belum tercatat' }: { code: StatusCode | null; empty?: string }) {
   if (!code) return <span className={cx(CHIP, 'border-[1.5px] border-dashed border-garis-kuat bg-kapur-raised text-tinta-muted')}>{empty}</span>;
   const { huruf, kata } = statusTokens(code);
   return (

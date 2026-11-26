@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Card } from '../../components/card';
 import { PageMain } from '../../components/frames';
 import { SegmentedControl } from '../../components/segmented-control';
-import { ChildTabs, CountsRow, LinkRow, StatusChip } from './portal-parts';
+import { ChildTabs, CountsRow, LinkRow, PortalStatusChip } from './portal-parts';
 
 const meta = { title: 'Portal/Beranda orang tua', component: LinkRow, parameters: { layout: 'fullscreen', ownsMain: true }, args: { href: '#', title: 'Judul' } } satisfies Meta<typeof LinkRow>;
 export default meta;
@@ -28,7 +28,7 @@ export const Beranda: Story = {
       <Card as="section" aria-label="Kehadiran ADITYA PRATAMA" className="flex flex-col gap-3">
         <h2 className="m-0 text-h2">ADITYA PRATAMA · 4A</h2>
         <p className="m-0 flex flex-wrap items-center gap-2 text-body">
-          Hari ini: <StatusChip code="H" />
+          Hari ini: <PortalStatusChip code="H" />
           <span className="text-tinta-muted"> · tiba 06.52</span>
         </p>
         <CountsRow label="30 hari terakhir" counts={{ H: 19, T: 1, S: 1, I: 0, A: 0 }} />
@@ -36,7 +36,7 @@ export const Beranda: Story = {
           {DAYS.map(([d, c]) => (
             <li key={d} className="flex min-h-11 items-center justify-between gap-3 border-b border-garis py-1 last:border-b-0">
               <span>{d}</span>
-              <StatusChip code={c} />
+              <PortalStatusChip code={c} />
             </li>
           ))}
         </ul>

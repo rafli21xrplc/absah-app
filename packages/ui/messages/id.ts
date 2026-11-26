@@ -36,6 +36,7 @@ export const messages = {
   },
   progress: {
     of: 'dari',
+    target: 'target',
   },
   dialog: {
     cancel: 'Batal',

@@ -623,7 +623,7 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
   tidak cocok dengan isi berkas, hapus `apps/*/.next` lalu build ulang.
 - Jangan menulis warna hex, ukuran huruf, atau radius di komponen. Pakai token dari `packages/ui`.
 - Huruf: Plus Jakarta Sans lewat `next/font`. Isi teks HP minimal 15 px, web staf 14 px.
-- Jarak kelipatan 4. Radius 6, 10, atau 16 saja.
+- Jarak kelipatan 4. Radius 6, 10, 16, atau v3: `rounded-kontrol` 12 (tombol, isian, filter), `rounded-ubin` 14 (ubin statistik, kepala tabel), `rounded-kartu` 20 (kartu, panel).
 - Satu tombol utama (hijau papan) per layar. Stabilo (kuning) hanya untuk "ada yang belum beres".
 
 ### Aksesibilitas
