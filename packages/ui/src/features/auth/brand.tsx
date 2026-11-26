@@ -1,4 +1,7 @@
-import { BarChart3, CalendarDays, ClipboardCheck, FileText, MessageCircle, NotebookPen, ScanLine, Users, type LucideIcon } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
+import { BarChart3, CalendarDays, ClipboardCheck, FileText, MessageCircle, NotebookPen, ScanLine, Users, Pause, Play, type LucideIcon } from 'lucide-react';
 import { messages } from '../../../messages/id';
 import { cx } from '../../cx';
 
@@ -55,20 +58,27 @@ function Lines() {
   return (
     <svg aria-hidden viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 size-full">
       {segments.map(([x1, y1, x2, y2]) => (
-        <line key={`${x1}-${y1}-${x2}-${y2}`} x1={x1} y1={y1} x2={x2} y2={y2} vectorEffect="non-scaling-stroke" strokeWidth="1.25" strokeDasharray="2 5" strokeLinecap="round" className="stroke-garis-kuat opacity-60" />
+        <line key={`${x1}-${y1}-${x2}-${y2}`} x1={x1} y1={y1} x2={x2} y2={y2} vectorEffect="non-scaling-stroke" strokeWidth="1.25" strokeDasharray="2 5" strokeLinecap="round" className="auth-line stroke-garis-kuat opacity-60" />
       ))}
     </svg>
   );
 }
 
 /**
- * The panel beside the form on wide screens (MA1): a white card on a dot grid, a short line about Absah and a diagram of what it
- * connects. Static, so there is nothing to pause. The parts are a real list with their names, so a screen reader hears them too.
+ * The panel beside the form on wide screens (MA1, MA2): a card on a dot grid, a short line about Absah and a diagram of what it
+ * connects. The diagram builds itself once, then the dashes flow and each part pings in turn (base.css auth-*). That loop is
+ * longer than 5 s, so a pause button sits at the foot (hidden with reduced motion, when nothing moves). The parts are a real
+ * list with their names, so a screen reader hears them too.
  */
 export function BrandPanel({ className }: { className?: string }) {
   const t = messages.auth;
+  const [paused, setPaused] = useState(false);
+  const label = paused ? t.playPanel : t.pausePanel;
   return (
-    <aside aria-label={t.aboutLabel} className={cx('auth-dots box-border flex-col items-center justify-center gap-12 rounded-lg border border-garis bg-kapur p-12', className)}>
+    <aside
+      aria-label={t.aboutLabel}
+      className={cx('auth-dots relative box-border flex-col items-center justify-center gap-12 rounded-lg border border-garis bg-kapur p-12', paused && 'auth-paused', className)}
+    >
       <div className="flex max-w-110 flex-col items-center gap-3 text-center">
         <h2 className="m-0 text-h1 text-tinta">{t.headline}</h2>
         <p className="m-0 text-body text-tinta-muted">{t.headlineBody}</p>
@@ -84,8 +94,9 @@ export function BrandPanel({ className }: { className?: string }) {
               <li key={label} className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2" style={{ left: `${spot.x}%`, top: `${spot.y}%` }}>
                 <span
                   aria-hidden
+                  style={{ ['--n' as string]: i }}
                   className={cx(
-                    'card-surface flex size-13 items-center justify-center rounded-md border',
+                    'auth-node card-surface relative flex size-13 items-center justify-center rounded-md border',
                     middle ? 'border-papan bg-papan text-on-papan' : 'border-garis bg-kapur-raised text-papan',
                   )}
                 >
@@ -96,10 +107,21 @@ export function BrandPanel({ className }: { className?: string }) {
             );
           })}
         </ul>
-        <span className="card-surface absolute left-1/2 top-1/2 flex size-22 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-lg border border-garis bg-kapur-raised">
-          <BrandMark size={56} />
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <span className="auth-hub card-surface flex size-22 items-center justify-center rounded-lg border border-garis bg-kapur-raised">
+            <BrandMark size={56} />
+          </span>
         </span>
       </div>
+      <button
+        type="button"
+        aria-label={label}
+        title={label}
+        onClick={() => setPaused((p) => !p)}
+        className="auth-pause absolute bottom-4 left-1/2 inline-flex size-10 -translate-x-1/2 cursor-pointer items-center justify-center rounded-full border border-garis bg-kapur-raised text-tinta-muted hover:border-garis-kuat hover:text-tinta"
+      >
+        {paused ? <Play aria-hidden strokeWidth={1.75} className="size-4" /> : <Pause aria-hidden strokeWidth={1.75} className="size-4" />}
+      </button>
     </aside>
   );
 }
