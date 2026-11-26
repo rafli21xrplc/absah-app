@@ -142,32 +142,29 @@ test('alamat WhatsApp lama membuka tab Orang tua', async ({ page }) => {
   await expect(page.getByRole('tab', { name: 'Orang tua' })).toHaveAttribute('aria-selected', 'true');
 });
 
-test('dengan gerak dikurangi, panel contoh diam dan tombol Jeda tetap bisa difokus', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'panel contoh hanya ada di layar lebar');
-  await page.goto('/masuk');
-  const running = await page.evaluate(() =>
-    document
-      .getAnimations()
-      .filter((a) => (a.effect as KeyframeEffect | null)?.target?.closest('#isi-masuk, aside'))
-      .map((a) => (a as CSSAnimation).animationName),
-  );
-  expect(running).toEqual([]);
-  await expect(page.getByText('862')).toBeHidden(); // the board is hidden from assistive technology, so it has no accessible text
-  const pause = page.getByRole('button', { name: 'Jeda animasi' });
-  await pause.focus();
-  await expect(pause).toBeFocused();
-});
-
-test('panel contoh berjalan bila gerak diizinkan, dan Jeda menghentikannya', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'panel contoh hanya ada di layar lebar');
+test('layar lebar: panel di samping formulir menyebut bagian Absah yang terhubung, tanpa animasi', async ({ page, isMobile }, info) => {
+  test.skip(isMobile, 'panel hanya ada di layar lebar');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/masuk');
-  const names = () => page.evaluate(() => document.getAnimations().filter((a) => (a.effect as KeyframeEffect | null)?.target?.closest('aside')).map((a) => `${(a as CSSAnimation).animationName}:${a.playState}`));
-  await expect.poll(async () => (await names()).some((n) => n.endsWith(':running'))).toBe(true);
-  await page.getByRole('button', { name: 'Jeda animasi' }).click();
-  await expect.poll(async () => (await names()).every((n) => n.endsWith(':paused'))).toBe(true);
-  await page.getByRole('button', { name: 'Putar animasi' }).click();
-  await expect.poll(async () => (await names()).some((n) => n.endsWith(':running'))).toBe(true);
+  const panel = page.getByRole('complementary', { name: 'Tentang Absah' });
+  await expect(panel.getByRole('heading', { name: 'Satu sekolah, semua tercatat.' })).toBeVisible();
+  await expect(panel.getByRole('list', { name: 'Yang terhubung di Absah' }).getByRole('listitem')).toHaveCount(8);
+  // The form comes first (left), the panel second (right).
+  const form = await page.getByRole('main').boundingBox();
+  const side = await panel.boundingBox();
+  expect((form?.x ?? 0) < (side?.x ?? 0)).toBe(true);
+  // Only the card's entrance may move; the panel itself is still.
+  const moving = await page.evaluate(() => document.getAnimations().filter((a) => (a.effect as KeyframeEffect | null)?.target?.closest('aside')).length);
+  expect(moving).toBe(0);
+  if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/masuk-${info.project.name}.png` });
+});
+
+test('HP: formulir saja, tanpa panel', async ({ page, isMobile }, info) => {
+  test.skip(!isMobile, 'khusus HP');
+  await page.goto('/masuk');
+  await expect(page.getByRole('complementary', { name: 'Tentang Absah' })).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Masuk ke Absah' })).toBeVisible();
+  if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/masuk-${info.project.name}.png` });
 });
 
 for (const scheme of ['light', 'dark'] as const) {

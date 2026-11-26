@@ -827,6 +827,11 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 - Sukses tidak berwarna hijau (hijau milik aksi dan Hadir): centang dengan teks tinta.
 - Tanpa preflight Tailwind, elemen `w-full` yang punya padding WAJIB `box-border`, kalau tidak ia melebar keluar wadah.
 
+### Halaman masuk (MA1)
+
+- `AuthShell`: formulir di kiri (rata tengah, logo dalam kotak putih di atas judul, latar putih dengan kilau hijau tipis `.auth-sheen`), panel di kanan sebagai kartu (`BrandPanel`, latar titik `.auth-dots`) berisi diagram 8 bagian Absah di sekeliling logo. Panel statis: tidak ada animasi, jadi tidak ada tombol Jeda. Di HP hanya formulir.
+- Bagian diagram adalah daftar sungguhan (`Yang terhubung di Absah`), garisnya dekorasi.
+
 ### Selesai berarti
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, tes aksesibilitas, dan tangkapan layar dibandingkan
 dengan desain: semuanya dijalankan dan hasilnya ditempel di PR.

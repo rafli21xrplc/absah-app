@@ -92,25 +92,17 @@ describe('RoleTabs and AuthShell', () => {
     expect(onValueChange).toHaveBeenCalledWith('b');
   });
 
-  it('has the form as its main landmark, a way to pause the panel, and passes axe', async () => {
+  it('has the form as its main landmark, names what Absah connects, and passes axe', async () => {
     const { container } = render(
       <AuthShell>
         <h1>Masuk ke Absah</h1>
       </AuthShell>,
     );
     expect(screen.getByRole('main')).toBeTruthy();
-    const pause = screen.getByRole('button', { name: 'Jeda animasi' });
-    expect(pause.getAttribute('aria-pressed')).toBe('false');
-    await userEvent.click(pause);
-    expect(screen.getByRole('button', { name: 'Putar animasi' }).getAttribute('aria-pressed')).toBe('true');
-    expect(container.querySelector('.board-paused')).not.toBeNull();
+    const parts = screen.getByRole('list', { name: 'Yang terhubung di Absah' });
+    expect(parts.querySelectorAll('li')).toHaveLength(8);
+    expect(parts.textContent).toContain('Kios gerbang');
+    expect(screen.queryByRole('button', { name: 'Jeda animasi' })).toBeNull();
     await expectNoAxeViolations(container);
-  });
-
-  it('hides the sample board from screen readers and labels it as an example', () => {
-    const { container } = render(<AuthShell><h1>x</h1></AuthShell>);
-    const board = container.querySelector('section[aria-hidden="true"]');
-    expect(board?.textContent).toContain('Contoh tampilan');
-    expect(board).not.toBeNull();
   });
 });

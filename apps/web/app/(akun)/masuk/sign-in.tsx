@@ -50,7 +50,7 @@ export function SignIn({ start = 'staf', fallbackNext = '/' }: SignInProps) {
   const atStart = stage === 'start';
   return (
     <AuthShell footer={atStart ? messages.auth.footerNote : undefined}>
-      <div className={atStart ? 'flex flex-col gap-1' : 'hidden'}>
+      <div className={atStart ? 'flex flex-col gap-2 text-center' : 'hidden'}>
         <h1 className="m-0 text-h1 text-tinta">{t.title}</h1>
         <p className="m-0 text-body text-tinta-muted">{t.lead}</p>
       </div>
