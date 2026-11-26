@@ -265,3 +265,17 @@ Keputusan (bisa diubah):
 
 Bukti: `docs/ui/pg1/*.png` (data contoh dari `pilot:seed` di DB lokal).
 
+## 17. PG2: halaman CMS lebih ringkas dan lebih berinformasi (2026-11-26)
+
+Permintaan: rombak penempatan komponen, data yang ditampilkan, dan kepadatan; "data kurang informasi dan layout kurang compact".
+
+Keputusan (bisa diubah):
+- `StatCard` dirombak menjadi ringkas (sekitar 120 px, bukan 190): pita penuh diganti chip ikon, ada `meter`. Kartu baru: `CompositionBar`, `TaskRow`; `SegmentedControl` mendapat `count`; `BarList` mendapat `columns`.
+- Dasbor: informasi baru tanpa endpoint baru: komposisi H/T/I/S/A dengan persen, "Perlu tindakan" (sesi lewat jam, izin menunggu, siswa berisiko, rombel tanpa presensi, MBG), rombel terendah lebih dulu (6, bisa dibuka semua), dan guru dengan sesi belum diisi terbanyak (dikelompokkan dari daftar sesi yang sama). Kartu kosong disembunyikan.
+- Presensi kelas: "Semua sesi" di laptop menjadi tabel padat (12 per halaman) dengan filter berjumlah; HP tidak berubah.
+- Izin: KPI diganti yang bisa ditindaklanjuti (sedang izin hari ini, menunggu, akan datang, ditolak/dibatalkan), filter status lengkap dengan jumlah, filter waktu, kolom lama izin.
+- Kegiatan: KPI kegiatan hari ini, chip hari, avatar pembina, filter aktif.
+- Perbaikan yang ditemukan di HP: teks `sr-only` absolut di tabel melebarkan dokumen ke 807 px (klik meleset); wadah tabel kini `relative`.
+
+Bukti: `docs/ui/pg2/*.png`; e2e izin, kegiatan, rekap, portal, presensi, a11y, tema di laptop dan HP: 26 lolos.
+

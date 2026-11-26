@@ -20,8 +20,19 @@ const BAND: Record<Tone, string> = {
   izin: 'bg-izin-soft text-izin',
   sakit: 'bg-sakit-soft text-sakit',
   alpa: 'bg-alpa-soft text-alpa',
-  papan: 'bg-papan text-on-papan',
+  papan: 'bg-papan-soft text-papan',
   netral: 'bg-kapur text-tinta',
+};
+
+/** The strong fill of each tone, for meters and composition bars. */
+export const FILL: Record<Tone, string> = {
+  hadir: 'bg-hadir',
+  telat: 'bg-telat',
+  izin: 'bg-izin',
+  sakit: 'bg-sakit',
+  alpa: 'bg-alpa',
+  papan: 'bg-papan',
+  netral: 'bg-garis-kuat',
 };
 
 export interface StatPart {
@@ -36,52 +47,119 @@ export interface StatCardProps {
   value: ReactNode;
   /** A word after the number, e.g. "siswa". */
   unit?: string;
-  /** "+4 dibanding kemarin": shown as a small chip next to the number. */
+  /** "+4 dibanding kemarin": a small chip in the header. */
   delta?: { text: string; label: string };
-  /** The split under the number: "82 Tepat waktu · 11 Telat". */
+  /** The split under the number: "611 tepat waktu · 114 telat". */
   parts?: StatPart[];
-  /** One line at the foot instead of parts, e.g. "2 menunggu persetujuan". */
+  /** One short line at the foot, e.g. "2 menunggu persetujuan". */
   note?: ReactNode;
+  /** A thin bar under the number (0..1); null = nothing recorded, an empty bar. */
+  meter?: number | null;
   className?: string;
 }
 
-/** A number with a coloured band on top (Present / On leave / Absent in the reference). The band names it in words. */
-export function StatCard({ title, tone, icon: Icon, value, unit, delta, parts, note, className }: StatCardProps) {
+/**
+ * A compact number card (PG2): icon chip and title on one line, the number with its unit, an optional thin meter, then one line of
+ * split or note. About 120 px high, so five fit in a row on a laptop.
+ */
+export function StatCard({ title, tone, icon: Icon, value, unit, delta, parts, note, meter, className }: StatCardProps) {
   return (
-    <section aria-label={title} className={cx('card-surface flex min-w-0 flex-col overflow-hidden rounded-lg border border-garis bg-kapur-raised text-tinta', className)}>
-      <h2 className={cx('m-0 flex items-center gap-2 px-4 py-3 text-body-strong', BAND[tone])}>
-        {Icon && <Icon aria-hidden strokeWidth={1.75} className="size-5 shrink-0" />}
-        {title}
-      </h2>
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        <div className="flex items-end justify-between gap-3">
-          <p className="m-0 flex items-baseline gap-2">
-            <span className="text-display tabular-nums">{value}</span>
-            {unit && <span className="text-small text-tinta-muted">{unit}</span>}
-          </p>
-          {delta && (
-            <p className="m-0 flex flex-col items-end text-right">
-              <span className="rounded-sm bg-papan-soft px-2 text-body-strong tabular-nums text-papan">{delta.text}</span>
-              <span className="text-small text-tinta-muted">{delta.label}</span>
-            </p>
-          )}
-        </div>
-        {parts && parts.length > 0 && (
-          <dl className="m-0 mt-auto flex flex-wrap gap-x-4 gap-y-1 rounded-md bg-kapur px-3 py-2">
-            {parts.map((p) => (
-              <div key={p.label} className="flex items-baseline gap-1">
-                <dt className="sr-only">{p.label}</dt>
-                <dd className="m-0 text-body-strong tabular-nums">{p.value}</dd>
-                <span aria-hidden className="text-small text-tinta-muted">
-                  {p.label}
-                </span>
-              </div>
-            ))}
-          </dl>
+    <section aria-label={title} className={cx('card-surface flex min-w-0 flex-col gap-2 rounded-lg border border-garis bg-kapur-raised p-4 text-tinta', className)}>
+      <header className="flex items-center gap-2">
+        {Icon && (
+          <span aria-hidden className={cx('inline-flex size-8 shrink-0 items-center justify-center rounded-md', BAND[tone])}>
+            <Icon strokeWidth={1.75} className="size-4" />
+          </span>
         )}
-        {note && <p className="m-0 mt-auto rounded-md bg-kapur px-3 py-2 text-small text-tinta-muted">{note}</p>}
-      </div>
+        <h2 className="m-0 min-w-0 flex-1 truncate text-small font-semibold text-tinta-muted">{title}</h2>
+        {delta && (
+          <span title={delta.label} className="shrink-0 rounded-sm bg-papan-soft px-2 text-small font-bold tabular-nums text-papan">
+            {delta.text}
+            <span className="sr-only"> {delta.label}</span>
+          </span>
+        )}
+      </header>
+      <p className="m-0 flex items-baseline gap-2">
+        <span className="text-h1 tabular-nums">{value}</span>
+        {unit && <span className="text-small text-tinta-muted">{unit}</span>}
+      </p>
+      {meter !== undefined && (
+        <span aria-hidden className="block h-2 overflow-hidden rounded-full bg-kapur">
+          <span className={cx('block h-full rounded-full', FILL[tone])} style={{ width: `${meter === null ? 0 : Math.round(Math.max(0, Math.min(1, meter)) * 100)}%` }} />
+        </span>
+      )}
+      {parts && parts.length > 0 && (
+        <dl className="m-0 mt-auto flex flex-wrap gap-x-3 gap-y-1 text-small">
+          {parts.map((p) => (
+            <div key={p.label} className="flex items-baseline gap-1">
+              <dt className="sr-only">{p.label}</dt>
+              <dd className="m-0 font-bold tabular-nums">{p.value}</dd>
+              <span aria-hidden className="text-tinta-muted">
+                {p.label}
+              </span>
+            </div>
+          ))}
+        </dl>
+      )}
+      {note && <p className="m-0 mt-auto truncate text-small text-tinta-muted">{note}</p>}
     </section>
+  );
+}
+
+export interface CompositionItem {
+  key: string;
+  /** The letter of the status (H, T, ...), shown with the word so the colour never carries it alone. */
+  code?: string;
+  label: string;
+  value: number;
+  tone: Tone;
+}
+
+/**
+ * One bar split into the parts of a whole (today's H/T/I/S/A), with a legend that says count and share in words. The bar is
+ * decoration; the legend is the content.
+ */
+export function CompositionBar({ label, items }: { label: string; items: CompositionItem[] }) {
+  const total = items.reduce((n, i) => n + i.value, 0);
+  const share = (v: number) => (total > 0 ? `${Math.round((v / total) * 1000) / 10}%`.replace('.', ',') : '–');
+  return (
+    <div className="flex flex-col gap-3">
+      <div aria-hidden className="flex h-3 gap-1 overflow-hidden rounded-full bg-kapur">
+        {total > 0 && items.filter((i) => i.value > 0).map((i) => <span key={i.key} className={cx('block h-full', FILL[i.tone])} style={{ width: `${(i.value / total) * 100}%` }} />)}
+      </div>
+      <dl aria-label={label} className="m-0 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3 xl:grid-cols-5">
+        {items.map((i) => (
+          <div key={i.key} className="flex min-w-0 flex-col">
+            <dt className="flex items-center gap-2 text-small text-tinta-muted">
+              <span aria-hidden className={cx('size-3 shrink-0 rounded-full', FILL[i.tone])} />
+              {i.code && <span className="font-bold text-tinta">{i.code}</span>}
+              <span className="truncate">{i.label}</span>
+            </dt>
+            <dd className="m-0 flex items-baseline gap-2">
+              <span className="text-h2 tabular-nums">{i.value}</span>
+              <span className="text-small text-tinta-muted">{share(i.value)}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+/** One row of a "Perlu tindakan" list: icon, what it is, a count, and the page's own link as the action. */
+export function TaskRow({ tone, icon: Icon, title, detail, count, action }: { tone: Tone; icon: LucideIcon; title: string; detail?: string; count: ReactNode; action?: ReactNode }) {
+  return (
+    <li className="flex items-center gap-3 border-b border-garis py-2 last:border-b-0">
+      <span aria-hidden className={cx('inline-flex size-9 shrink-0 items-center justify-center rounded-md', BAND[tone])}>
+        <Icon strokeWidth={1.75} className="size-4" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-body-strong">{title}</span>
+        {detail && <span className="truncate text-small text-tinta-muted">{detail}</span>}
+      </span>
+      <span className="shrink-0 text-h2 tabular-nums">{count}</span>
+      {action}
+    </li>
   );
 }
 
@@ -102,7 +180,7 @@ export interface StackedBar {
  * Stacked bars, each bar the share of its own total (100% tall when there is data). A table with the same numbers sits under it for
  * screen readers, so the picture never has to be read.
  */
-export function StackedBars({ title, bars, legend }: { title: string; bars: StackedBar[]; legend: { label: string; fill: string }[] }) {
+export function StackedBars({ title, bars, legend, compact = false }: { title: string; bars: StackedBar[]; legend: { label: string; fill: string }[]; compact?: boolean }) {
   return (
     <figure className="m-0 flex flex-col gap-3">
       <ul aria-hidden className="m-0 flex list-none flex-wrap gap-x-4 gap-y-1 p-0">
@@ -113,7 +191,7 @@ export function StackedBars({ title, bars, legend }: { title: string; bars: Stac
           </li>
         ))}
       </ul>
-      <div aria-hidden className="flex h-40 items-end gap-2">
+      <div aria-hidden className={cx('flex items-end gap-2', compact ? 'h-24' : 'h-40')}>
         {bars.map((b) => {
           const total = b.segments.reduce((n, s) => n + s.value, 0);
           return (
@@ -187,7 +265,7 @@ export function DataCard({ title, aside, toolbar, footer, children, className }:
   return (
     <section aria-label={title} className={cx('card-surface flex min-w-0 flex-col gap-4 rounded-lg border border-garis bg-kapur-raised p-4 text-tinta lg:p-5', className)}>
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 items-baseline gap-2">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
           <h2 className="m-0 text-h2">{title}</h2>
           {aside && <span className="text-small text-tinta-muted">{aside}</span>}
         </div>

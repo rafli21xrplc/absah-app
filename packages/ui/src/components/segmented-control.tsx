@@ -3,6 +3,8 @@ import { cx } from '../cx';
 export interface SegmentedOption<V extends string> {
   value: V;
   label: string;
+  /** A count after the word ("Menunggu 3"); part of the button's name. */
+  count?: number;
 }
 
 export interface SegmentedControlProps<V extends string> {
@@ -15,10 +17,11 @@ export interface SegmentedControlProps<V extends string> {
   compact?: boolean;
 }
 
-/** A few exclusive choices in one grey pill (the status filter of a data page). Buttons with aria-pressed, 44 px high. */
+/** A few exclusive choices in one grey pill (the status filter of a data page). Buttons with aria-pressed, 44 px high. Wider than
+ * its place (five choices with counts on a phone), the pill scrolls sideways instead of pushing the page wider. */
 export function SegmentedControl<V extends string>({ label, options, value, onChange, compact = false }: SegmentedControlProps<V>) {
   return (
-    <div role="group" aria-label={label} className={cx('gap-1 rounded-md bg-garis p-1', compact ? 'flex w-full' : 'inline-flex')}>
+    <div role="group" aria-label={label} className={cx('gap-1 rounded-md bg-garis p-1', compact ? 'flex w-full' : 'inline-flex max-w-full overflow-x-auto')}>
       {options.map((o) => (
         <button
           key={o.value}
@@ -33,6 +36,7 @@ export function SegmentedControl<V extends string>({ label, options, value, onCh
           )}
         >
           {o.label}
+          {o.count !== undefined && <span className={cx('ml-2 rounded-sm px-2 tabular-nums', o.value === value ? 'bg-papan-soft text-papan' : 'bg-kapur-raised text-tinta')}>{o.count}</span>}
         </button>
       ))}
     </div>

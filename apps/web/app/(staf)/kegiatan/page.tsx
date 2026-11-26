@@ -1,14 +1,15 @@
 'use client';
 
 import { Activity, ActivityList, SchoolMembersResponse, type ActivityKind, type ActivityLocation } from '@absah/contracts';
-import { Badge, Button, DataCard, DataHeader, Dialog, EmptyState, ErrorState, Input, messages, PageMain, Pagination, SearchBox, Select, SkeletonRows, StatCard, usePaged } from '@absah/ui';
-import { CalendarDays, MapPin, Sparkles, Users } from 'lucide-react';
+import { Badge, Button, cx, DataCard, SegmentedControl, DataHeader, Dialog, EmptyState, ErrorState, Input, messages, PageMain, Pagination, SearchBox, Select, SkeletonRows, StatCard, usePaged } from '@absah/ui';
+import { CalendarCheck, MapPin, Sparkles, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { ACTIVITY_MANAGERS, DAY_LABELS, DAYS, KIND_LABELS, KINDS, LOCATION_LABELS, LOCATIONS, scheduleLabel } from '@/lib/activities';
+import { ACTIVITY_MANAGERS, ACTIVITY_OVERSEERS, DAY_LABELS, DAYS, KIND_LABELS, KINDS, LOCATION_LABELS, LOCATIONS, scheduleLabel } from '@/lib/activities';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { staffCandidates } from '@/lib/tppk';
 import { useCapability } from '@/lib/capabilities';
+import { todayIn } from '@/lib/leave';
 import { useWorkspace } from '@/lib/workspace';
 
 const t = messages.activityPage;
@@ -17,8 +18,13 @@ const FORM_ID = 'kegiatan-baru';
 
 /** Kegiatan (KEG-01): managers see and create all; a pembina sees the activities they coach. PG1: stat cards + card grid. */
 export default function KegiatanPage() {
-  const { schoolId, hasRole } = useWorkspace();
+  const { schoolId, hasRole, me } = useWorkspace();
   const manager = hasRole(...ACTIVITY_MANAGERS);
+  // Overseers (kepsek, operator too) get every activity from the API, not only the ones they coach.
+  const overseer = hasRole(...ACTIVITY_OVERSEERS);
+  const timezone = me.schools.find((x) => x.id === schoolId)?.timezone ?? 'Asia/Jakarta';
+  const today = todayIn(timezone);
+  const [state, setState] = useState<'active' | 'inactive' | 'all'>('active');
   const [list, setList] = useState<ActivityList | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -39,17 +45,25 @@ export default function KegiatanPage() {
   const items = useMemo(() => list?.items ?? [], [list]);
   const q = query.trim().toLowerCase();
   const shown = useMemo(
-    () => items.filter((a) => (!kind || a.kind === kind) && (!q || a.name.toLowerCase().includes(q) || a.coaches.some((c) => c.name.toLowerCase().includes(q)))),
-    [items, kind, q],
+    () =>
+      items.filter(
+        (a) =>
+          (state === 'all' || a.active === (state === 'active')) &&
+          (!kind || a.kind === kind) &&
+          (!q || a.name.toLowerCase().includes(q) || a.coaches.some((c) => c.name.toLowerCase().includes(q))),
+      ),
+    [items, state, kind, q],
   );
   const paged = usePaged(shown, PAGE);
   const active = items.filter((a) => a.active);
+  const todayList = active.filter((a) => meetsOn(a, today));
+  const members = active.reduce((n, a) => n + a.memberCount, 0);
 
   return (
     <PageMain width="xl">
       <DataHeader
         title={t.title}
-        subtitle={manager ? t.subtitleManager : t.subtitleCoach}
+        subtitle={overseer ? t.subtitleManager : t.subtitleCoach}
         {...(manager
           ? {
               actions: (
@@ -62,15 +76,15 @@ export default function KegiatanPage() {
       />
 
       {list && items.length > 0 && (
-        <ul aria-label={t.summary} className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 xl:grid-cols-4">
+        <ul aria-label={t.summary} className="m-0 grid list-none grid-cols-2 gap-3 p-0 xl:grid-cols-4">
           <li className="flex">
-            <StatCard className="flex-1" title={t.statActive} tone="papan" icon={Sparkles} value={active.length} unit={t.activities} note={t.ofTotal.replace('{n}', String(items.length))} />
+            <StatCard className="flex-1" title={t.statToday} tone="papan" icon={CalendarCheck} value={todayList.length} unit={t.activities} note={todayList.length > 0 ? todayList.map((a) => a.name).join(', ') : t.todayNone} />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={t.statMembers} tone="hadir" icon={Users} value={active.reduce((n, a) => n + a.memberCount, 0)} unit={t.students} note={t.membersNote} />
+            <StatCard className="flex-1" title={t.statActive} tone="hadir" icon={Sparkles} value={active.length} unit={t.activities} parts={[{ value: items.length - active.length, label: t.inactiveLower }]} />
           </li>
           <li className="flex">
-            <StatCard className="flex-1" title={t.statWeekly} tone="izin" icon={CalendarDays} value={active.filter((a) => a.days.length > 0).length} unit={t.activities} note={t.weeklyNote} />
+            <StatCard className="flex-1" title={t.statMembers} tone="izin" icon={Users} value={members} unit={t.students} note={active.length > 0 ? t.avgMembers.replace('{n}', String(Math.round(members / active.length))) : t.membersNote} />
           </li>
           <li className="flex">
             <StatCard className="flex-1" title={t.statOutside} tone="sakit" icon={MapPin} value={active.filter((a) => a.location === 'luar_sekolah').length} unit={t.activities} note={t.outsideNote} />
@@ -83,7 +97,7 @@ export default function KegiatanPage() {
         {...(list ? { aside: t.count.replace('{n}', String(shown.length)) } : {})}
         toolbar={
           <>
-            <SearchBox label={t.search} value={query} onChange={setQuery} className="w-72" />
+            <SearchBox label={t.search} value={query} onChange={setQuery} className="w-64" />
             <label className="flex items-center gap-2 text-small text-tinta-muted">
               {t.kind}
               <Select value={kind} onChange={(e) => setKind(e.target.value as '' | ActivityKind)}>
@@ -95,37 +109,73 @@ export default function KegiatanPage() {
                 ))}
               </Select>
             </label>
+            <SegmentedControl
+              label={t.stateLabel}
+              value={state}
+              onChange={setState}
+              options={[
+                { value: 'active', label: t.stateActive, count: active.length },
+                { value: 'inactive', label: t.stateInactive, count: items.length - active.length },
+                { value: 'all', label: t.stateAll, count: items.length },
+              ]}
+            />
           </>
         }
         footer={<Pagination page={paged.page} pageCount={paged.pageCount} total={paged.total} size={PAGE} onPage={paged.setPage} />}
       >
         {error && <ErrorState headingLevel="h3" title={error} onRetry={load} />}
         {!list && !error && <SkeletonRows count={3} />}
-        {list && shown.length === 0 && <EmptyState bare headingLevel="h3" title={items.length === 0 ? (manager ? t.emptyManager : t.emptyCoach) : t.noMatch} />}
+        {list && shown.length === 0 && <EmptyState bare headingLevel="h3" title={items.length === 0 ? (overseer ? t.emptyManager : t.emptyCoach) : t.noMatch} />}
         {shown.length > 0 && (
           <ul aria-label={t.listLabel} className="m-0 grid list-none grid-cols-1 gap-3 p-0 md:grid-cols-2 xl:grid-cols-3">
-            {paged.slice.map((a) => (
-              <li key={a.id} className="flex">
-                <Link
-                  href={`/kegiatan/${a.id}`}
-                  className="box-border flex flex-1 flex-col gap-3 rounded-md border border-garis bg-kapur p-4 text-tinta no-underline hover:border-papan hover:bg-papan-tipis"
-                >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="text-small font-semibold text-papan">{KIND_LABELS[a.kind]}</span>
-                    {!a.active && <Badge tone="netral">{t.inactive}</Badge>}
-                  </span>
-                  <span className="text-body-strong">{a.name}</span>
-                  <span className="flex flex-wrap gap-2">
-                    <Badge tone={a.location === 'sekolah' ? 'hadir' : 'sakit'}>{LOCATION_LABELS[a.location]}</Badge>
-                    <span className="text-small text-tinta-muted">{scheduleLabel(a)}</span>
-                  </span>
-                  <span className="mt-auto flex items-center justify-between gap-2 border-t border-garis pt-3 text-small text-tinta-muted">
-                    <span className="truncate">Pembina: {a.coaches.map((c) => c.name).join(', ')}</span>
-                    <span className="whitespace-nowrap text-body-strong text-tinta">{a.memberCount} peserta</span>
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {paged.slice.map((a) => {
+              const isToday = a.active && meetsOn(a, today);
+              return (
+                <li key={a.id} className="flex min-w-0">
+                  <Link
+                    href={`/kegiatan/${a.id}`}
+                    className="box-border flex min-w-0 flex-1 flex-col gap-2 rounded-md border border-garis bg-kapur-raised p-4 text-tinta no-underline hover:border-papan hover:bg-papan-tipis"
+                  >
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="text-small font-semibold text-papan">{KIND_LABELS[a.kind]}</span>
+                      <span className="flex-1" />
+                      {isToday && <Badge tone="papan">{t.todayBadge}</Badge>}
+                      {!a.active && <Badge tone="netral">{t.inactive}</Badge>}
+                      <Badge tone={a.location === 'sekolah' ? 'hadir' : 'sakit'}>{LOCATION_LABELS[a.location]}</Badge>
+                    </span>
+                    <span className="truncate text-body-strong">{a.name}</span>
+                    <span className="flex items-center gap-1" aria-label={scheduleLabel(a)}>
+                      {DAYS.map((d) => (
+                        <span
+                          key={d}
+                          aria-hidden
+                          className={cx('inline-flex h-6 min-w-0 flex-1 items-center justify-center rounded-sm text-small', a.days.includes(d) ? 'bg-papan-soft font-bold text-papan' : 'bg-kapur text-tinta-muted')}
+                        >
+                          {DAY_LABELS[d]}
+                        </span>
+                      ))}
+                    </span>
+                    {(a.startsOn || a.endsOn || a.days.length === 0) && <span className="text-small text-tinta-muted">{scheduleLabel(a)}</span>}
+                    <span className="mt-auto flex items-center justify-between gap-2 border-t border-garis pt-2 text-small text-tinta-muted">
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span aria-hidden className="flex shrink-0 -space-x-2">
+                          {a.coaches.slice(0, 3).map((c) => (
+                            <span key={c.id} className="inline-flex size-7 items-center justify-center rounded-full border-2 border-kapur-raised bg-papan-soft text-small font-bold text-papan">
+                              {c.name.charAt(0).toUpperCase()}
+                            </span>
+                          ))}
+                        </span>
+                        <span className="truncate">Pembina: {a.coaches.map((c) => c.name).join(', ')}</span>
+                      </span>
+                      <span className="flex shrink-0 items-center gap-1 text-body-strong text-tinta">
+                        <Users aria-hidden strokeWidth={1.75} className="size-4 text-tinta-muted" />
+                        {a.memberCount} peserta
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </DataCard>
@@ -317,6 +367,15 @@ function NewActivity({ schoolId, onDone }: { schoolId: string | null; onDone: ()
       {busy && <p role="status" className="m-0 text-small text-tinta-muted">{t.saving}</p>}
     </form>
   );
+}
+
+/** Does an active activity meet on this school date: a listed weekday (1 = Senin) inside its optional dates, or any day of a dated
+ * run without weekdays. */
+function meetsOn(a: { days: number[]; startsOn: string | null; endsOn: string | null }, date: string): boolean {
+  if ((a.startsOn && date < a.startsOn) || (a.endsOn && date > a.endsOn)) return false;
+  if (a.days.length === 0) return Boolean(a.startsOn || a.endsOn);
+  const weekday = new Date(`${date}T00:00:00Z`).getUTCDay() || 7;
+  return a.days.includes(weekday);
 }
 
 const FIELD = 'flex flex-col gap-1 text-body-strong';

@@ -1,13 +1,13 @@
 'use client';
 
 import { ClassRecapList, CollectionDashboardList, LeaveRequestList, MbgDaily, MbgForecast, PrincipalDashboard, ReportSemesterList, TodayResponse } from '@absah/contracts';
-import { AlertRow, BarList, BoardSection, buttonStyles, cx, DataCard, PageMain, Pagination, SearchBox, StackedBars, StatCard, Table, TableBody, TableHead, TableRow, Td, Th, messages, usePaged, type BarItem, type StackedBar } from '@absah/ui';
-import { CircleAlert, CircleCheck, ClipboardCheck, FileText } from 'lucide-react';
+import { AlertRow, Badge, BarList, BoardSection, buttonStyles, CompositionBar, cx, DataCard, messages, PageMain, Pagination, PersonCell, SearchBox, StackedBars, StatCard, Table, TableBody, TableHead, TableRow, TaskRow, Td, Th, usePaged, type BarItem, type StackedBar } from '@absah/ui';
+import { CircleAlert, ClipboardCheck, ClipboardList, Clock, FileText, School, ShieldAlert, TrendingUp, UtensilsCrossed } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { useCapability } from '@/lib/capabilities';
-import { DASHBOARD_READERS, kindsLine, mbgLine, presentCaption, sessionsLine, warningCode } from '@/lib/dashboard';
+import { DASHBOARD_READERS, kindsLine, sessionsLine, warningCode } from '@/lib/dashboard';
 import { GATE_VIEWERS } from '@/lib/gate';
 import { todayIn } from '@/lib/leave';
 import { clock, MBG_READERS } from '@/lib/mbg';
@@ -23,7 +23,6 @@ const fill = (text: string, values: Record<string, string | number>) => text.rep
 
 const longDate = (date: string) => new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${date}T00:00:00Z`));
 const shortDate = (iso: string) => new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
-const dayName = (iso: string) => new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
 const dotted = (hhmm: string) => hhmm.replace(':', '.');
 
 /**
@@ -45,6 +44,7 @@ export default function DasborPage() {
   const [tick, setTick] = useState(() => Date.now());
   const [loadedAt, setLoadedAt] = useState<number | null>(null);
   const [foundation, setFoundation] = useState(false);
+  const [allClasses, setAllClasses] = useState(false);
 
   useEffect(() => {
     const id = window.setInterval(() => setTick(Date.now()), 30_000);
@@ -98,21 +98,26 @@ export default function DasborPage() {
   const subtitle = [longDate(today), semester ? semesterLabel(semester).toLowerCase() : null, loadedAt ? fill(t.updated, { time: savedLabel(new Date(loadedAt).toISOString(), timezone) }) : null].filter(Boolean).join(' · ');
 
   const todayCounts = principal.data?.attendance.today;
-  const pendingLeave = leave.data?.items.length;
+  const pendingLeave = leave.data?.items.length ?? 0;
   const trend = principal.data?.attendance.trend ?? [];
   // "vs kemarin": today's present against the previous school date with a rekap, when today has one.
   const last = trend.at(-1);
   const before = trend.at(-2);
   const delta = last && before && last.date === today ? last.present - before.present : null;
   const fillRate = principal.data?.sessions;
-  const classBars: BarItem[] = (classes.data?.items ?? []).map((c) => ({
+  const classItems = classes.data?.items ?? [];
+  const bar = (c: (typeof classItems)[number]): BarItem => ({
     key: c.id,
     label: c.name,
     value: c.presentRate,
     text: percent(c.presentRate),
     ...(c.counts.A > 0 ? { flag: `A ${c.counts.A}` } : {}),
     name: c.presentRate === null ? `${c.name}: belum ada presensi` : `${c.name}: ${percent(c.presentRate)} hadir${c.counts.A > 0 ? `, ${c.counts.A} alpa` : ''}`,
-  }));
+  });
+  // Lowest first; rombel without any presensi yet go last (they are not "low", they are not filled).
+  const ranked = [...classItems].sort((x, y) => (x.presentRate ?? 2) - (y.presentRate ?? 2) || y.counts.A - x.counts.A);
+  const shownClasses = (allClasses ? ranked : ranked.slice(0, CLASS_PREVIEW)).map(bar);
+  const unrecordedClasses = classItems.filter((c) => c.presentRate === null).length;
   const trendBars: StackedBar[] = trend.map((p) => ({
     key: p.date,
     label: shortDate(p.date),
@@ -121,52 +126,56 @@ export default function DasborPage() {
       { value: p.days - p.present, fill: 'bg-alpa-soft', label: t.trendAbsent },
     ],
   }));
+  // Who to chase: teachers with the most sessions past their time and still empty (from the same list as the table).
+  const byTeacher = [...late.reduce((m, s) => m.set(s.teacher?.name ?? t.noTeacher, (m.get(s.teacher?.name ?? t.noTeacher) ?? 0) + 1), new Map<string, number>())]
+    .sort((x, y) => y[1] - x[1])
+    .slice(0, 5);
   const atRisk = principal.data?.atRisk;
   const showMbg = Boolean(mbgOn) && hasRole(...MBG_READERS);
+  const linkCls = 'shrink-0 text-small font-bold text-papan';
 
   return (
     <PageMain width="xl">
-      <header className="flex flex-wrap items-start justify-between gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1">
           <h1 className="m-0 text-h1">{t.title}</h1>
-          <p className="m-0 text-body text-tinta-muted">{subtitle}</p>
+          <p className="m-0 text-small text-tinta-muted">{subtitle}</p>
         </div>
         <nav aria-label="Pintasan" className="flex flex-wrap gap-2">
           {gateOn && hasRole(...GATE_VIEWERS) && (
-            <Link href="/gerbang/papan" className={cx(buttonStyles({ variant: 'secondary', size: '48' }), 'no-underline')}>
+            <Link href="/gerbang/papan" className={cx(buttonStyles({ variant: 'secondary' }), 'no-underline')}>
               {t.gate}
             </Link>
           )}
-          {hasRole(...RECAP_MANAGERS) && (
-            <Link href="/rekap" className={cx(buttonStyles({ variant: 'secondary', size: '48' }), 'no-underline')}>
-              {t.recap}
+          {foundation && (
+            <Link href="/dasbor/yayasan" className={cx(buttonStyles({ variant: 'secondary' }), 'no-underline')}>
+              {t.foundation}
             </Link>
           )}
-          {foundation && (
-            <Link href="/dasbor/yayasan" className={cx(buttonStyles({ variant: 'secondary', size: '48' }), 'no-underline')}>
-              {t.foundation}
+          {hasRole(...RECAP_MANAGERS) && (
+            <Link href="/rekap" className={cx(buttonStyles({ variant: 'primary' }), 'no-underline')}>
+              {t.recap}
             </Link>
           )}
         </nav>
       </header>
 
       {todayCounts ? (
-        <ul aria-label={t.summaryLabel} className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 xl:grid-cols-4">
-          <li className="flex">
+        <ul aria-label={t.summaryLabel} className="m-0 grid list-none grid-cols-2 gap-3 p-0 md:grid-cols-3 xl:grid-cols-5">
+          <li className="col-span-2 flex md:col-span-1">
             <StatCard
               className="flex-1"
-              title={t.cardPresent}
+              title={t.cardRate}
               tone="hadir"
-              icon={CircleCheck}
-              value={todayCounts.counts.H + todayCounts.counts.T}
-              unit={t.students}
+              icon={TrendingUp}
+              value={percent(todayCounts.presentRate)}
+              meter={todayCounts.presentRate}
               {...(delta !== null ? { delta: { text: `${delta > 0 ? '+' : ''}${delta}`, label: t.vsYesterday } } : {})}
-              parts={[
-                { value: todayCounts.counts.H, label: t.onTime },
-                { value: todayCounts.counts.T, label: t.late },
-              ]}
-              note={presentCaption(todayCounts, percent) ?? (todayCounts.days === 0 ? t.noRecapYet : undefined)}
+              note={todayCounts.days === 0 ? t.noRecapYet : fill(t.rateNote, { n: todayCounts.counts.H + todayCounts.counts.T, total: todayCounts.days })}
             />
+          </li>
+          <li className="flex">
+            <StatCard className="flex-1" title={t.late} tone="telat" icon={Clock} value={todayCounts.counts.T} unit={t.students} parts={[{ value: todayCounts.counts.H, label: t.onTimeLower }]} />
           </li>
           <li className="flex">
             <StatCard
@@ -177,10 +186,9 @@ export default function DasborPage() {
               value={todayCounts.counts.I + todayCounts.counts.S}
               unit={t.students}
               parts={[
-                { value: todayCounts.counts.I, label: 'Izin' },
-                { value: todayCounts.counts.S, label: 'Sakit' },
+                { value: todayCounts.counts.I, label: 'izin' },
+                { value: todayCounts.counts.S, label: 'sakit' },
               ]}
-              {...(pendingLeave ? { note: fill(t.pendingLeave, { n: pendingLeave }) } : {})}
             />
           </li>
           <li className="flex">
@@ -190,11 +198,11 @@ export default function DasborPage() {
             <StatCard
               className="flex-1"
               title={t.cardSessions}
-              tone="netral"
+              tone="papan"
               icon={ClipboardCheck}
               value={fillRate ? `${fillRate.filled}/${fillRate.total}` : '–'}
-              unit={t.sessionsUnit}
-              {...(fillRate ? { parts: [{ value: fillRate.missed, label: t.missed }, { value: fillRate.open, label: t.notDue }] } : {})}
+              meter={fillRate?.fillRate ?? null}
+              {...(fillRate ? { parts: [{ value: late.length, label: t.lateSessions }, { value: fillRate.missed, label: t.missedLower }] } : {})}
             />
           </li>
         </ul>
@@ -202,137 +210,192 @@ export default function DasborPage() {
         <BoardSection title={t.summaryLabel} state={principal.state === 'ready' ? 'empty' : principal.state} emptyText={t.noRecapYet} onRetry={principal.reload} />
       )}
 
-      <div className={cx('grid grid-cols-1 gap-4', showMbg && 'lg:grid-cols-[2fr_1fr]')}>
-        {principal.state === 'ready' && trendBars.length > 0 ? (
-          <DataCard title={fill(t.trendTitle, { n: trendBars.length })} aside={t.trendAside}>
-            <StackedBars title={fill(t.trendTitle, { n: trendBars.length })} bars={trendBars} legend={[{ label: t.trendPresent, fill: 'bg-papan' }, { label: t.trendAbsent, fill: 'bg-alpa-soft' }]} />
-          </DataCard>
-        ) : (
-          <BoardSection title={fill(t.trendTitle, { n: trendBars.length })} state={principal.state === 'ready' ? 'empty' : principal.state} emptyText={t.trendEmpty} onRetry={principal.reload} />
-        )}
-        {showMbg && (
-          <BoardSection
-            title={t.mbgTitle}
-            aside={mbg.data ? fill(t.mbgCutoff, { time: clock(mbg.data.daily.cutoffTime) }) : undefined}
-            state={mbg.state}
-            onRetry={mbg.reload}
-            action={
-              <Link href="/mbg" className="text-body-strong text-papan">
-                {t.mbgMore}
-              </Link>
-            }
-          >
-            {mbg.data?.daily.status === 'not_school_day' ? (
-              <p className="m-0 text-body">{t.mbgNotSchoolDay}</p>
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
+        <DataCard className="lg:col-span-2" title={t.compositionTitle} aside={todayCounts ? fill(t.compositionAside, { n: todayCounts.days }) : undefined}>
+          {todayCounts && todayCounts.days > 0 ? (
+            <CompositionBar
+              label={t.compositionTitle}
+              items={[
+                { key: 'H', code: 'H', label: 'Hadir', value: todayCounts.counts.H, tone: 'hadir' },
+                { key: 'T', code: 'T', label: 'Telat', value: todayCounts.counts.T, tone: 'telat' },
+                { key: 'I', code: 'I', label: 'Izin', value: todayCounts.counts.I, tone: 'izin' },
+                { key: 'S', code: 'S', label: 'Sakit', value: todayCounts.counts.S, tone: 'sakit' },
+                { key: 'A', code: 'A', label: 'Alpa', value: todayCounts.counts.A, tone: 'alpa' },
+              ]}
+            />
+          ) : (
+            <p className="m-0 text-body text-tinta-muted">{principal.state === 'ready' ? t.noRecapYet : t.loading}</p>
+          )}
+          <div className="flex flex-col gap-2 border-t border-garis pt-3">
+            <h3 className="m-0 text-small font-semibold text-tinta-muted">{fill(t.trendTitle, { n: trendBars.length })}</h3>
+            {trendBars.length >= 2 ? (
+              <StackedBars compact title={fill(t.trendTitle, { n: trendBars.length })} bars={trendBars} legend={[{ label: t.trendPresent, fill: 'bg-papan' }, { label: t.trendAbsent, fill: 'bg-alpa-soft' }]} />
             ) : (
-              mbg.data && (
-                <dl className="m-0 flex flex-col gap-3">
-                  <div className="flex flex-col">
-                    <dt className="text-small text-tinta-muted">{t.mbgToday}</dt>
-                    <dd className="m-0 text-h1 tabular-nums">{mbg.data.daily.total.present}</dd>
-                    <dd className="m-0 text-small text-tinta-muted">{mbgLine({ status: mbg.data.daily.status, enrolled: mbg.data.daily.total.enrolled, present: mbg.data.daily.total.present, unrecorded: mbg.data.daily.total.unrecorded })}</dd>
-                  </div>
-                  <div className="flex flex-col">
-                    <dt className="text-small text-tinta-muted">{fill(mbg.data.forecast.status === 'computed' ? t.mbgForecast : t.mbgForecastPending, { date: dayName(mbg.data.forecast.date) })}</dt>
-                    {mbg.data.forecast.status === 'computed' && <dd className="m-0 text-h2 tabular-nums">{mbg.data.forecast.total}</dd>}
-                  </div>
-                </dl>
-              )
+              <p className="m-0 text-small text-tinta-muted">{trendBars.length === 1 ? t.trendOne : t.trendEmpty}</p>
             )}
-          </BoardSection>
-        )}
-      </div>
-
-
-      {sessionsState === 'ready' ? (
-        <DataCard
-          title={t.sessionsTitle}
-          aside={[fill(t.sessionsCount, { n: late.length }), principal.data ? sessionsLine(principal.data.sessions) : null].filter(Boolean).join(' · ')}
-          toolbar={<SearchBox label={t.sessionsSearch} value={lateQuery.query} onChange={lateQuery.setQuery} className="w-64" />}
-          footer={<Pagination page={lateQuery.paged.page} pageCount={lateQuery.paged.pageCount} total={lateQuery.paged.total} size={PAGE} onPage={lateQuery.paged.setPage} />}
-        >
-          <Table bare caption={t.sessionsTable} className="min-w-160">
-            <TableHead>
-              <TableRow>
-                <Th>{t.colTime}</Th>
-                <Th>{t.colClass}</Th>
-                <Th>{t.colSubject}</Th>
-                <Th>{t.colTeacher}</Th>
-                <Th>{t.colLate}</Th>
-                <Th>{t.colAction}</Th>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {lateQuery.paged.slice.map((s) => (
-                <TableRow key={s.id}>
-                  <Td>
-                    <span className="flex flex-col">
-                      <span className="text-body-strong">{s.period ? `Jam ke-${s.period.number}` : '–'}</span>
-                      {s.period && <span className="whitespace-nowrap text-small text-tinta-muted">{`${dotted(s.period.startsAt)}–${dotted(s.period.endsAt)}`}</span>}
-                    </span>
-                  </Td>
-                  <Td>{s.owner.name}</Td>
-                  <Td>{s.subject?.name ?? '–'}</Td>
-                  <Td>{s.teacher?.name ?? t.noTeacher}</Td>
-                  <Td className="whitespace-nowrap">{s.period ? (overdueText(s.period.endsAt, nowMinutes) ?? '–') : '–'}</Td>
-                  <Td>
-                    <Link href={`/sesi/${s.id}`} aria-label={`${t.open} ${s.owner.name}${s.subject ? ` · ${s.subject.name}` : ''}`} className="text-body-strong text-papan">
-                      {t.open}
-                    </Link>
-                  </Td>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <p className="m-0 text-small text-tinta-muted">{t.sessionsNote}</p>
+          </div>
         </DataCard>
-      ) : (
-        <BoardSection title={t.sessionsTitle} aside={principal.data ? sessionsLine(principal.data.sessions) : undefined} state={sessionsState} emptyText={t.sessionsEmpty} onRetry={sessions.reload} />
-      )}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {atRisk !== null && (
-          <BoardSection
-            title={t.attentionTitle}
-            aside={t.attentionAside}
-            state={principal.state === 'ready' && atRisk?.items.length === 0 ? 'empty' : principal.state}
-            emptyText={t.attentionEmpty}
-            onRetry={principal.reload}
-          >
-            <ul className="m-0 flex list-none flex-col gap-2 p-0">
-              {atRisk?.items.map((s) => (
-                <AlertRow
-                  key={s.enrollmentId}
-                  code={warningCode(s.kinds)}
-                  title={`${s.name} · ${s.className}`}
-                  detail={`${kindsLine(s.kinds)} · terakhir ${shortDate(s.lastDate)}`}
-                  actions={
-                    <Link href="/peringatan-dini" className="text-body-strong text-papan">
-                      {t.attentionDetail}
-                    </Link>
-                  }
-                />
-              ))}
-            </ul>
-            {atRisk && atRisk.students > atRisk.items.length && (
-              <Link href="/peringatan-dini" className="text-body-strong text-papan">
-                {fill(t.attentionAll, { n: atRisk.students })}
-              </Link>
+        <DataCard title={t.tasksTitle}>
+          <ul aria-label={t.tasksTitle} className="m-0 flex list-none flex-col p-0">
+            <TaskRow
+              tone="telat"
+              icon={ClipboardList}
+              title={t.taskSessions}
+              detail={late.length > 0 ? t.taskSessionsDetail : t.taskNone}
+              count={late.length}
+              {...(late.length > 0 ? { action: <a href="#sesi-belum-diisi" className={linkCls}>{t.see}</a> } : {})}
+            />
+            <TaskRow
+              tone="izin"
+              icon={FileText}
+              title={t.taskLeave}
+              detail={pendingLeave > 0 ? t.taskLeaveDetail : t.taskNone}
+              count={leave.state === 'ready' || leave.state === 'empty' ? pendingLeave : '–'}
+              action={<Link href="/izin" className={linkCls}>{t.see}</Link>}
+            />
+            {atRisk !== null && (
+              <TaskRow
+                tone="alpa"
+                icon={ShieldAlert}
+                title={t.taskRisk}
+                detail={atRisk && atRisk.students > 0 ? t.taskRiskDetail : t.taskNone}
+                count={atRisk?.students ?? '–'}
+                action={<Link href="/peringatan-dini" className={linkCls}>{t.see}</Link>}
+              />
             )}
-          </BoardSection>
-        )}
-        <LeaveSection section={leave} onDecided={principal.reload} />
+            <TaskRow
+              tone="netral"
+              icon={School}
+              title={t.taskUnrecorded}
+              detail={unrecordedClasses > 0 ? t.taskUnrecordedDetail : t.taskNone}
+              count={classes.state === 'ready' || classes.state === 'empty' ? unrecordedClasses : '–'}
+            />
+            {showMbg && (
+              <TaskRow
+                tone="papan"
+                icon={UtensilsCrossed}
+                title={t.mbgToday}
+                detail={mbg.data ? (mbg.data.daily.status === 'not_school_day' ? t.mbgNotSchoolDay : fill(t.mbgCutoff, { time: clock(mbg.data.daily.cutoffTime) })) : t.loading}
+                count={mbg.data && mbg.data.daily.status !== 'not_school_day' ? mbg.data.daily.total.present : '–'}
+                action={<Link href="/mbg" className={linkCls}>{t.see}</Link>}
+              />
+            )}
+          </ul>
+        </DataCard>
       </div>
 
-      <BoardSection title={t.classesTitle} aside={t.classesAside} state={classes.state} emptyText={t.classesEmpty} onRetry={classes.reload}>
-        <BarList label={t.classesTitle} items={classBars} />
-      </BoardSection>
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
+        <div id="sesi-belum-diisi" className="flex min-w-0 flex-col lg:col-span-2">
+          {sessionsState === 'ready' ? (
+            <DataCard
+              title={t.sessionsTitle}
+              aside={[fill(t.sessionsCount, { n: late.length }), principal.data ? sessionsLine(principal.data.sessions) : null].filter(Boolean).join(' · ')}
+              toolbar={<SearchBox label={t.sessionsSearch} value={lateQuery.query} onChange={lateQuery.setQuery} className="w-64" />}
+              footer={<Pagination page={lateQuery.paged.page} pageCount={lateQuery.paged.pageCount} total={lateQuery.paged.total} size={PAGE} onPage={lateQuery.paged.setPage} />}
+            >
+              <Table bare caption={t.sessionsTable} className="min-w-140">
+                <TableHead>
+                  <TableRow>
+                    <Th>{t.colTime}</Th>
+                    <Th>{t.colClassSubject}</Th>
+                    <Th>{t.colTeacher}</Th>
+                    <Th>{t.colLate}</Th>
+                    <Th>
+                      <span className="sr-only">{t.colAction}</span>
+                    </Th>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {lateQuery.paged.slice.map((s) => (
+                    <TableRow key={s.id}>
+                      <Td className="whitespace-nowrap">
+                        <span className="text-body-strong">{s.period ? `Jam ${s.period.number}` : '–'}</span>
+                        {s.period && <span className="block text-small text-tinta-muted">{`${dotted(s.period.startsAt)}–${dotted(s.period.endsAt)}`}</span>}
+                      </Td>
+                      <Td>
+                        <span className="text-body-strong">{s.owner.name}</span>
+                        <span className="block text-small text-tinta-muted">{s.subject?.name ?? '–'}</span>
+                      </Td>
+                      <Td>{s.teacher?.name ?? t.noTeacher}</Td>
+                      <Td className="whitespace-nowrap">
+                        <Badge tone="telat">{s.period ? (overdueText(s.period.endsAt, nowMinutes) ?? '–') : '–'}</Badge>
+                      </Td>
+                      <Td className="text-right">
+                        <Link href={`/sesi/${s.id}`} aria-label={`${t.open} ${s.owner.name}${s.subject ? ` · ${s.subject.name}` : ''}`} className="text-body-strong text-papan">
+                          {t.open}
+                        </Link>
+                      </Td>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <p className="m-0 text-small text-tinta-muted">{t.sessionsNote}</p>
+            </DataCard>
+          ) : (
+            <BoardSection title={t.sessionsTitle} aside={principal.data ? sessionsLine(principal.data.sessions) : undefined} state={sessionsState} emptyText={t.sessionsEmpty} onRetry={sessions.reload} />
+          )}
+        </div>
 
+        <div className="flex min-w-0 flex-col gap-4">
+          <BoardSection title={t.classesTitle} aside={allClasses ? t.classesAside : t.classesLowest} state={classes.state} emptyText={t.classesEmpty} onRetry={classes.reload}>
+            <BarList columns={1} label={t.classesTitle} items={shownClasses} />
+            {ranked.length > CLASS_PREVIEW && (
+              <button type="button" onClick={() => setAllClasses((v) => !v)} aria-expanded={allClasses} className="cursor-pointer self-start border-0 bg-transparent p-0 text-small font-bold text-papan">
+                {allClasses ? t.classesFewer : fill(t.classesAll, { n: ranked.length })}
+              </button>
+            )}
+          </BoardSection>
+          {byTeacher.length > 0 && (
+            <DataCard title={t.teachersTitle}>
+              <ul aria-label={t.teachersTitle} className="m-0 flex list-none flex-col p-0">
+                {byTeacher.map(([name, n]) => (
+                  <li key={name} className="flex items-center justify-between gap-3 border-b border-garis py-2 last:border-b-0">
+                    <PersonCell name={name} />
+                    <Badge tone="telat">{fill(t.sessionsCount, { n })}</Badge>
+                  </li>
+                ))}
+              </ul>
+            </DataCard>
+          )}
+        </div>
+      </div>
+
+      {(pendingLeave > 0 || leave.state === 'error' || leave.state === 'offline' || (atRisk && atRisk.items.length > 0)) && (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {atRisk && atRisk.items.length > 0 && (
+            <BoardSection title={t.attentionTitle} aside={t.attentionAside} state={principal.state} emptyText={t.attentionEmpty} onRetry={principal.reload}>
+              <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                {atRisk.items.map((s) => (
+                  <AlertRow
+                    key={s.enrollmentId}
+                    code={warningCode(s.kinds)}
+                    title={`${s.name} · ${s.className}`}
+                    detail={`${kindsLine(s.kinds)} · terakhir ${shortDate(s.lastDate)}`}
+                    actions={
+                      <Link href="/peringatan-dini" className="text-body-strong text-papan">
+                        {t.attentionDetail}
+                      </Link>
+                    }
+                  />
+                ))}
+              </ul>
+              {atRisk.students > atRisk.items.length && (
+                <Link href="/peringatan-dini" className="text-body-strong text-papan">
+                  {fill(t.attentionAll, { n: atRisk.students })}
+                </Link>
+              )}
+            </BoardSection>
+          )}
+          {(pendingLeave > 0 || leave.state === 'error' || leave.state === 'offline') && <LeaveSection section={leave} onDecided={principal.reload} />}
+        </div>
+      )}
     </PageMain>
   );
 }
 
-const PAGE = 10;
+const CLASS_PREVIEW = 6;
+const PAGE = 8;
 
 /** Search over the late sessions (rombel, mapel, guru) and pages of ten. */
 function useLateFilter<T extends { owner: { name: string }; subject: { name: string } | null; teacher: { name: string } | null }>(items: T[]) {
