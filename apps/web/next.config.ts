@@ -9,6 +9,9 @@ const config: NextConfig = {
   poweredByHeader: false,
   // The dev badge sits at the right: at the left it covers the account button at the foot of the side menu.
   devIndicators: { position: 'bottom-right' },
+  // Dev only: next dev allows just `localhost`. Opened as 127.0.0.1 the page's dev chunks and hot reload are blocked as
+  // cross-origin, so the page never becomes interactive (it seems to load forever and the theme button does nothing).
+  allowedDevOrigins: ['127.0.0.1', '0.0.0.0'],
   // Shared packages ship TypeScript source.
   transpilePackages: ['@absah/ui', '@absah/contracts', '@absah/capabilities'],
   headers() {
