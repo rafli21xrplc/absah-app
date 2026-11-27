@@ -48,7 +48,7 @@ export default function PopoverSelect({ sections, className, children, ...props 
             aria-describedby={c['aria-describedby']}
             aria-invalid={c['aria-invalid']}
             disabled={props.disabled}
-            className={cx(controlClass, 'flex min-h-12 cursor-pointer items-center justify-between gap-2 pr-3 text-left lg:min-h-9', borderClass(c.invalid), className)}
+            className={cx(controlClass, 'flex min-h-12 cursor-pointer items-center justify-between gap-2 pr-3 text-left lg:min-h-9 lg:max-w-120', borderClass(c.invalid), className)}
           >
             <span className="truncate">{current?.label ?? ''}</span>
             <ChevronDown aria-hidden strokeWidth={1.75} className="size-4 shrink-0 text-tinta-muted" />

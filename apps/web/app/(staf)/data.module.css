@@ -1,7 +1,16 @@
 .main {
-  max-width: 960px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 24px 16px 48px;
+}
+/* V9: as wide as the v3 boards (PageMain full) and on the same left edge as the breadcrumb. */
+@media (min-width: 1024px) {
+  .main {
+    padding: 8px 32px 48px;
+  }
+  .toolbar > * {
+    flex: 0 1 18rem;
+  }
 }
 .back {
   color: var(--absah-muted);
@@ -193,4 +202,32 @@ a.notice {
   list-style: none;
   display: grid;
   gap: 8px;
+}
+
+/* V9, from 1280 px: a page that records something and lists what was recorded shows both side by side (form left,
+   list right) instead of stacking them, so the wide screen is used. .withAside: the page's main content and a 22rem
+   column of context on the right. */
+@media (min-width: 1280px) {
+  .split {
+    display: grid;
+    grid-template-columns: minmax(22rem, 28rem) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+  .withAside {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: 24px;
+    align-items: start;
+  }
+  .split > *,
+  .withAside > * {
+    margin-top: 0;
+    min-width: 0;
+  }
+}
+.aside {
+  display: grid;
+  gap: 16px;
+  align-content: start;
 }

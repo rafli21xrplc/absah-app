@@ -59,40 +59,44 @@ export default function BkPage() {
         </Link>
         <h1 className={styles.title}>Catatan BK</h1>
         <p>Catatan ini hanya dibuka untuk guru BK dan admin. Isinya tidak pernah dikirim ke orang tua atau muncul di log.</p>
-        {writer && <NewNote schoolId={schoolId} today={todayIn(timezone)} onDone={load} />}
-        <fieldset className={forms.field}>
-          <legend>Tampilkan</legend>
-          {FILTERS.map((f) => (
-            <label key={f.value}>
-              <input type="radio" name="filter" checked={filter === f.value} onChange={() => setFilter(f.value)} /> {f.label}
-            </label>
-          ))}
-        </fieldset>
-        {error && (
-          <p className={forms.error} role="alert">
-            {error}
-          </p>
-        )}
-        {notes && notes.length === 0 && <p className={styles.empty}>Tidak ada catatan.</p>}
-        <ul className={ui.sessions}>
-          {notes?.map((n) => (
-            <li key={n.id} className={ui.student} aria-label={`${n.student.name} ${n.date}`}>
-              <span className={ui.studentName}>
-                {n.student.name} · {n.student.className} · {n.date}
-              </span>
-              <span>{n.note}</span>
-              <span className={n.followUp === 'planned' ? styles.badgeWarn : styles.badge}>
-                {FOLLOW_UP_LABELS[n.followUp]}
-                {n.followUpOn ? ` · ${n.followUpOn}` : ''}
-              </span>
-              {writer && n.followUp === 'planned' && (
-                <Button variant="secondary" type="button" onClick={() => void complete(n)}>
-                  Tandai tindak lanjut selesai
-                </Button>
-              )}
-            </li>
-          ))}
-        </ul>
+        <div className={writer ? styles.split : undefined}>
+          {writer && <NewNote schoolId={schoolId} today={todayIn(timezone)} onDone={load} />}
+          <div>
+            <fieldset className={forms.field}>
+              <legend>Tampilkan</legend>
+              {FILTERS.map((f) => (
+                <label key={f.value}>
+                  <input type="radio" name="filter" checked={filter === f.value} onChange={() => setFilter(f.value)} /> {f.label}
+                </label>
+              ))}
+            </fieldset>
+            {error && (
+              <p className={forms.error} role="alert">
+                {error}
+              </p>
+            )}
+            {notes && notes.length === 0 && <p className={styles.empty}>Tidak ada catatan.</p>}
+            <ul className={ui.sessions}>
+              {notes?.map((n) => (
+                <li key={n.id} className={ui.student} aria-label={`${n.student.name} ${n.date}`}>
+                  <span className={ui.studentName}>
+                    {n.student.name} · {n.student.className} · {n.date}
+                  </span>
+                  <span>{n.note}</span>
+                  <span className={n.followUp === 'planned' ? styles.badgeWarn : styles.badge}>
+                    {FOLLOW_UP_LABELS[n.followUp]}
+                    {n.followUpOn ? ` · ${n.followUpOn}` : ''}
+                  </span>
+                  {writer && n.followUp === 'planned' && (
+                    <Button variant="secondary" type="button" onClick={() => void complete(n)}>
+                      Tandai tindak lanjut selesai
+                    </Button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </main>
     </IfCap>
   );

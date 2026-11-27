@@ -56,3 +56,31 @@
   padding: 0;
   list-style: none;
 }
+
+/* V9, from 1024 px: a page is as wide as the screen, so a form puts its fields side by side (each column at least 18rem)
+   instead of one long stretched column. Anything that is not a field (a heading, a radio group, a note, an error, the
+   buttons) and a field with a long text box takes the whole row. The sign-in pages (.page, 420 px) stay one column. */
+@media (min-width: 1024px) {
+  .form {
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    column-gap: 16px;
+  }
+  .form > :not(.field),
+  .form > .field:has(textarea) {
+    grid-column: 1 / -1;
+  }
+  .form > button {
+    justify-self: start;
+    min-width: 12rem;
+  }
+  .page .form > button {
+    justify-self: stretch;
+  }
+  /* A field on its own (a page filter above a table) never stretches across the whole screen. */
+  .field {
+    max-width: 32rem;
+  }
+  .form > .field:has(textarea) {
+    max-width: none;
+  }
+}

@@ -80,7 +80,7 @@ export const borderClass = (invalid: boolean) => (invalid ? 'border-2 border-alp
 /** `ref` works as a plain prop (React 19), so a page can focus the first box with a mistake. */
 export function Input({ className, ...props }: ComponentPropsWithRef<'input'>) {
   const c = useControl(props);
-  return <input {...props} id={c.id} aria-describedby={c['aria-describedby']} aria-invalid={c['aria-invalid']} className={cx(controlClass, 'min-h-12 lg:min-h-9', borderClass(c.invalid), className)} />;
+  return <input {...props} id={c.id} aria-describedby={c['aria-describedby']} aria-invalid={c['aria-invalid']} className={cx(controlClass, 'min-h-12 lg:min-h-9 lg:max-w-120', borderClass(c.invalid), className)} />;
 }
 
 export function Textarea({ className, rows = 4, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
