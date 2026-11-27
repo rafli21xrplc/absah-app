@@ -6,7 +6,8 @@ export const buttonStyles = cva(
   {
     variants: {
       variant: { primary: '', stabilo: '', secondary: '', soft: '', outline: '', ghost: '', danger: '' },
-      size: { '36': 'min-h-9 px-3', '40': 'min-h-10 px-4', '44': 'min-h-11', '48': 'min-h-12', '52': 'min-h-13 px-5', '64': 'min-h-16 px-6' },
+      // From 1024 px (mouse) every size is one step thinner; phones keep the 44 px tap target.
+      size: { '36': 'min-h-9 px-3 lg:min-h-8', '40': 'min-h-10 px-4 lg:min-h-9 lg:px-3', '44': 'min-h-11 lg:min-h-10', '48': 'min-h-12 lg:min-h-10', '52': 'min-h-13 px-5 lg:min-h-11', '64': 'min-h-16 px-6' },
       blocked: { true: 'cursor-not-allowed border border-transparent bg-garis text-tinta-muted', false: 'cursor-pointer' },
       // Working is not the same as unavailable (Motion-UI 2): the button keeps its colour, shows the ring and ignores presses.
       busy: { true: '!cursor-progress', false: '' },

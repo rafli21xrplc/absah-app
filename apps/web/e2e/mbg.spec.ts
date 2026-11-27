@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomInt, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { choose, createSchool, fillSession, generateSessions, onboardAdmin } from './helpers';
+import { choose, createSchool, fillSession, generateSessions, onboardAdmin, pickDate, dateField } from './helpers';
 
 test('MBG: admin mengatur jam batas dan PIC, alpa tidak dihitung hadir', async ({ page }) => {
   test.slow(); // onboarding, import and a session
@@ -39,7 +39,7 @@ test('MBG: admin mengatur jam batas dan PIC, alpa tidak dihitung hadir', async (
   await expect(page.getByText(/belum dihitung\. Dihitung pukul 13\.00/)).toBeVisible();
 
   const phone = `0812${String(randomInt(10_000_000, 99_999_999))}`;
-  await page.getByLabel('Jam batas').fill('09:15');
+  await pickDate(page.getByLabel('Jam batas'), '09:15');
   await page.getByLabel('Nama PIC MBG').fill('Bu Sari SPPG');
   await page.getByLabel(/WhatsApp PIC/).fill(phone);
   await page.getByRole('button', { name: 'Simpan pengaturan' }).click();
@@ -47,8 +47,8 @@ test('MBG: admin mengatur jam batas dan PIC, alpa tidak dihitung hadir', async (
   await expect(page.getByText(`(sekarang +62812****${phone.slice(-4)})`)).toBeVisible();
 
   // Changing only the cutoff keeps the number (the field stays empty).
-  await page.getByLabel('Jam batas').fill('09:30');
+  await pickDate(page.getByLabel('Jam batas'), '09:30');
   await page.getByRole('button', { name: 'Simpan pengaturan' }).click();
   await expect(page.getByText(`(sekarang +62812****${phone.slice(-4)})`)).toBeVisible();
-  await expect(page.getByLabel('Jam batas')).toHaveValue('09:30');
+  await expect(dateField(page.getByLabel('Jam batas'))).toHaveValue('09:30');
 });

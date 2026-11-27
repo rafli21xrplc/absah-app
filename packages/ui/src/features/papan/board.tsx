@@ -76,7 +76,7 @@ export function BoardSection({ title, aside, subtitle, count, action, state, emp
     </Button>
   );
   return (
-    <section aria-labelledby={id} aria-busy={state === 'loading'} className={cx('card-surface box-border flex min-w-0 flex-col gap-4 rounded-kartu border border-transparent bg-kapur-raised p-5', className)}>
+    <section aria-labelledby={id} aria-busy={state === 'loading'} className={cx('card-surface box-border flex min-w-0 flex-col gap-3 rounded-kartu border border-transparent bg-kapur-raised p-5', className)}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex min-w-0 flex-col gap-0">
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">

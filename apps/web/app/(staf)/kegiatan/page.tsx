@@ -1,7 +1,7 @@
 'use client';
 
 import { Activity, ActivityList, SchoolMembersResponse, type ActivityKind, type ActivityLocation } from '@absah/contracts';
-import { Badge, Button, CountList, cx, DataCard, SegmentedControl, DataHeader, Dialog, EmptyState, ErrorState, Input, messages, PageMain, Pagination, SearchBox, Select, SkeletonRows, StatCard, usePaged } from '@absah/ui';
+import { Badge, Button, CountList, cx, DataCard, DataHeader, DateInput, Dialog, EmptyState, ErrorState, Input, messages, PageMain, Pagination, SearchBox, SegmentedControl, Select, SkeletonRows, StatCard, usePaged } from '@absah/ui';
 import { CalendarCheck, MapPin, Sparkles, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
@@ -360,7 +360,7 @@ function NewActivity({ schoolId, onDone }: { schoolId: string | null; onDone: ()
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <label className={FIELD}>
         Tanggal mulai (boleh kosong)
-        <Input
+        <DateInput
           type="date"
           value={startsOn}
           onChange={(e) => {
@@ -371,7 +371,7 @@ function NewActivity({ schoolId, onDone }: { schoolId: string | null; onDone: ()
       </label>
       <label className={FIELD}>
         Tanggal selesai (boleh kosong)
-        <Input
+        <DateInput
           type="date"
           value={endsOn}
           onChange={(e) => {

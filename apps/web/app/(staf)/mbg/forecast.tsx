@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { forecastLine } from '@/lib/mbg';
 import forms from '../../forms.module.css';
 import styles from '../data.module.css';
+import { DateInput } from '@absah/ui';
 
 /** Prakiraan H-3 (RKP-09): what the PIC got at 13.00 for a coming school day (default three days ahead). */
 export function MbgForecastSection({ schoolId, timezone }: { schoolId: string; timezone: string }) {
@@ -23,7 +24,7 @@ export function MbgForecastSection({ schoolId, timezone }: { schoolId: string; t
       <h2 id="prakiraan">Prakiraan porsi (H-3)</h2>
       <label className={forms.field}>
         Tanggal
-        <input type="date" value={date || forecast?.date || ''} onChange={(e) => setDate(e.target.value)} />
+        <DateInput type="date" value={date || forecast?.date || ''} onChange={(e) => setDate(e.target.value)} />
       </label>
       {forecast && (
         <>

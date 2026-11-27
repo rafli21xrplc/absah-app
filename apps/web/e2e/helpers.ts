@@ -230,3 +230,17 @@ export async function choose(control: Locator, option: string | { label?: string
   // Resolved at action time: on a laptop the native select is swapped for the popover button a moment after the page loads.
   await control.locator('xpath=self::select | preceding-sibling::select | following-sibling::select').first().selectOption(option);
 }
+
+/**
+ * Fills a date, month or time box (DateInput). A phone shows the browser's <input>; a laptop shows a button that opens a
+ * calendar in a popover, with the real <input> kept beside it as the form control. Either way the value goes through that
+ * <input>, so one call serves both. The calendar itself is clicked by hand in popover.spec.ts.
+ */
+export async function pickDate(control: Locator, value: string) {
+  await dateField(control).fill(value);
+}
+
+/** The real <input> behind a DateInput (itself on a phone), for reading its value. */
+export function dateField(control: Locator): Locator {
+  return control.locator('xpath=self::input | following-sibling::input').first();
+}

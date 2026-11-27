@@ -1,7 +1,7 @@
 'use client';
 
 import { UksStudentList, UksVisit, UksVisitList, type UksOutcome } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -62,7 +62,7 @@ export default function UksPage() {
           <h2 id="kunjungan">Kunjungan</h2>
           <label className={forms.field}>
             Tanggal
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <DateInput type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
           {error && (
             <p className={forms.error} role="alert">

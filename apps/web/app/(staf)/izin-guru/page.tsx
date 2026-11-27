@@ -2,7 +2,7 @@
 
 import { TeacherLeave, TeacherLeaveList, type TeacherLeaveKind } from '@absah/contracts';
 import { TEACHER_LEAVE_KINDS } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -190,11 +190,11 @@ function NewLeave({ schoolId, today, onDone }: { schoolId: string | null; today:
       </fieldset>
       <label className={forms.field}>
         Mulai
-        <input type="date" value={startsOn} onChange={(e) => { changed(); setStartsOn(e.target.value); if (endsOn < e.target.value) setEndsOn(e.target.value); }} />
+        <DateInput type="date" value={startsOn} onChange={(e) => { changed(); setStartsOn(e.target.value); if (endsOn < e.target.value) setEndsOn(e.target.value); }} />
       </label>
       <label className={forms.field}>
         Selesai
-        <input type="date" value={endsOn} min={startsOn} onChange={(e) => { changed(); setEndsOn(e.target.value); }} />
+        <DateInput type="date" value={endsOn} min={startsOn} onChange={(e) => { changed(); setEndsOn(e.target.value); }} />
       </label>
       <label className={forms.field}>
         Alasan

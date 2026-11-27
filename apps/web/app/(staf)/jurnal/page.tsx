@@ -1,7 +1,7 @@
 'use client';
 
 import { JournalResponse } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
@@ -67,7 +67,7 @@ export default function JurnalPage() {
       <div className={styles.toolbar}>
         <label className={forms.field}>
           Bulan
-          <input type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
+          <DateInput type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
         </label>
       </div>
       {error && (

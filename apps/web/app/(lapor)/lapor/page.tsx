@@ -1,7 +1,7 @@
 'use client';
 
 import { TppkChannel, TppkReportReceipt, type TppkReportCategory, type TppkReporterRelation } from '@absah/contracts';
-import { Banner, Button, Field, Input, PageMain, Select, SkeletonRows, Textarea, messages } from '@absah/ui';
+import { Banner, Button, DateInput, Field, Input, messages, PageMain, Select, SkeletonRows, Textarea } from '@absah/ui';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, type FormEvent } from 'react';
@@ -143,7 +143,7 @@ function LaporForm() {
         </Field>
 
         <Field label={t.date}>
-          <Input type="date" value={occurredOn} onChange={(e) => setOccurredOn(e.target.value)} />
+          <DateInput type="date" value={occurredOn} onChange={(e) => setOccurredOn(e.target.value)} />
         </Field>
 
         <Field label={t.iAm}>

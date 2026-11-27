@@ -235,7 +235,7 @@ export function StackedBars({ title, bars, legend, compact = false }: { title: s
 /** The search box inside a card's header (smaller than the page toolbar's). The label is for screen readers. */
 export function SearchBox({ label, value, onChange, placeholder, className }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; className?: string }) {
   return (
-    <label className={cx('box-border flex min-h-10 min-w-0 items-center gap-2 rounded-md border border-garis bg-kapur px-3 focus-within:border-papan', className)}>
+    <label className={cx('box-border flex min-h-10 min-w-0 items-center gap-2 rounded-md border border-garis bg-kapur px-3 focus-within:border-papan lg:min-h-9', className)}>
       <Search aria-hidden strokeWidth={1.75} className="size-4 shrink-0 text-tinta-muted" />
       <span className="sr-only">{label}</span>
       <input
@@ -243,7 +243,7 @@ export function SearchBox({ label, value, onChange, placeholder, className }: { 
         value={value}
         placeholder={placeholder ?? label}
         onChange={(e) => onChange(e.target.value)}
-        className="min-w-0 flex-1 border-0 bg-transparent p-0 text-body text-tinta placeholder:text-tinta-muted focus-visible:!shadow-none"
+        className="min-w-0 flex-1 border-0 bg-transparent p-0 text-body text-tinta placeholder:text-tinta-muted focus-visible:!shadow-none lg:text-isi"
       />
     </label>
   );

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { choose, createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin, dateField } from './helpers';
 
 test('Jadwal: jam pelajaran, wali kelas, lesson with clash check, Excel template round trip', async ({ page }, testInfo) => {
   const { inviteUrl, email } = createSchool('SMP Negeri Jadwal E2E');
@@ -18,7 +18,7 @@ test('Jadwal: jam pelajaran, wali kelas, lesson with clash check, Excel template
 
   await page.getByRole('tab', { name: 'Jam pelajaran' }).click();
   await page.getByRole('button', { name: 'Isi', exact: true }).click();
-  await expect(page.getByLabel('Jumat jam 8 selesai')).toHaveValue('12:20');
+  await expect(dateField(page.getByLabel('Jumat jam 8 selesai'))).toHaveValue('12:20');
   // No sideways scrolling on phones.
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Simpan jam pelajaran' }).click();

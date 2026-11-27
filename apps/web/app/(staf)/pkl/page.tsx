@@ -1,7 +1,7 @@
 'use client';
 
 import { PklPlacement, PklPlacementList } from '@absah/contracts';
-import { Button, Input, Select } from '@absah/ui';
+import { Button, DateInput, Input, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
@@ -176,7 +176,7 @@ function PlacementForm({ schoolId, placement, onDone }: { schoolId: string; plac
       </h2>
       <label className={forms.field}>
         <span className={forms.label}>Tanggal selesai</span>
-        <Input name="endsOn" type="date" defaultValue={placement.endsOn} min={placement.startsOn} required />
+        <DateInput name="endsOn" type="date" defaultValue={placement.endsOn} min={placement.startsOn} required />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Nama pembimbing industri</span>

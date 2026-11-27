@@ -1,7 +1,7 @@
 'use client';
 
 import { FeeTypeList } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api } from '@/lib/api';
 import { periodProblem, type PeriodForm } from '@/lib/exam';
@@ -45,11 +45,11 @@ export function PeriodFormFields({ initial, submitLabel, busy, error, onSubmit, 
       </label>
       <label className={forms.field}>
         Tanggal mulai
-        <input type="date" value={form.startsOn} onChange={(e) => change({ startsOn: e.target.value })} />
+        <DateInput type="date" value={form.startsOn} onChange={(e) => change({ startsOn: e.target.value })} />
       </label>
       <label className={forms.field}>
         Tanggal selesai
-        <input type="date" value={form.endsOn} onChange={(e) => change({ endsOn: e.target.value })} />
+        <DateInput type="date" value={form.endsOn} onChange={(e) => change({ endsOn: e.target.value })} />
       </label>
       <fieldset className={forms.field}>
         <legend>Syarat boleh ujian</legend>
@@ -67,7 +67,7 @@ export function PeriodFormFields({ initial, submitLabel, busy, error, onSubmit, 
             </label>
             <label className={forms.field}>
               Hitung kehadiran mulai (kosong = awal tahun ajaran)
-              <input type="date" value={form.attendanceFrom} onChange={(e) => change({ attendanceFrom: e.target.value })} />
+              <DateInput type="date" value={form.attendanceFrom} onChange={(e) => change({ attendanceFrom: e.target.value })} />
             </label>
           </>
         )}

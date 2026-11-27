@@ -1,7 +1,7 @@
 'use client';
 
 import { DudiPartner, DudiPartnerList, PKL_DEFAULT_RADIUS_M, type DudiWorkDay } from '@absah/contracts';
-import { Button, Input } from '@absah/ui';
+import { Button, DateInput, Input } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { DAY_LABELS, DAYS } from '@/lib/activities';
@@ -170,8 +170,8 @@ function PartnerForm({ schoolId, partner, onDone }: { schoolId: string; partner:
               </label>
               {h && (
                 <>
-                  <Input type="time" aria-label={`Mulai ${DAY_LABELS[day]}`} value={h.startsAt} onChange={(e) => setDay(day, { startsAt: e.target.value })} />
-                  <Input type="time" aria-label={`Selesai ${DAY_LABELS[day]}`} value={h.endsAt} onChange={(e) => setDay(day, { endsAt: e.target.value })} />
+                  <DateInput type="time" aria-label={`Mulai ${DAY_LABELS[day]}`} value={h.startsAt} onChange={(e) => setDay(day, { startsAt: e.target.value })} />
+                  <DateInput type="time" aria-label={`Selesai ${DAY_LABELS[day]}`} value={h.endsAt} onChange={(e) => setDay(day, { endsAt: e.target.value })} />
                 </>
               )}
             </div>

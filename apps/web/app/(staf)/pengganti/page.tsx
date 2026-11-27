@@ -1,7 +1,7 @@
 'use client';
 
 import { CandidateList, SubstitutionItem, SubstitutionList, type SubstituteCandidate } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -49,7 +49,7 @@ export default function PenggantiPage() {
           <>
             <label className={forms.field}>
               Tanggal
-              <input type="date" value={date} onChange={(e) => { setPicking(null); setDate(e.target.value); }} />
+              <DateInput type="date" value={date} onChange={(e) => { setPicking(null); setDate(e.target.value); }} />
             </label>
             <p className={styles.muted}>Daftar memuat sesi yang sudah dibuat sistem untuk hari itu. Hari yang belum berjalan masih kosong.</p>
             {error && (
