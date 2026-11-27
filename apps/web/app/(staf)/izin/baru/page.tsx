@@ -1,7 +1,7 @@
 'use client';
 
 import { CreateLeaveAttachmentResponse, LEAVE_ATTACHMENT_MAX_BYTES, LEAVE_ATTACHMENT_TYPES, LeaveRequest, LeaveStudentList, type LeaveKind } from '@absah/contracts';
-import { Button, Input, Select } from '@absah/ui';
+import { Button, DateRangeInput, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -114,22 +114,19 @@ export default function IzinBaruPage() {
             </button>
           ))}
         </div>
-        <label className={forms.field}>
-          <span className={forms.label}>Mulai</span>
-          <Input
-            type="date"
+        <div className={forms.field}>
+          <span className={forms.label}>Tanggal izin</span>
+          <DateRangeInput
+            aria-label="Tanggal izin"
             required
-            value={startsOn}
-            onChange={(e) => {
-              change(setStartsOn)(e.target.value);
-              if (endsOn < e.target.value) setEndsOn(e.target.value);
+            from={startsOn}
+            to={endsOn}
+            onChange={(from, to) => {
+              change(setStartsOn)(from);
+              setEndsOn(to);
             }}
           />
-        </label>
-        <label className={forms.field}>
-          <span className={forms.label}>Sampai</span>
-          <Input type="date" required min={startsOn} value={endsOn} onChange={(e) => change(setEndsOn)(e.target.value)} />
-        </label>
+        </div>
         <label className={forms.field}>
           <span className={forms.label}>Alasan</span>
           <textarea className={ui.reason} required minLength={3} maxLength={500} value={reason} onChange={(e) => change(setReason)(e.target.value)} />

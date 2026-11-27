@@ -1,7 +1,7 @@
 'use client';
 
 import { Visitor, VisitorList, VisitorPhotoLink } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -74,7 +74,7 @@ export default function TamuPage() {
         <div className={styles.toolbar}>
           <label className={forms.field}>
             Tanggal
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <DateInput type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
           <label>
             <input type="checkbox" checked={insideOnly} onChange={(e) => setInsideOnly(e.target.checked)} /> Hanya yang masih di sekolah

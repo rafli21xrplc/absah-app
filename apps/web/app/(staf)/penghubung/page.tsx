@@ -1,7 +1,7 @@
 'use client';
 
 import { LiaisonSettings, LiaisonStudentList } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { LiaisonThreads } from '../../_liaison/thread-list';
@@ -109,11 +109,11 @@ function ServiceHours({ schoolId }: { schoolId: string }) {
       <p>Pemberitahuan WhatsApp di luar jam ini dikirim saat jam layanan dimulai. Pesannya sendiri tetap masuk.</p>
       <label className={forms.field}>
         Mulai
-        <input type="time" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
+        <DateInput type="time" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
       </label>
       <label className={forms.field}>
         Selesai
-        <input type="time" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} />
+        <DateInput type="time" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} />
       </label>
       {message && <p role="status">{message}</p>}
       <Button type="submit" disabled={busy}>

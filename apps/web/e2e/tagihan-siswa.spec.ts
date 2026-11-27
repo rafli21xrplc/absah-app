@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { choose, createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin, pickDate } from './helpers';
 
 test('Tagihan siswa: admin membuat jenis, menerbitkan ke rombel dua kali, membatalkan satu tagihan, melihat rekap', async ({ page }) => {
   test.slow();
@@ -31,7 +31,7 @@ test('Tagihan siswa: admin membuat jenis, menerbitkan ke rombel dua kali, membat
   await choose(page.getByLabel('Jenis tagihan'), { label: 'SPP (Rp250.000)' });
   await page.getByLabel(/^Periode/).fill('2026-11');
   await choose(page.getByRole('combobox', { name: /^Rombel/ }), { index: 1 });
-  await page.getByLabel('Jatuh tempo', { exact: true }).fill('2099-12-10');
+  await pickDate(page.getByLabel('Jatuh tempo', { exact: true }), '2099-12-10');
   await page.getByRole('button', { name: 'Terbitkan' }).click();
   await expect(page.getByRole('status').filter({ hasText: /tagihan dibuat, total/ })).toBeVisible();
   // The same click again replays the same answer (one Idempotency-Key per form state); a changed form is a new request.

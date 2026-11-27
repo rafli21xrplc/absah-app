@@ -9,7 +9,7 @@ import { periodFrom, semesterLabel, type Period } from '@/lib/report';
 import { useWorkspace } from '@/lib/workspace';
 import forms from '../../forms.module.css';
 import styles from '../data.module.css';
-import { Input, Select } from '@absah/ui';
+import { DateInput, DateRangeInput, Select } from '@absah/ui';
 
 /** Semesters of the active year and the period chosen in the URL (null while loading). */
 export function usePeriod(): { period: Period | null; semesters: ReportSemesterList['items'] } {
@@ -75,24 +75,18 @@ export function PeriodPicker({ period, semesters }: { period: Period; semesters:
           <option value="custom">Rentang tanggal</option>
         </Select>
       </label>
-      {!period.semesterId && (
-        <>
+      {!period.semesterId &&
+        (custom ? (
+          <div className={forms.field}>
+            <span className={forms.label}>Rentang tanggal</span>
+            <DateRangeInput aria-label="Rentang tanggal" from={period.from} to={period.to} onChange={(from, to) => from && to && go(`from=${from}&to=${to}`)} />
+          </div>
+        ) : (
           <label className={forms.field}>
-            <span className={forms.label}>{custom ? 'Dari' : 'Tanggal'}</span>
-            <Input
-              type="date"
-              value={period.from}
-              onChange={(e) => e.target.value && go(`from=${e.target.value}&to=${custom && e.target.value <= period.to ? period.to : e.target.value}`)}
-            />
+            <span className={forms.label}>Tanggal</span>
+            <DateInput type="date" value={period.from} onChange={(e) => e.target.value && go(`from=${e.target.value}&to=${e.target.value}`)} />
           </label>
-          {custom && (
-            <label className={forms.field}>
-              <span className={forms.label}>Sampai</span>
-              <Input type="date" min={period.from} value={period.to} onChange={(e) => e.target.value && go(`from=${period.from}&to=${e.target.value}`)} />
-            </label>
-          )}
-        </>
-      )}
+        ))}
     </div>
   );
 }

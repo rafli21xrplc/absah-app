@@ -1,7 +1,7 @@
 'use client';
 
 import { BillingClassList, FeeTypeList, IssueBillsResult, MAX_INSTALLMENTS } from '@absah/contracts';
-import { Button, Select } from '@absah/ui';
+import { Button, DateInput, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -149,7 +149,7 @@ function Issue() {
         </label>
         <label className={forms.field}>
           {form.parts > 1 ? 'Jatuh tempo cicilan pertama' : 'Jatuh tempo'}
-          <input type="date" value={form.dueOn} onChange={(e) => change({ dueOn: e.target.value })} />
+          <DateInput type="date" value={form.dueOn} onChange={(e) => change({ dueOn: e.target.value })} />
         </label>
         {plan && (
           <ol aria-label="Rencana cicilan">

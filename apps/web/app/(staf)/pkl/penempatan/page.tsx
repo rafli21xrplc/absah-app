@@ -1,7 +1,7 @@
 'use client';
 
 import { DudiPartnerList, PklPlacementList, PklStaffList, PklStudentList, type DudiPartner } from '@absah/contracts';
-import { Button, Input, Select } from '@absah/ui';
+import { Button, DateInput, Input, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
@@ -161,11 +161,11 @@ export default function NewPlacementsPage() {
             </ul>
             <label className={forms.field}>
               <span className={forms.label}>Mulai</span>
-              <Input name="startsOn" type="date" defaultValue={today} required />
+              <DateInput name="startsOn" type="date" defaultValue={today} required />
             </label>
             <label className={forms.field}>
               <span className={forms.label}>Selesai</span>
-              <Input name="endsOn" type="date" min={today} required />
+              <DateInput name="endsOn" type="date" min={today} required />
             </label>
             <label className={forms.field}>
               <span className={forms.label}>Guru pembimbing</span>

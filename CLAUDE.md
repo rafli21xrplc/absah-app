@@ -634,6 +634,8 @@ Bila ragu, desain menang. Bila desain bertabrakan dengan aturan di bawah, berhen
 
 ### Aksesibilitas
 - Sasaran sentuh minimal 44 px (baris siswa 64, aksi utama 52), jarak antarsasaran 8.
+- Kontrol ramping di laptop (V8): mulai 1024 px (mouse) input, Select, kotak cari, dan `DateInput` 36 px dengan teks `isi` 14; segmented control dan tab 32 px; tombol satu langkah lebih tipis (44/48 jadi 40). Di bawah 1024 px tetap 44 px. Tulis dengan prefiks `lg:` (`min-h-12 lg:min-h-9`), jangan kecilkan ukuran ponsel.
+- Tanggal, bulan, dan jam memakai `DateInput` (`type="date" | "month" | "time"`, props sama dengan `<input>`): popover kalender, kisi bulan, atau daftar jam dan menit di laptop; pemilih bawaan browser di ponsel. Dua tanggal yang membentuk rentang memakai `DateRangeInput` (satu tombol, dua bulan, klik mulai lalu selesai). Jangan menulis `<input type="date">` polos. Di e2e isi lewat `pickDate(control, nilai)` dan baca lewat `dateField(control)` (helpers.ts).
 - Makna tidak boleh hanya lewat warna. Status presensi = huruf + kata + warna, urutan tetap:
   Hadir, Telat, Izin, Sakit, Alpa. Status kosong = "Belum diisi" dengan garis putus-putus.
 - Kontras teks minimal 4,5 : 1, komponen UI minimal 3 : 1.

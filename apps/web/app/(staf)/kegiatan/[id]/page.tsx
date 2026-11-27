@@ -1,7 +1,7 @@
 'use client';
 
 import { Activity, ActivityMemberList, ActivityRecap, SessionDetail } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -224,7 +224,7 @@ function Recap({ schoolId, activityId, timezone }: { schoolId: string | null; ac
       <h2 id="rekap">Rekap kehadiran kegiatan</h2>
       <label className={forms.field}>
         Bulan
-        <input type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
+        <DateInput type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
       </label>
       {recap && (
         <>

@@ -20,7 +20,7 @@ export function TabsTrigger({ className, ...props }: ComponentPropsWithoutRef<ty
     <RTabs.Trigger
       className={cx(
         // The chosen tab is a white pill with a shadow and its word in `papan`. `tinta-muted` on the `track` is 5.5:1 (light).
-        'inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap rounded-md border border-transparent bg-transparent px-4 text-small font-bold text-tinta-muted transition-colors hover:text-tinta',
+        'inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap rounded-md border border-transparent bg-transparent px-4 text-small font-semibold text-tinta-muted lg:min-h-8 lg:px-3 transition-colors hover:text-tinta',
         'data-[state=active]:border-batas-lembut data-[state=active]:bg-kapur-raised data-[state=active]:text-papan data-[state=active]:shadow-aksi',
         className,
       )}

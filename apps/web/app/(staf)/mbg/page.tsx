@@ -1,7 +1,7 @@
 'use client';
 
 import { MbgDaily, MbgSettings } from '@absah/contracts';
-import { Button, Input } from '@absah/ui';
+import { Button, DateInput, Input } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -151,7 +151,7 @@ export default function MbgPage() {
             <form className={forms.form} onSubmit={(e) => void saveSettings(e)}>
               <label className={forms.field}>
                 <span className={forms.label}>Jam batas</span>
-                <Input name="cutoffTime" type="time" required defaultValue={settings.cutoffTime} />
+                <DateInput name="cutoffTime" type="time" required defaultValue={settings.cutoffTime} />
               </label>
               <label className={forms.field}>
                 <span className={forms.label}>Nama PIC MBG</span>

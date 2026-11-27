@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { choose, createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin, pickDate } from './helpers';
 
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(new Date());
 
@@ -26,8 +26,8 @@ test('Ujian: admin membuat ujian hari ini, menata ruang, mengisi rombel dan menc
   await page.getByLabel('Nama ujian').fill('PTS Ganjil');
   await page.getByRole('button', { name: 'Buat ujian' }).click();
   await expect(page.getByText('Isi tanggal mulai dan selesai.')).toBeVisible();
-  await page.getByLabel('Tanggal mulai').fill(today());
-  await page.getByLabel('Tanggal selesai').fill(today());
+  await pickDate(page.getByLabel('Tanggal mulai'), today());
+  await pickDate(page.getByLabel('Tanggal selesai'), today());
   await page.getByRole('button', { name: 'Buat ujian' }).click();
   await expect(page.getByRole('link', { name: 'PTS Ganjil' })).toBeVisible();
 

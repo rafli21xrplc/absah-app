@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatePointEvidenceResponse, PointEntry, PointRuleList, PointStudentList, type PointRule } from '@absah/contracts';
-import { Button, Select } from '@absah/ui';
+import { Button, DateInput, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -156,7 +156,7 @@ function NewEntry({ schoolId, timezone, onDone }: { schoolId: string | null; tim
       {rules.length === 0 && <p className={styles.empty}>Belum ada aturan poin. Wakasek atau admin menambahkannya di halaman aturan.</p>}
       <label className={forms.field}>
         Tanggal kejadian
-        <input
+        <DateInput
           type="date"
           value={date}
           min={earliestEntryDate(today)}

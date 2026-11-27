@@ -74,18 +74,18 @@ export function Field({ label, optional, hint, error, className, children }: Fie
 }
 
 export const controlClass =
-  'box-border w-full rounded-md bg-kapur-raised px-3 text-body text-tinta placeholder:text-tinta-muted disabled:cursor-not-allowed disabled:bg-garis disabled:text-tinta-muted';
+  'box-border w-full rounded-md bg-kapur-raised px-3 text-body text-tinta lg:text-isi placeholder:text-tinta-muted disabled:cursor-not-allowed disabled:bg-garis disabled:text-tinta-muted';
 export const borderClass = (invalid: boolean) => (invalid ? 'border-2 border-alpa' : 'border border-garis-kuat');
 
 /** `ref` works as a plain prop (React 19), so a page can focus the first box with a mistake. */
 export function Input({ className, ...props }: ComponentPropsWithRef<'input'>) {
   const c = useControl(props);
-  return <input {...props} id={c.id} aria-describedby={c['aria-describedby']} aria-invalid={c['aria-invalid']} className={cx(controlClass, 'min-h-12', borderClass(c.invalid), className)} />;
+  return <input {...props} id={c.id} aria-describedby={c['aria-describedby']} aria-invalid={c['aria-invalid']} className={cx(controlClass, 'min-h-12 lg:min-h-9', borderClass(c.invalid), className)} />;
 }
 
 export function Textarea({ className, rows = 4, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const c = useControl(props);
   return (
-    <textarea {...props} rows={rows} id={c.id} aria-describedby={c['aria-describedby']} aria-invalid={c['aria-invalid']} className={cx(controlClass, 'py-3', borderClass(c.invalid), className)} />
+    <textarea {...props} rows={rows} id={c.id} aria-describedby={c['aria-describedby']} aria-invalid={c['aria-invalid']} className={cx(controlClass, 'py-3 lg:py-2', borderClass(c.invalid), className)} />
   );
 }

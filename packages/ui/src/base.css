@@ -45,6 +45,14 @@ a {
   padding: 12px;
   min-height: 96px;
 }
+/* From 1024 px (mouse) a bare control is as thin as Input: 36 px, 14 px text. Phones keep 44. */
+@media (min-width: 1024px) {
+  :where(input:not([class]):not([type='checkbox'], [type='radio'], [type='file'], [type='hidden'], [type='range'], [type='color'])),
+  :where(select:not([class])) {
+    min-height: 36px;
+    font-size: var(--text-isi);
+  }
+}
 :where(input:not([class]), textarea:not([class]), select:not([class]))::placeholder {
   color: var(--tinta-muted);
   opacity: 1;

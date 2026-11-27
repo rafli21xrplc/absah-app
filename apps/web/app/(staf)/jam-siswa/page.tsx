@@ -8,7 +8,7 @@ import { STATUS_LABELS } from '@/lib/attendance';
 import { todayIn } from '@/lib/leave';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../data.module.css';
-import { Select } from '@absah/ui';
+import { DateInput, Select } from '@absah/ui';
 
 type Session = ClassStudentHours['sessions'][number];
 
@@ -73,7 +73,7 @@ export default function JamSiswa() {
             </Select>
           </label>{' '}
           <label>
-            Tanggal <input type="date" value={date} max={today} onChange={(e) => e.target.value && setDate(e.target.value)} />
+            Tanggal <DateInput type="date" value={date} max={today} onChange={(e) => e.target.value && setDate(e.target.value)} />
           </label>
         </p>
       )}

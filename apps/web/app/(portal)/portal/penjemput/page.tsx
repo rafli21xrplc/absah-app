@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatePickupPhotoResponse, PickupGuardian, PickupGuardianList, PortalAttendance, type PickupRelation } from '@absah/contracts';
-import { Button, Input, Select } from '@absah/ui';
+import { Button, DateInput, Input, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
@@ -173,7 +173,7 @@ function AddPickup({ schoolId, studentId, onDone }: { schoolId: string; studentI
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Berlaku sampai (kosongkan bila tetap)</span>
-        <Input name="validUntil" type="date" />
+        <DateInput name="validUntil" type="date" />
       </label>
       {message && (
         <p className={forms.error} role="alert">

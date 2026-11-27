@@ -1,7 +1,7 @@
 'use client';
 
 import { DAY_NAMES, SchedulePeriodsResponse } from '@absah/contracts';
-import { Button, Input } from '@absah/ui';
+import { Button, DateInput, Input } from '@absah/ui';
 import { useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { useWorkspace } from '@/lib/workspace';
@@ -71,7 +71,7 @@ export function PeriodsEditor({ initial, canEdit, onSaved }: { initial: Schedule
           <div className={page.row}>
             <label className={forms.field}>
               <span className={forms.label}>Mulai</span>
-              <Input type="time" value={start} onChange={(e) => setStart(e.target.value)} />
+              <DateInput type="time" value={start} onChange={(e) => setStart(e.target.value)} />
             </label>
             <label className={forms.field}>
               <span className={forms.label}>Menit per jam</span>
@@ -100,8 +100,8 @@ export function PeriodsEditor({ initial, canEdit, onSaved }: { initial: Schedule
             {rows.map((r, i) => (
               <div key={i} className={page.periodRow}>
                 <span>Jam {r.number}</span>
-                <Input type="time" aria-label={`${DAY_NAMES[day]} jam ${r.number} mulai`} value={r.startsAt} onChange={(e) => set(i, { startsAt: e.target.value })} />
-                <Input type="time" aria-label={`${DAY_NAMES[day]} jam ${r.number} selesai`} value={r.endsAt} onChange={(e) => set(i, { endsAt: e.target.value })} />
+                <DateInput type="time" aria-label={`${DAY_NAMES[day]} jam ${r.number} mulai`} value={r.startsAt} onChange={(e) => set(i, { startsAt: e.target.value })} />
+                <DateInput type="time" aria-label={`${DAY_NAMES[day]} jam ${r.number} selesai`} value={r.endsAt} onChange={(e) => set(i, { endsAt: e.target.value })} />
                 <Button type="button" variant="secondary" aria-label={`Hapus jam ${r.number}`} onClick={() => edit(day, rows.filter((_, j) => j !== i))}>
                   ×
                 </Button>

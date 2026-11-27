@@ -1,7 +1,7 @@
 'use client';
 
 import { CounselingNote, CounselingNoteList, PointStudentList, type CounselingFollowUp } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -154,7 +154,7 @@ function NewNote({ schoolId, today, onDone }: { schoolId: string | null; today: 
       />
       <label className={forms.field}>
         Tanggal sesi
-        <input type="date" value={date} max={today} onChange={(e) => { changed(); setDate(e.target.value); }} />
+        <DateInput type="date" value={date} max={today} onChange={(e) => { changed(); setDate(e.target.value); }} />
       </label>
       <label className={forms.field}>
         Catatan
@@ -171,7 +171,7 @@ function NewNote({ schoolId, today, onDone }: { schoolId: string | null; today: 
       {followUp === 'planned' && (
         <label className={forms.field}>
           Direncanakan pada (boleh dikosongkan)
-          <input type="date" value={followUpOn} min={date} onChange={(e) => { changed(); setFollowUpOn(e.target.value); }} />
+          <DateInput type="date" value={followUpOn} min={date} onChange={(e) => { changed(); setFollowUpOn(e.target.value); }} />
         </label>
       )}
       {error && (

@@ -9,7 +9,7 @@ import { dateLabel, monthLabel, rupiah } from '@/lib/billing';
 import { STUDENT_BILLING_READING } from '@/lib/student-billing';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../../data.module.css';
-import { Select } from '@absah/ui';
+import { DateInput, Select } from '@absah/ui';
 
 /** Rekap pembayaran (TGH-04): what came in during a month and what is still owed per rombel. JSON only on the API for now. */
 export default function RekapTagihanPage() {
@@ -57,7 +57,7 @@ function Recap() {
       <h1 className={styles.title}>Rekap pembayaran</h1>
       <form className={styles.toolbar} aria-label="Saring rekap" onSubmit={(e) => e.preventDefault()}>
         <label>
-          Bulan <input type="month" value={month || recap?.month || ''} onChange={(e) => setMonth(e.target.value)} />
+          Bulan <DateInput type="month" value={month || recap?.month || ''} onChange={(e) => setMonth(e.target.value)} />
         </label>
         <label>
           Jenis{' '}

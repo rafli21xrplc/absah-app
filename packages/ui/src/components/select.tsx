@@ -39,11 +39,11 @@ function NativeSelect({ className, children, ...props }: SelectHTMLAttributes<HT
         id={c.id}
         aria-describedby={c['aria-describedby']}
         aria-invalid={c['aria-invalid']}
-        className={cx(controlClass, 'min-h-12 cursor-pointer appearance-none pr-10', borderClass(c.invalid), className)}
+        className={cx(controlClass, 'min-h-12 cursor-pointer appearance-none pr-10 lg:min-h-9', borderClass(c.invalid), className)}
       >
         {children}
       </select>
-      <ChevronDown aria-hidden strokeWidth={1.75} className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-tinta-muted" />
+      <ChevronDown aria-hidden strokeWidth={1.75} className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-tinta-muted" />
     </span>
   );
 }

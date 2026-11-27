@@ -1,7 +1,7 @@
 'use client';
 
 import { PklSupervisionDay } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, DateInput } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -83,7 +83,7 @@ export default function DudiHome() {
       <h1 className={styles.title}>Kehadiran siswa PKL</h1>
       <label>
         Tanggal{' '}
-        <input type="date" value={date} max={todayIn(timezone)} onChange={(e) => e.target.value && setDate(e.target.value)} />
+        <DateInput type="date" value={date} max={todayIn(timezone)} onChange={(e) => e.target.value && setDate(e.target.value)} />
       </label>
       {error && <p role="alert">{error}</p>}
       {day && day.pending > 0 && (

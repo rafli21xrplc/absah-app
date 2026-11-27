@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 import { DAPODIK_FIXTURES } from './env';
-import { choose, createSchool, onboardAdmin } from './helpers';
+import { choose, createSchool, onboardAdmin, pickDate } from './helpers';
 
 test('Buku penghubung: wali kelas menulis ke orang tua, menarik pesan dalam 15 menit, admin mengatur jam layanan', async ({ page }) => {
   const { inviteUrl, email } = createSchool('SMP Penghubung E2E', 'smp');
@@ -18,8 +18,8 @@ test('Buku penghubung: wali kelas menulis ke orang tua, menarik pesan dalam 15 m
 
   // The admin's service hours.
   await page.goto('/penghubung');
-  await page.getByLabel('Mulai').fill('07:00');
-  await page.getByLabel('Selesai').fill('16:00');
+  await pickDate(page.getByLabel('Mulai'), '07:00');
+  await pickDate(page.getByLabel('Selesai'), '16:00');
   await page.getByRole('button', { name: 'Simpan jam layanan' }).click();
   await expect(page.getByText('Jam layanan tersimpan.')).toBeVisible();
   await expect(page.getByText('Belum ada percakapan.')).toBeVisible();

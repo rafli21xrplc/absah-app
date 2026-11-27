@@ -1,7 +1,7 @@
 'use client';
 
 import { ActionLinkContext, ActionLinkLeave, CardDeviceKeys, LinkHeldPickups, PickupPhotoLink, type LeaveKind, type LinkHeldPickup } from '@absah/contracts';
-import { Button, Input, Textarea } from '@absah/ui';
+import { Button, DateInput, Textarea } from '@absah/ui';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError } from '@/lib/api';
 import { STATUS_LABELS } from '@/lib/attendance';
@@ -168,11 +168,11 @@ function LeaveForm({ token, today, onDone }: { token: string; today: string; onD
       </fieldset>
       <label className={forms.field}>
         <span className={forms.label}>Dari tanggal</span>
-        <Input type="date" name="startsOn" defaultValue={today} required />
+        <DateInput type="date" name="startsOn" defaultValue={today} required />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Sampai tanggal</span>
-        <Input type="date" name="endsOn" defaultValue={today} required />
+        <DateInput type="date" name="endsOn" defaultValue={today} required />
       </label>
       <label className={forms.field}>
         <span className={forms.label}>Alasan</span>
