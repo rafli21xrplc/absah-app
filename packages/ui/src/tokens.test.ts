@@ -138,11 +138,11 @@ describe('statusTokens', () => {
   });
 
   it('uses the colours of tokens.json', () => {
-    expect(statusHex('H', 'light')).toEqual({ fg: '#1E5B4B', bg: '#E3EFEA' });
-    expect(statusHex('T', 'light')).toEqual({ fg: '#9A5B00', bg: '#FBEFD9' });
-    expect(statusHex('I', 'light')).toEqual({ fg: '#2F5FC4', bg: '#E6EDFB' });
-    expect(statusHex('S', 'light')).toEqual({ fg: '#7A4CC2', bg: '#EFE8FA' });
-    expect(statusHex('A', 'light')).toEqual({ fg: '#B53434', bg: '#FBE7E7' });
+    expect(statusHex('H', 'light')).toEqual({ fg: '#0A7655', bg: '#DFF3EA' });
+    expect(statusHex('T', 'light')).toEqual({ fg: '#A65800', bg: '#FFF1DB' });
+    expect(statusHex('I', 'light')).toEqual({ fg: '#1F5FD6', bg: '#E7EFFE' });
+    expect(statusHex('S', 'light')).toEqual({ fg: '#7444D6', bg: '#F0EAFD' });
+    expect(statusHex('A', 'light')).toEqual({ fg: '#C42B2B', bg: '#FDE8E8' });
   });
 });
 

@@ -20,7 +20,7 @@ export interface DataToolbarProps {
 /** The bar above a data table: search, filters and the page's actions. The page decides what a search or filter does. */
 export function DataToolbar({ search, children, actions, className }: DataToolbarProps) {
   return (
-    <div className={cx('flex flex-wrap items-center gap-3', className)}>
+    <div className={cx('flex flex-wrap items-end gap-3', className)}>
       <label className="flex min-h-11 min-w-60 max-w-120 flex-1 items-center gap-2 rounded-kontrol border border-garis-kuat bg-kapur-raised px-3">
         <Search aria-hidden strokeWidth={1.75} className="size-5 shrink-0 text-tinta-muted" />
         <span className="shrink-0 text-small font-bold text-tinta-muted">{search.label}</span>
