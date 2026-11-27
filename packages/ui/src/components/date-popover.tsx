@@ -36,7 +36,7 @@ function label(kind: DateKind, value: string): string {
 const PLACEHOLDER: Record<DateKind, string> = { date: t.pickDate, month: t.pickMonth, time: t.pickTime };
 
 export const triggerClass = (invalid: boolean, className?: string) =>
-  cx(controlClass, 'flex min-h-12 cursor-pointer items-center gap-2 pr-3 text-left lg:min-h-9', borderClass(invalid), className);
+  cx(controlClass, 'flex min-h-12 cursor-pointer items-center gap-2 pr-3 text-left lg:min-h-9 lg:max-w-120', borderClass(invalid), className);
 
 /** Sets the hidden input the way typing would and fires a real `input` event, so React's onChange runs with a genuine target. */
 function write(el: HTMLInputElement | null, next: string) {

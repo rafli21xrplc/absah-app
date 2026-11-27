@@ -56,35 +56,37 @@ export default function UksPage() {
         </Link>
         <h1 className={styles.title}>UKS</h1>
         {notice && <p role="status">{notice}</p>}
-        <NewVisit schoolId={schoolId} onDone={recorded} />
+        <div className={styles.split}>
+          <NewVisit schoolId={schoolId} onDone={recorded} />
 
-        <section className={styles.section} aria-labelledby="kunjungan">
-          <h2 id="kunjungan">Kunjungan</h2>
-          <label className={forms.field}>
-            Tanggal
-            <DateInput type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </label>
-          {error && (
-            <p className={forms.error} role="alert">
-              {error}
-            </p>
-          )}
-          {visits && visits.items.length === 0 && <p className={styles.empty}>Belum ada kunjungan.</p>}
-          <ul className={ui.sessions}>
-            {visits?.items.map((v) => (
-              <li key={v.id} className={ui.student} aria-label={`Kunjungan ${v.student.name}`}>
-                <span className={ui.studentName}>
-                  {v.student.name} · {v.student.className}
-                </span>
-                <span>
-                  {timeIn(timezone, v.visitedAt)} · {v.complaint}
-                  {v.action ? ` · ${v.action}` : ''}
-                </span>
-                <span className={v.outcome === 'dipulangkan' ? styles.badgeWarn : styles.badge}>{OUTCOME_LABELS[v.outcome]}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+          <section className={styles.section} aria-labelledby="kunjungan">
+            <h2 id="kunjungan">Kunjungan</h2>
+            <label className={forms.field}>
+              Tanggal
+              <DateInput type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            </label>
+            {error && (
+              <p className={forms.error} role="alert">
+                {error}
+              </p>
+            )}
+            {visits && visits.items.length === 0 && <p className={styles.empty}>Belum ada kunjungan.</p>}
+            <ul className={ui.sessions}>
+              {visits?.items.map((v) => (
+                <li key={v.id} className={ui.student} aria-label={`Kunjungan ${v.student.name}`}>
+                  <span className={ui.studentName}>
+                    {v.student.name} · {v.student.className}
+                  </span>
+                  <span>
+                    {timeIn(timezone, v.visitedAt)} · {v.complaint}
+                    {v.action ? ` · ${v.action}` : ''}
+                  </span>
+                  <span className={v.outcome === 'dipulangkan' ? styles.badgeWarn : styles.badge}>{OUTCOME_LABELS[v.outcome]}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
       </main>
     </IfCap>
   );

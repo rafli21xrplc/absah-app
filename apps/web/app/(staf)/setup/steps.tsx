@@ -71,9 +71,12 @@ function Shell(props: {
 }) {
   return (
     <form className="flex flex-col gap-5" onSubmit={props.onSubmit}>
-      <h1 className="m-0 text-h1">{props.title}</h1>
-      {props.hint && <p className="m-0 text-body text-tinta-muted">{props.hint}</p>}
-      {props.children}
+      <div className="flex flex-col gap-1">
+        <h1 className="m-0 text-h2">{props.title}</h1>
+        {props.hint && <p className="m-0 text-isi text-tinta-muted">{props.hint}</p>}
+      </div>
+      {/* Two columns from 1024 px; a field or question that needs the room spans both (lg:col-span-2). */}
+      <div className="grid gap-4 lg:grid-cols-2">{props.children}</div>
       {props.message && (
         <p role="alert" className="m-0 text-body text-alpa">
           {props.message}
@@ -142,9 +145,14 @@ export function ProfileStep({ setup, schoolId, onCaps, onDone, onBack }: StepPro
 
 /** Features a profile turns on, for the summary before saving. */
 function presetSummary(level: Level, isMadrasah: boolean): string[] {
-  const caps = presetCapabilities(level, isMadrasah);
+  return describeCaps(presetCapabilities(level, isMadrasah));
+}
+
+/** The switched-on features in words, e.g. "Mode presensi: per jam pelajaran". Values as the API gives them. */
+export function describeCaps(caps: Caps): string[] {
   return CAPABILITY_KEYS.flatMap((key) => {
     const value = caps[key];
+    if (value === undefined || value === null) return [];
     if (CAPABILITIES[key].kind === 'bool') return value === true ? [CAPABILITY_LABELS[key]] : [];
     if (value === 'off') return [];
     return [`${CAPABILITY_LABELS[key]}: ${CAPABILITY_VALUE_LABELS[String(value)] ?? String(value)}`];
@@ -169,9 +177,19 @@ export function LevelStep({ setup, schoolId, onCaps, onDone, onBack }: StepProps
     });
   return (
     <Shell title={t.levelTitle} busy={busy} message={message} onBack={onBack} onSubmit={submit}>
-      <ChoiceGroup legend={t.level} name="level" options={LEVEL_OPTIONS} value={level} onValueChange={(v) => setLevel(v as Level)} />
+      <ChoiceGroup
+        legend={t.level}
+        name="level"
+        columns={4}
+        className="lg:col-span-2"
+        options={LEVEL_OPTIONS.map((o) => ({ ...o, hint: t.levelHints[o.value] }))}
+        value={level}
+        onValueChange={(v) => setLevel(v as Level)}
+      />
       <ChoiceGroup
         legend={t.madrasahQuestion}
+        columns={2}
+        className="lg:col-span-2"
         name="madrasah"
         options={[
           { value: 'ya', label: t.madrasahYes },
@@ -180,7 +198,9 @@ export function LevelStep({ setup, schoolId, onCaps, onDone, onBack }: StepProps
         value={madrasah ? 'ya' : 'bukan'}
         onValueChange={(v) => setMadrasah(v === 'ya')}
       />
-      <PresetSummary testId="preset-summary" title={fill(t.presetTitle, { level: LEVEL_LABELS[level], madrasah: madrasah ? t.madrasahSuffix : '' })} items={presetSummary(level, madrasah)} />
+      <div className="lg:col-span-2">
+        <PresetSummary testId="preset-summary" title={fill(t.presetTitle, { level: LEVEL_LABELS[level], madrasah: madrasah ? t.madrasahSuffix : '' })} items={presetSummary(level, madrasah)} />
+      </div>
     </Shell>
   );
 }
@@ -191,6 +211,8 @@ function YesNo({ name, legend, defaultValue }: { name: string; legend: string; d
       legend={legend}
       name={name}
       required
+      columns={2}
+      className="lg:col-span-2"
       defaultValue={defaultValue ? 'ya' : 'tidak'}
       options={[
         { value: 'ya', label: t.yes },
@@ -228,9 +250,9 @@ export function ImportStep({ caps, onDone, onBack }: StepProps) {
   const source = caps['data.source'] === 'emis' ? 'EMIS' : 'Dapodik';
   return (
     <Shell title={t.importTitle} hint={fill(t.importHint, { source })} busy={busy} message={message} onBack={onBack} submitLabel={t.skipForNow} onSubmit={(e) => void run(e, () => onDone('skipped'))}>
-      <div className="flex flex-col gap-2 rounded-lg border border-garis bg-kapur-raised p-4">
-        <strong className="text-body-strong">{fill(t.importFrom, { source })}</strong>
-        <p className="m-0 text-body text-tinta-muted">{source === 'Dapodik' ? t.importDapodik : t.importEmis}</p>
+      <div className="flex flex-col gap-2 rounded-ubin bg-ubin p-4 lg:col-span-2">
+        <strong className="text-isi-strong">{fill(t.importFrom, { source })}</strong>
+        <p className="m-0 text-isi text-tinta-muted">{source === 'Dapodik' ? t.importDapodik : t.importEmis}</p>
       </div>
     </Shell>
   );
@@ -287,14 +309,18 @@ export function InviteStep({ schoolId, onDone, onBack }: StepProps) {
   return (
     <div className="flex flex-col gap-5">
       <form className="flex flex-col gap-5" onSubmit={submit}>
-        <h1 className="m-0 text-h1">{t.inviteTitle}</h1>
-        <p className="m-0 text-body text-tinta-muted">{t.inviteHint}</p>
+        <div className="flex flex-col gap-1">
+          <h1 className="m-0 text-h2">{t.inviteTitle}</h1>
+          <p className="m-0 text-isi text-tinta-muted">{t.inviteHint}</p>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
         <Field label={t.name}>
           <Input name="name" required minLength={2} />
         </Field>
         <ChoiceGroup
           legend={t.sendVia}
           name="channel"
+          columns={2}
           options={[
             { value: 'email', label: t.email },
             { value: 'whatsapp', label: t.whatsapp },
@@ -314,18 +340,19 @@ export function InviteStep({ schoolId, onDone, onBack }: StepProps) {
             ))}
           </Select>
         </Field>
+        </div>
         {message && (
           <p role="alert" className="m-0 text-body text-alpa">
             {message}
           </p>
         )}
-        <Button type="submit" variant="secondary" loading={busy}>
+        <Button type="submit" variant="secondary" loading={busy} className="self-start">
           {t.invite}
         </Button>
       </form>
 
       {invited.length > 0 && (
-        <ul aria-label={t.invited} className="m-0 flex list-none flex-col gap-2 p-0">
+        <ul aria-label={t.invited} className="m-0 grid list-none gap-2 p-0 lg:grid-cols-2">
           {invited.map((i) => (
             <li key={i.link} className="flex flex-col gap-1 rounded-lg border border-garis bg-kapur-raised p-3">
               <strong className="text-body-strong">

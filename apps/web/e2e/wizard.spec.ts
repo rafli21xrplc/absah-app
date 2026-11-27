@@ -78,9 +78,9 @@ for (const c of cases) {
     await page.getByLabel('Nama').fill('Guru E2E');
     await page.getByRole('textbox', { name: 'Email' }).fill(`guru-${randomDigits(10)}@test.local`);
     await choose(page.getByLabel('Peran'), 'guru');
-    await page.getByRole('button', { name: 'Undang' }).click();
+    await page.getByRole('button', { name: 'Undang', exact: true }).click();
     await expect(page.getByRole('list', { name: 'Sudah diundang' })).toContainText('/undangan#');
-    await page.getByRole('button', { name: 'Selesai' }).click();
+    await page.getByRole('button', { name: 'Selesai', exact: true }).click();
 
     // Home with the menu filtered by capabilities
     await expect(page.getByRole('heading', { name: 'Halo, Admin E2E' })).toBeVisible();

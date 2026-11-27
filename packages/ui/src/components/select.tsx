@@ -39,7 +39,7 @@ function NativeSelect({ className, children, ...props }: SelectHTMLAttributes<HT
         id={c.id}
         aria-describedby={c['aria-describedby']}
         aria-invalid={c['aria-invalid']}
-        className={cx(controlClass, 'min-h-12 cursor-pointer appearance-none pr-10 lg:min-h-9', borderClass(c.invalid), className)}
+        className={cx(controlClass, 'min-h-12 cursor-pointer appearance-none pr-10 lg:min-h-9 lg:max-w-120', borderClass(c.invalid), className)}
       >
         {children}
       </select>

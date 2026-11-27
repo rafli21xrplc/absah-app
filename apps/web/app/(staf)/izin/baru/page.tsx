@@ -1,7 +1,7 @@
 'use client';
 
-import { CreateLeaveAttachmentResponse, LEAVE_ATTACHMENT_MAX_BYTES, LEAVE_ATTACHMENT_TYPES, LeaveRequest, LeaveStudentList, type LeaveKind } from '@absah/contracts';
-import { Button, DateRangeInput, Select } from '@absah/ui';
+import { CreateLeaveAttachmentResponse, LEAVE_ATTACHMENT_MAX_BYTES, LEAVE_ATTACHMENT_TYPES, LeaveRequest, LeaveRequestList, LeaveStudentList, type LeaveKind } from '@absah/contracts';
+import { Avatar, BoardSection, Button, Chip, DateRangeInput, ListCardList, ListCardRow, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -95,56 +95,112 @@ export default function IzinBaruPage() {
         ← Izin siswa
       </Link>
       <h1 className={styles.title}>Catat izin</h1>
-      <form className={forms.form} onSubmit={(e) => void submit(e)}>
-        <label className={forms.field}>
-          <span className={forms.label}>Siswa</span>
-          <Select required value={enrollmentId} onChange={(e) => change(setEnrollmentId)(e.target.value)}>
-            <option value="">{students ? 'Pilih siswa' : 'Memuat…'}</option>
-            {students?.map((s) => (
-              <option key={s.enrollmentId} value={s.enrollmentId}>
-                {s.name} · {s.className}
-              </option>
+      <div className={styles.withAside}>
+        <form className={forms.form} onSubmit={(e) => void submit(e)}>
+          <label className={forms.field}>
+            <span className={forms.label}>Siswa</span>
+            <Select required value={enrollmentId} onChange={(e) => change(setEnrollmentId)(e.target.value)}>
+              <option value="">{students ? 'Pilih siswa' : 'Memuat…'}</option>
+              {students?.map((s) => (
+                <option key={s.enrollmentId} value={s.enrollmentId}>
+                  {s.name} · {s.className}
+                </option>
+              ))}
+            </Select>
+          </label>
+          <div className={ui.segment} role="group" aria-label="Jenis">
+            {(['sakit', 'izin'] as const).map((k) => (
+              <button key={k} type="button" aria-pressed={kind === k} onClick={() => change(setKind)(k)}>
+                {LEAVE_KIND_LABELS[k]}
+              </button>
             ))}
-          </Select>
-        </label>
-        <div className={ui.segment} role="group" aria-label="Jenis">
-          {(['sakit', 'izin'] as const).map((k) => (
-            <button key={k} type="button" aria-pressed={kind === k} onClick={() => change(setKind)(k)}>
-              {LEAVE_KIND_LABELS[k]}
-            </button>
-          ))}
-        </div>
-        <div className={forms.field}>
-          <span className={forms.label}>Tanggal izin</span>
-          <DateRangeInput
-            aria-label="Tanggal izin"
-            required
-            from={startsOn}
-            to={endsOn}
-            onChange={(from, to) => {
-              change(setStartsOn)(from);
-              setEndsOn(to);
-            }}
-          />
-        </div>
-        <label className={forms.field}>
-          <span className={forms.label}>Alasan</span>
-          <textarea className={ui.reason} required minLength={3} maxLength={500} value={reason} onChange={(e) => change(setReason)(e.target.value)} />
-        </label>
-        <label className={forms.field}>
-          <span className={forms.label}>Surat atau foto (opsional)</span>
-          <input className={forms.input} type="file" accept={LEAVE_ATTACHMENT_TYPES.join(',')} onChange={(e) => change(setFile)(e.target.files?.[0] ?? null)} />
-          <span className={forms.hint}>Foto atau PDF, maksimal 5 MB.</span>
-        </label>
-        {error && (
-          <p className={forms.error} role="alert">
-            {error}
-          </p>
-        )}
-        <Button type="submit" disabled={busy || !enrollmentId}>
-          {busy ? 'Menyimpan…' : 'Simpan izin'}
-        </Button>
-      </form>
+          </div>
+          <div className={forms.field}>
+            <span className={forms.label}>Tanggal izin</span>
+            <DateRangeInput
+              aria-label="Tanggal izin"
+              required
+              from={startsOn}
+              to={endsOn}
+              onChange={(from, to) => {
+                change(setStartsOn)(from);
+                setEndsOn(to);
+              }}
+            />
+          </div>
+          <label className={forms.field}>
+            <span className={forms.label}>Alasan</span>
+            <textarea className={ui.reason} required minLength={3} maxLength={500} value={reason} onChange={(e) => change(setReason)(e.target.value)} />
+          </label>
+          <label className={forms.field}>
+            <span className={forms.label}>Surat atau foto (opsional)</span>
+            <input className={forms.input} type="file" accept={LEAVE_ATTACHMENT_TYPES.join(',')} onChange={(e) => change(setFile)(e.target.files?.[0] ?? null)} />
+            <span className={forms.hint}>Foto atau PDF, maksimal 5 MB.</span>
+          </label>
+          {error && (
+            <p className={forms.error} role="alert">
+              {error}
+            </p>
+          )}
+          <Button type="submit" disabled={busy || !enrollmentId}>
+            {busy ? 'Menyimpan…' : 'Simpan izin'}
+          </Button>
+        </form>
+        <aside className={styles.aside} aria-label="Tentang izin">
+          <PendingLeave schoolId={schoolId} />
+          <BoardSection title="Cara izin dicatat" state="ready">
+            <ul className="m-0 flex list-disc flex-col gap-2 pl-5 text-isi text-tinta">
+              <li>Dicatat wali kelas atau staf setelah telepon atau surat: langsung disetujui dan presensi siswa terisi otomatis.</li>
+              <li>Diajukan orang tua lewat portal: menunggu persetujuan wali kelas.</li>
+              <li>Lampiran surat dokter atau foto: JPG, PNG, atau PDF, paling besar {Math.round(LEAVE_ATTACHMENT_MAX_BYTES / 1024 / 1024)} MB.</li>
+              <li>Izin beberapa hari: pilih tanggal mulai, lalu tanggal selesai di kalender.</li>
+            </ul>
+          </BoardSection>
+        </aside>
+      </div>
     </main>
+  );
+}
+
+/** What is still waiting, so the person recording sees whether this student already has a request open. */
+function PendingLeave({ schoolId }: { schoolId: string | null }) {
+  const [list, setList] = useState<LeaveRequestList['items'] | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (!schoolId) return;
+    api('/leave-requests?status=pending', LeaveRequestList, { schoolId })
+      .then((r) => setList(r.items))
+      .catch(() => setFailed(true));
+  }, [schoolId, attempt]);
+  const shown = list?.slice(0, 5) ?? [];
+  return (
+    <BoardSection
+      title="Menunggu persetujuan"
+      {...(list && list.length > 0 ? { count: `${list.length} izin` } : {})}
+      state={failed ? 'error' : list === null ? 'loading' : list.length === 0 ? 'empty' : 'ready'}
+      emptyText="Tidak ada izin yang menunggu."
+      onRetry={() => {
+        setFailed(false);
+        setAttempt((n) => n + 1);
+      }}
+    >
+      <ListCardList label="Izin menunggu persetujuan">
+        {shown.map((l) => (
+          <ListCardRow
+            key={l.id}
+            lead={<Avatar name={l.student.name} seed={l.student.enrollmentId} size={30} />}
+            title={l.student.name}
+            tags={<Chip tone={l.kind === 'sakit' ? 'sakit' : 'izin'}>{LEAVE_KIND_LABELS[l.kind]}</Chip>}
+            detail={`${l.student.className} · ${dateRangeLabel(l.startsOn, l.endsOn)}`}
+          />
+        ))}
+      </ListCardList>
+      {list && list.length > shown.length && (
+        <Link className="text-small font-bold text-papan" href="/izin">
+          Lihat semua {list.length} izin
+        </Link>
+      )}
+    </BoardSection>
   );
 }

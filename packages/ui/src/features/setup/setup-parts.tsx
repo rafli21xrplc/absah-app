@@ -63,6 +63,7 @@ export function ChoiceGroup({
   defaultValue,
   onValueChange,
   required,
+  columns = 1,
   className,
 }: {
   legend: string;
@@ -72,16 +73,18 @@ export function ChoiceGroup({
   defaultValue?: string;
   onValueChange?: (value: string) => void;
   required?: boolean;
+  /** Cards side by side on a wide screen (2: from 640 px; 4: two from 640 px, four from 1024 px). One column on a phone. */
+  columns?: 1 | 2 | 4;
   className?: string;
 }) {
   const id = useId();
   return (
-    <fieldset className={cx('m-0 flex flex-col gap-2 border-0 p-0', className)}>
-      <legend className="mb-1 p-0 text-small font-semibold text-tinta">{legend}</legend>
+    <fieldset className={cx('m-0 grid min-w-0 gap-2 border-0 p-0', columns === 2 && 'sm:grid-cols-2', columns === 4 && 'sm:grid-cols-2 lg:grid-cols-4', className)}>
+      <legend className="mb-2 p-0 text-small font-semibold text-tinta">{legend}</legend>
       {options.map((o, i) => (
         <div
           key={o.value}
-          className="relative grid min-h-12 grid-cols-[auto_1fr] items-center gap-x-3 gap-y-0.5 rounded-md border border-garis-kuat bg-kapur-raised px-3 py-2 text-body text-tinta has-[:checked]:border-2 has-[:checked]:border-papan"
+          className="relative grid min-h-12 grid-cols-[auto_1fr] items-center gap-x-3 gap-y-0.5 rounded-kontrol border border-garis-kuat bg-kapur-raised px-3 py-2 text-body text-tinta has-[:checked]:border-2 has-[:checked]:border-papan has-[:checked]:bg-papan-tipis lg:min-h-11 lg:text-isi"
         >
           <input
             id={`${id}-in-${i}`}
@@ -94,7 +97,7 @@ export function ChoiceGroup({
             className="relative z-10 size-5 accent-papan"
           />
           {/* The label is only the name; its ::after covers the card so a press anywhere on it chooses. */}
-          <label htmlFor={`${id}-in-${i}`} className="cursor-pointer text-body-strong after:absolute after:inset-0 after:content-['']">
+          <label htmlFor={`${id}-in-${i}`} className="cursor-pointer font-bold after:absolute after:inset-0 after:content-['']">
             {o.label}
           </label>
           {o.hint && (
@@ -111,9 +114,9 @@ export function ChoiceGroup({
 /** A short list of what an answer turns on, shown before saving. Polite live region: it changes as the choice changes. */
 export function PresetSummary({ title, items, testId }: { title: string; items: readonly string[]; testId?: string }) {
   return (
-    <div aria-live="polite" data-testid={testId} className="flex flex-col gap-2 rounded-lg border border-garis bg-kapur-raised p-4">
-      <strong className="text-body-strong">{title}</strong>
-      <ul className="m-0 flex list-disc flex-col gap-1 pl-5 text-body text-tinta">
+    <div aria-live="polite" data-testid={testId} className="flex flex-col gap-2 rounded-ubin bg-ubin p-4">
+      <strong className="text-isi-strong">{title}</strong>
+      <ul className="m-0 grid list-disc gap-x-6 gap-y-1 pl-5 text-isi text-tinta sm:grid-cols-2 xl:grid-cols-3">
         {items.map((line) => (
           <li key={line}>{line}</li>
         ))}
@@ -125,9 +128,9 @@ export function PresetSummary({ title, items, testId }: { title: string; items: 
 /** Back on the left, the step's own actions on the right. */
 export function WizardNav({ onBack, backLabel, children }: { onBack?: () => void; backLabel: string; children: ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-3 pt-2">
+    <div className="flex items-center justify-between gap-3 border-t border-hairline pt-4">
       {onBack ? (
-        <button type="button" onClick={onBack} className="min-h-11 cursor-pointer rounded-md border border-garis-kuat bg-kapur-raised px-4 text-body-strong text-tinta">
+        <button type="button" onClick={onBack} className="min-h-11 cursor-pointer rounded-kontrol border border-batas-lembut bg-kapur-raised px-4 text-isi-strong font-semibold text-tinta hover:bg-ubin lg:min-h-10">
           {backLabel}
         </button>
       ) : (

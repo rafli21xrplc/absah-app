@@ -234,7 +234,7 @@ export async function choose(control: Locator, option: string | { label?: string
 /**
  * Fills a date, month or time box (DateInput). A phone shows the browser's <input>; a laptop shows a button that opens a
  * calendar in a popover, with the real <input> kept beside it as the form control. Either way the value goes through that
- * <input>, so one call serves both. The calendar itself is clicked by hand in popover.spec.ts.
+ * <input>, so one call serves both. The calendar itself is clicked in packages/ui date-input.test.tsx.
  */
 export async function pickDate(control: Locator, value: string) {
   await dateField(control).fill(value);
