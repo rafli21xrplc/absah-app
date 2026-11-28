@@ -7,10 +7,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState, type ComponentProps, type ReactNode } from 'react';
 import { useCapabilities } from '@/lib/capabilities';
 import { LEVEL_LABELS } from '@/lib/levels';
+import { arrangeMenu, togglePin, useMenuPrefs } from '@/lib/menu-prefs';
 import { ACCOUNT_LINKS, currentBarKey, currentItemKey, menuContext, TEACHER_BAR, usesTeacherBar, visibleMenu, type BarItem } from '@/lib/nav-menu';
 import { ROLE_LABELS } from '@/lib/roles';
 import { STUDENT_READERS } from '@/lib/student-access';
 import { useWorkspace } from '@/lib/workspace';
+import { MenuCustomizer } from './menu-customizer';
 import { useSignOut } from './sign-out-button';
 import { MIN_SEARCH, useStudentSearch } from './use-student-search';
 
@@ -58,20 +60,27 @@ export function StaffShell({ children }: { children: ReactNode }) {
     if (!group || !item) return pathname === '/' ? [{ label: messages.breadcrumb.home }] : [home];
     return [home, ...(group.title ? [{ label: sentence(group.title) }] : []), { label: item.label }];
   }, [groups, current, pathname]);
+  // The side menu as the person arranged it (V12). Crumbs and Ctrl+K keep the standard menu, so a hidden page is still found.
+  const [menuPrefs, setMenuPrefs] = useMenuPrefs(me.user.id, schoolId);
+  const [customizing, setCustomizing] = useState(false);
+  const arranged = useMemo(() => arrangeMenu(groups, menuPrefs, messages.menuCustom.pinnedTitle), [groups, menuPrefs]);
+  const onTogglePin = useCallback((key: string) => setMenuPrefs((p) => togglePin(p, key)), [setMenuPrefs]);
   const navGroups: SideNavGroup[] = useMemo(
     () =>
-      groups.map((g) => ({
+      arranged.groups.map((g) => ({
         key: g.key,
         ...(g.title ? { title: g.title } : {}),
+        ...(g.kind !== 'base' ? { defaultOpen: true } : {}),
         items: g.items.map((i) => ({
           key: i.key,
           label: i.label,
           href: i.href,
           icon: <i.icon aria-hidden strokeWidth={1.75} className="size-5" />,
           current: i.key === current,
+          pinned: g.kind === 'pinned',
         })),
       })),
-    [groups, current],
+    [arranged, current],
   );
 
   const canSearchStudents = ctx.hasRole(...STUDENT_READERS);
@@ -175,7 +184,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
   return (
     <AppShell
       sidebar={
-        <SideNav groups={navGroups} linkAs={MenuLink} collapsible tone="sidebar" />
+        <SideNav groups={navGroups} linkAs={MenuLink} collapsible tone="sidebar" onTogglePin={onTogglePin} onCustomize={() => setCustomizing(true)} />
       }
       sidebarHeader={
         <>
@@ -216,7 +225,17 @@ export function StaffShell({ children }: { children: ReactNode }) {
             </AppTopBar>
             <Sheet open={open} onOpenChange={setOpen} title="Menu" eyebrow={school.name}>
               {switcher}
-              <SideNav groups={navGroups} linkAs={MenuLink} collapsible onNavigate={() => setOpen(false)} />
+              <SideNav
+                groups={navGroups}
+                linkAs={MenuLink}
+                collapsible
+                onNavigate={() => setOpen(false)}
+                onTogglePin={onTogglePin}
+                onCustomize={() => {
+                  setOpen(false);
+                  setCustomizing(true);
+                }}
+              />
               <div className="flex flex-col gap-1 border-t border-garis pt-3">
                 <div className="px-2 pb-2">
                   <AccountSummary name={me.user.name} detail={roleLine} />
@@ -241,6 +260,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
         />
       )}
       {signOutDialog}
+      <MenuCustomizer open={customizing} onOpenChange={setCustomizing} base={groups} prefs={menuPrefs} onSave={(p) => setMenuPrefs(() => p)} />
       <CommandPalette
         open={paletteOpen}
         onOpenChange={(next) => {
