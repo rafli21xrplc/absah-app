@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Pin, PinOff, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState, type ElementType, type ReactNode } from 'react';
 import { messages } from '../../messages/id';
 import { cx } from '../cx';
@@ -15,6 +15,8 @@ export interface SideNavItem {
   current?: boolean;
   /** A count next to the label (v3), e.g. izin waiting. `label` is the spoken text ("4 izin menunggu"). */
   badge?: { count: number; tone: 'stabilo' | 'alpa'; label: string };
+  /** On the person's pinned list (V12): the pin next to it stays visible and unpins it. */
+  pinned?: boolean;
 }
 
 const BADGE = { stabilo: 'bg-stabilo-soft text-on-stabilo-soft', alpa: 'bg-alpa-soft text-alpa' } as const;
@@ -24,6 +26,8 @@ export interface SideNavGroup {
   /** Small heading above the group (e.g. "DATA SEKOLAH"). A group without one is a plain list. */
   title?: string;
   items: readonly SideNavItem[];
+  /** Starts open until the person shuts it (V12: their pinned items and own groups are what they want to see). */
+  defaultOpen?: boolean;
 }
 
 export interface SideNavProps {
@@ -42,6 +46,10 @@ export interface SideNavProps {
   storageKey?: string;
   /** "sidebar": on the light v3 side column of a laptop (an icon rail from 1024 to 1279 px). "light" (default): on a light surface, e.g. the phone's sheet. */
   tone?: 'light' | 'sidebar';
+  /** Shows a pin button next to every link (V12). Hidden on the icon rail; the "Atur menu" panel does the same there. */
+  onTogglePin?: (key: string) => void;
+  /** Opens the panel where the person arranges the menu: a quiet button under the last group. */
+  onCustomize?: () => void;
 }
 
 const DEFAULT_KEY = 'absah-menu';
@@ -74,7 +82,7 @@ function useGroupMemory(key: string, enabled: boolean): [Record<string, boolean>
 }
 
 /** The staff side menu: groups of links, the current one marked with aria-current="page". The caller drops items that must not show. */
-export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavigate, className, collapsible = false, storageKey = DEFAULT_KEY, tone = 'light' }: SideNavProps) {
+export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavigate, className, collapsible = false, storageKey = DEFAULT_KEY, tone = 'light', onTogglePin, onCustomize }: SideNavProps) {
   const dark = tone === 'sidebar';
   const Link = linkAs ?? 'a';
   const [memory, remember] = useGroupMemory(storageKey, collapsible);
@@ -87,7 +95,7 @@ export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavi
       {groups.map((group) => {
         const folds = collapsible && Boolean(group.title) && !rail;
         const holdsCurrent = group.items.some((i) => i.current);
-        const open = !folds || holdsCurrent || (memory[group.key] ?? false);
+        const open = !folds || holdsCurrent || (memory[group.key] ?? group.defaultOpen ?? false);
         const listId = `menu-${group.key}`;
         return (
           <div key={group.key} className="flex flex-col gap-1">
@@ -117,7 +125,7 @@ export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavi
             {open && (
             <ul id={listId} className="m-0 flex list-none flex-col gap-px p-0">
               {group.items.map((item) => (
-                <li key={item.key}>
+                <li key={item.key} className="group/item relative">
                   <Link
                     href={item.href}
                     aria-current={item.current ? 'page' : undefined}
@@ -126,6 +134,8 @@ export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavi
                     className={cx(
                       // The current item is bold, filled and has a 4 px bar on the left (v3), so it does not depend on colour alone.
                       'relative flex min-h-11 items-center gap-3 rounded-kontrol px-3 text-isi no-underline lg:min-h-10',
+                      // Room on the right for the pin button, which sits over the link (a button may not live inside a link).
+                      onTogglePin && 'pr-11 lg:max-xl:pr-0',
                       dark && 'lg:max-xl:justify-center lg:max-xl:px-0',
                       item.current
                         ? dark
@@ -151,6 +161,32 @@ export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavi
                       </span>
                     )}
                   </Link>
+                  {onTogglePin && (
+                    <button
+                      type="button"
+                      aria-label={item.pinned ? messages.sideNav.unpin(item.label) : messages.sideNav.pin(item.label)}
+                      aria-pressed={item.pinned ?? false}
+                      title={item.pinned ? messages.sideNav.unpinShort : messages.sideNav.pinShort}
+                      onClick={() => onTogglePin(item.key)}
+                      className={cx(
+                        'absolute right-1 top-1/2 inline-flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent lg:size-8 lg:max-xl:hidden',
+                        // Quiet until the row is hovered or focused; always there when pinned and on touch screens (no hover).
+                        item.pinned ? 'opacity-100' : 'opacity-0 group-hover/item:opacity-100 focus-visible:opacity-100 group-focus-within/item:opacity-100 [@media(hover:none)]:opacity-100',
+                        dark ? 'text-sidebar-muted hover:bg-sidebar-hover hover:text-on-sidebar' : 'text-tinta-muted hover:bg-kapur hover:text-tinta',
+                        item.pinned && 'text-papan',
+                      )}
+                    >
+                      {/* Pinned: a filled pin, which turns into "lepas" under the pointer or focus. */}
+                      {item.pinned ? (
+                        <>
+                          <Pin aria-hidden strokeWidth={1.75} className="size-4 fill-current group-hover/item:hidden group-focus-within/item:hidden" />
+                          <PinOff aria-hidden strokeWidth={1.75} className="hidden size-4 group-hover/item:block group-focus-within/item:block" />
+                        </>
+                      ) : (
+                        <Pin aria-hidden strokeWidth={1.75} className="size-4" />
+                      )}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
@@ -158,6 +194,21 @@ export function SideNav({ groups, linkAs, label = messages.sideNav.label, onNavi
           </div>
         );
       })}
+      {onCustomize && (
+        <button
+          type="button"
+          onClick={onCustomize}
+          title={rail ? messages.sideNav.customize : undefined}
+          aria-haspopup="dialog"
+          className={cx(
+            'box-border flex min-h-10 w-full cursor-pointer items-center gap-3 rounded-kontrol border border-dashed bg-transparent px-3 text-left text-small font-semibold',
+            dark ? 'border-sidebar-muted/40 text-sidebar-muted hover:bg-sidebar-hover hover:text-on-sidebar lg:max-xl:justify-center lg:max-xl:px-0' : 'border-garis-kuat text-tinta-muted hover:bg-kapur hover:text-tinta',
+          )}
+        >
+          <SlidersHorizontal aria-hidden strokeWidth={1.75} className="size-4 shrink-0" />
+          <span className={railText}>{messages.sideNav.customize}</span>
+        </button>
+      )}
     </nav>
   );
 }
