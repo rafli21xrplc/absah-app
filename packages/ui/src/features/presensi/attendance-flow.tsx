@@ -150,7 +150,7 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
     // Saved on the phone is "tersimpan" until the last waiting one went out; then it is simply sent.
     const saved = phase === 'saved' && waitingCount > 0;
     return (
-      <main className="mx-auto box-border flex min-h-dvh w-full max-w-xl flex-col items-center justify-center gap-4 px-6 py-8 text-center">
+      <main className="mx-auto box-border flex min-h-dvh w-full max-w-xl flex-col items-center justify-center gap-4 px-6 py-8 text-center lg:min-h-[calc(100dvh-4.5rem)]">
         <span aria-hidden className={cx('inline-flex size-16 items-center justify-center rounded-lg', saved ? 'bg-stabilo text-on-stabilo' : 'bg-papan text-on-papan')}>
           {saved ? <Smartphone strokeWidth={2.25} className="size-8" /> : <CircleCheck strokeWidth={2.25} className="size-8" />}
         </span>
@@ -193,8 +193,10 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
 
   return (
     <ToastProvider duration={7000} viewportClassName="pointer-events-none fixed inset-x-0 bottom-28 z-50 m-0 flex list-none flex-col gap-2 p-4 sm:left-auto sm:right-4 sm:w-96">
-      <main className="mx-auto box-border flex h-[calc(100dvh-var(--offline-notice,0px))] w-full max-w-xl flex-col">
-        <header className="flex shrink-0 items-center gap-3 border-b border-garis bg-kapur-raised px-3 py-3">
+      {/* Phone: one column of the screen's height. Laptop (V10): the whole width next to the menu; the list fills the left in
+          columns and scrolls on its own, progress, filters, totals and the send button stay in the panel on the right. */}
+      <main className="mx-auto box-border flex h-[calc(100dvh-var(--offline-notice,0px))] w-full max-w-xl flex-col lg:grid lg:h-[calc(100dvh-4.5rem-var(--offline-notice,0px))] lg:max-w-none lg:grid-cols-[minmax(0,1fr)_22rem] lg:grid-rows-[auto_auto_minmax(0,1fr)_auto] lg:gap-x-6 lg:gap-y-4 lg:px-8 lg:pb-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <header className="flex shrink-0 items-center gap-3 border-b border-garis bg-kapur-raised px-3 py-3 lg:col-span-2 lg:rounded-lg lg:border">
           <Link href={backHref} aria-label={t.back} className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-tinta no-underline">
             <span aria-hidden className="text-h2">‹</span>
           </Link>
@@ -209,9 +211,9 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
           )}
         </header>
 
-        {banner && <div className="shrink-0">{banner}</div>}
+        {banner && <div className="shrink-0 lg:col-span-2 lg:overflow-hidden lg:rounded-lg">{banner}</div>}
 
-        <div className="flex shrink-0 flex-col gap-3 bg-kapur px-4 pb-3 pt-4">
+        <div className="flex shrink-0 flex-col gap-3 bg-kapur px-4 pb-3 pt-4 lg:col-start-2 lg:row-start-3 lg:min-h-0 lg:overflow-y-auto lg:rounded-lg lg:border lg:border-garis lg:bg-kapur-raised lg:p-4">
           <ProgressBar
             label={t.progressLabel}
             value={c.filled}
@@ -220,15 +222,34 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
             aside={dateLabel}
             text={complete ? fill(t.progressDone, { n: c.total }) : fill(t.progress, { k: c.filled, n: c.total })}
           />
-          <div role="group" aria-label={t.filterLabel} className="grid grid-cols-3 gap-2">
+          <div role="group" aria-label={t.filterLabel} className="grid grid-cols-3 gap-2 lg:grid-cols-1">
             <FilterChip label={t.filterAll} count={c.total} selected={state.filter === 'all'} onClick={() => dispatch({ type: 'setFilter', filter: 'all' })} />
             <FilterChip label={t.filterUnfilled} count={c.unfilled} selected={state.filter === 'unfilled'} onClick={() => dispatch({ type: 'setFilter', filter: 'unfilled' })} />
             <FilterChip label={t.filterAbsent} count={c.absent} selected={state.filter === 'absent'} onClick={() => dispatch({ type: 'setFilter', filter: 'absent' })} />
           </div>
+          {/* Laptop only: what each status means, so the panel next to the list explains the choices before a row is opened. */}
+          <section aria-labelledby="arti-status" className="hidden flex-col gap-2 border-t border-garis pt-3 lg:flex">
+            <h2 id="arti-status" className="m-0 text-small font-bold uppercase text-tinta-muted">
+              {t.legendTitle}
+            </h2>
+            <ul className="m-0 flex list-none flex-col gap-2 p-0">
+              {STATUSES.map((status) => (
+                <li key={status} className="flex items-start gap-3">
+                  <span aria-hidden className={cx('inline-flex size-7 shrink-0 items-center justify-center rounded-sm text-small font-bold', STATUS_LOOK[status].chip)}>
+                    {status}
+                  </span>
+                  <span className="flex min-w-0 flex-col">
+                    <span className="text-small font-bold">{statusTokens(status).kata}</span>
+                    <span className="text-small text-tinta-muted">{DESC[status]}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
 
         {/* The list scrolls on its own; the header, filters and footer stay in the flow, so nothing is ever drawn over a row. */}
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 pb-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 pb-4 lg:col-start-1 lg:row-span-2 lg:row-start-3 lg:px-0 lg:pb-0">
           {readOnly && readOnlyNote}
           {state.help && !readOnly && !correction && (
             <section aria-label={t.helpLabel} className="flex flex-col gap-3 rounded-lg bg-papan-soft p-4">
@@ -273,12 +294,12 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
               {state.filter === 'unfilled' ? t.emptyUnfilled : t.emptyAbsent}
             </p>
           ) : (
-            <ul className="m-0 flex list-none flex-col gap-2 p-0">
+            <ul className="m-0 flex list-none flex-col gap-2 p-0 lg:grid lg:grid-cols-2 min-[1800px]:grid-cols-3">
               {ids.map((id) => {
                 const s = byId.get(id);
                 if (!s) return null;
                 return (
-                  <li key={id}>
+                  <li key={id} className="lg:flex lg:[&>*]:flex-1">
                     <AttendanceRow
                       name={s.name}
                       detail={s.detail}
@@ -294,11 +315,12 @@ export function AttendanceFlow(props: AttendanceFlowProps) {
         </div>
 
         {!readOnly && (
-          <footer className="flex shrink-0 flex-col gap-2 border-t border-garis bg-kapur-raised px-4 py-3">
-            <div className="flex justify-between gap-2 text-small tabular-nums text-tinta-muted">
+          <footer className="flex shrink-0 flex-col gap-2 border-t border-garis bg-kapur-raised px-4 py-3 lg:col-start-2 lg:row-start-4 lg:gap-3 lg:rounded-lg lg:border lg:p-4">
+            {/* Phone: one line of totals. Laptop: five tiles, so the panel shows the class at a glance. */}
+            <div className="flex justify-between gap-2 text-small tabular-nums text-tinta-muted lg:grid lg:grid-cols-5">
               {STATUSES.map((s) => (
-                <span key={s}>
-                  {statusTokens(s).kata} {c[s]}
+                <span key={s} className="lg:flex lg:flex-col-reverse lg:items-center lg:rounded-md lg:border lg:border-garis lg:bg-kapur lg:py-2">
+                  {statusTokens(s).kata} <span className="lg:text-h2 lg:text-tinta">{c[s]}</span>
                 </span>
               ))}
             </div>

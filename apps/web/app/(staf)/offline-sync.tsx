@@ -93,7 +93,7 @@ export function OfflineSync() {
 
   if (!shown) return null;
   return (
-    <aside ref={box} aria-label={messages.presensi.waitingTitle} className="mx-auto flex w-full max-w-xl flex-col gap-2 px-4 pt-3">
+    <aside ref={box} aria-label={messages.presensi.waitingTitle} className="mx-auto flex w-full max-w-xl flex-col gap-2 px-4 pt-3 lg:max-w-none lg:px-8">
       {waiting.length > 0 && (
         <Banner
           kind="offline"

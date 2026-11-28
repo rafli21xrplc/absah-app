@@ -1,6 +1,6 @@
 'use client';
 
-import { AccountMenu, AccountSummary, AppShell, AppTopBar, BottomNav, BrandMark, Breadcrumbs, Button, ThemeToggle, CommandPalette, menuItemStyles, messages, SchoolSwitcher, SearchTrigger, Select, Sheet, SideNav, ThemeSwitch, useCommandShortcut, useTheme, WorkspaceLabel, type CommandGroupData, type SideNavGroup } from '@absah/ui';
+import { AccountMenu, AccountSummary, AppShell, AppTopBar, NarrowScreenGuard, BottomNav, BrandMark, Breadcrumbs, Button, ThemeToggle, CommandPalette, menuItemStyles, messages, SchoolSwitcher, SearchTrigger, Select, Sheet, SideNav, ThemeSwitch, useCommandShortcut, useTheme, WorkspaceLabel, type CommandGroupData, type SideNavGroup } from '@absah/ui';
 import { LogOut, Monitor, Moon, Search, Sun, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -229,6 +229,17 @@ export function StaffShell({ children }: { children: ReactNode }) {
       }
     >
       {children}
+      {/* Admin pages are made for a laptop: under 500 px they are covered, with Keluar as the way out (V10). */}
+      {ctx.hasRole('admin') && (
+        <NarrowScreenGuard
+          action={
+            <Button variant="secondary" onClick={() => void askSignOut()}>
+              <LogOut aria-hidden strokeWidth={1.75} className="size-5" />
+              {t.signOut}
+            </Button>
+          }
+        />
+      )}
       {signOutDialog}
       <CommandPalette
         open={paletteOpen}

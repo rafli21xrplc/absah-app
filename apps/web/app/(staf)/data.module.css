@@ -1,9 +1,8 @@
 .main {
-  max-width: 1440px;
   margin: 0 auto;
   padding: 24px 16px 48px;
 }
-/* V9: as wide as the v3 boards (PageMain full) and on the same left edge as the breadcrumb. */
+/* V10: no cap, the page fills the space next to the side menu, on the same left edge as the breadcrumb. */
 @media (min-width: 1024px) {
   .main {
     padding: 8px 32px 48px;
