@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatePointEvidenceResponse, PointEntry, PointRuleList, PointStudentList, type PointRule } from '@absah/contracts';
-import { Button, DateInput, Select } from '@absah/ui';
+import { Button, DateInput, EmptyState, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -44,7 +44,7 @@ export default function PoinPage() {
         {hasRole(...POINT_RECORDERS) ? (
           <NewEntry schoolId={schoolId} timezone={timezone} onDone={(entry, student) => setNotice({ entry, student })} />
         ) : (
-          <p className={styles.empty}>Peran Anda tidak mencatat poin. Poin siswa dibuka dari daftar tugas tindak lanjut.</p>
+          <EmptyState bare headingLevel="p" kind="noAccess" title="Peran Anda tidak mencatat poin.">Poin siswa dibuka dari daftar tugas tindak lanjut.</EmptyState>
         )}
       </main>
     </IfCap>
@@ -153,7 +153,7 @@ function NewEntry({ schoolId, timezone, onDone }: { schoolId: string | null; tim
           ))}
         </Select>
       </label>
-      {rules.length === 0 && <p className={styles.empty}>Belum ada aturan poin. Wakasek atau admin menambahkannya di halaman aturan.</p>}
+      {rules.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada aturan poin.">Wakasek atau admin menambahkannya di halaman aturan.</EmptyState>}
       <label className={forms.field}>
         Tanggal kejadian
         <DateInput

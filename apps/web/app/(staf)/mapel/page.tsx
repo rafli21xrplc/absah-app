@@ -97,7 +97,7 @@ export default function MapelPage() {
       )}
       {section.state === 'loading' && <SkeletonRows count={6} />}
       {section.state === 'empty' && <EmptyState title={t.empty}>{canManage ? t.emptyManage : t.emptyRead}</EmptyState>}
-      {items && items.length > 0 && shown.length === 0 && <EmptyState title={t.emptySearch}>{t.emptySearchBody}</EmptyState>}
+      {items && items.length > 0 && shown.length === 0 && <EmptyState kind="search" title={t.emptySearch}>{t.emptySearchBody}</EmptyState>}
       {shown.length > 0 && (
         <Table caption={t.table} className="min-w-96">
           <TableHead>

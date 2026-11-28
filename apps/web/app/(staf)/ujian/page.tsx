@@ -1,5 +1,6 @@
 'use client';
 
+import { EmptyState } from '@absah/ui';
 import { ExamPeriod, ExamPeriodList, MyRooms } from '@absah/contracts';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -94,7 +95,7 @@ function Periods({ manage }: { manage: boolean }) {
         </label>
         {error && <p role="alert">{error}</p>}
         {!items && !error && <p role="status">Memuat…</p>}
-        {items && items.length === 0 && <p className={styles.empty}>Belum ada ujian.</p>}
+        {items && items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada ujian." />}
         <ul>
           {items?.map((p) => (
             <li key={p.id}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { CandidateList, SubstitutionItem, SubstitutionList, type SubstituteCandidate } from '@absah/contracts';
-import { Button, DateInput } from '@absah/ui';
+import { Button, DateInput, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -44,7 +44,7 @@ export default function PenggantiPage() {
         </Link>
         <h1 className={styles.title}>Guru pengganti</h1>
         {!hasRole(...SUBSTITUTION_READING) ? (
-          <p className={styles.empty}>Peran Anda tidak membuka daftar guru pengganti.</p>
+          <EmptyState bare headingLevel="p" kind="noAccess" title="Peran Anda tidak membuka daftar guru pengganti." />
         ) : (
           <>
             <label className={forms.field}>
@@ -62,7 +62,7 @@ export default function PenggantiPage() {
                 {needed.length} sesi belum punya pengganti
               </p>
             )}
-            {items?.length === 0 && <p className={styles.empty}>Tidak ada sesi yang gurunya sedang izin.</p>}
+            {items?.length === 0 && <EmptyState bare headingLevel="p" kind="done" title="Tidak ada sesi yang gurunya sedang izin." />}
             <ul className={ui.sessions}>
               {items?.map((i) => (
                 <li key={i.session.id} className={ui.student} aria-label={`${i.session.owner.name} ${sessionTimeLabel(i.session.period)}`}>
@@ -136,7 +136,7 @@ function Candidates({ schoolId, item, onClose, onDone }: { schoolId: string | nu
         </p>
       )}
       {!list && !error && <p role="status">Memuat…</p>}
-      {list?.length === 0 && <p className={styles.empty}>Tidak ada guru yang kosong pada jam ini.</p>}
+      {list?.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Tidak ada guru yang kosong pada jam ini." />}
       <ul className={ui.sessions}>
         {list?.map((c) => (
           <li key={c.userId} className={ui.student}>

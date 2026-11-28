@@ -8,7 +8,7 @@ import { useWorkspace } from '@/lib/workspace';
 import styles from '../data.module.css';
 import { ExportButtons } from './export-buttons';
 import { PeriodPicker, usePeriod, useReport } from './period';
-import { Select } from '@absah/ui';
+import { EmptyState, Select } from '@absah/ui';
 
 /** Rekap S/I/A per rombel (RKP-01): every rombel for pimpinan, their own for a wali kelas. */
 function RekapList() {
@@ -82,7 +82,7 @@ function RekapList() {
               ))}
             </tbody>
           </table>
-          {rows.length === 0 && <p className={styles.empty}>Belum ada rombel pada tahun ajaran aktif.</p>}
+          {rows.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada rombel pada tahun ajaran aktif." />}
         </div>
       )}
       <p className={styles.muted}>Angka dalam hari sekolah. Hadir = hadir + terlambat dibagi semua hari tercatat.</p>

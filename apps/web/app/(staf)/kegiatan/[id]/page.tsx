@@ -1,7 +1,7 @@
 'use client';
 
 import { Activity, ActivityMemberList, ActivityRecap, SessionDetail } from '@absah/contracts';
-import { Button, DateInput } from '@absah/ui';
+import { Button, DateInput, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -163,7 +163,7 @@ function Members({ schoolId, activityId, canEdit, onSaved }: { schoolId: string 
   return (
     <section className={styles.section} aria-labelledby="peserta">
       <h2 id="peserta">Peserta ({members?.length ?? 0})</h2>
-      {members && members.length === 0 && <p className={styles.empty}>Belum ada peserta.</p>}
+      {members && members.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada peserta." />}
       <ul className={ui.sessions} aria-label="Peserta">
         {members?.map((m) => (
           <li key={m.enrollmentId} className={ui.student}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { FEE_KINDS, FeeType, FeeTypeList, type FeeKind } from '@absah/contracts';
-import { Button, Select } from '@absah/ui';
+import { Button, EmptyState, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -85,7 +85,7 @@ function Types() {
           {error}
         </p>
       )}
-      {items.length === 0 && <p className={styles.empty}>Belum ada jenis tagihan.</p>}
+      {items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada jenis tagihan." />}
       <ul className={ui.sessions}>
         {items.map((f) => (
           <li key={f.id} className={ui.student} aria-label={f.name}>

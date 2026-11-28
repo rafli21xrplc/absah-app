@@ -104,7 +104,7 @@ export default function StafPage() {
       )}
       {section.state === 'loading' && <SkeletonRows count={6} />}
       {section.state === 'empty' && <EmptyState title={t.empty}>{canManage ? t.emptyManage : t.emptyRead}</EmptyState>}
-      {members.length > 0 && shown.length === 0 && <EmptyState title={t.emptySearch}>{t.emptySearchBody}</EmptyState>}
+      {members.length > 0 && shown.length === 0 && <EmptyState kind="search" title={t.emptySearch}>{t.emptySearchBody}</EmptyState>}
       {shown.length > 0 && (
         <MemberTable members={shown} canManage={canManage} myUserId={me.user.id} onChanged={(text) => { setDone(text); section.reload(); }} />
       )}

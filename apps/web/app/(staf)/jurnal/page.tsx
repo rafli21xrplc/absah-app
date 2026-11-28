@@ -1,7 +1,7 @@
 'use client';
 
 import { JournalResponse } from '@absah/contracts';
-import { Button, DateInput } from '@absah/ui';
+import { Button, DateInput, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
@@ -80,7 +80,7 @@ export default function JurnalPage() {
           {monthLabel(journal.month)}: {journal.totals.withTopic} dari {journal.totals.sessions} jam pelajaran sudah ada topiknya.
         </p>
       )}
-      {journal && journal.entries.length === 0 && <p className={styles.empty}>Belum ada jam pelajaran pada bulan ini.</p>}
+      {journal && journal.entries.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada jam pelajaran pada bulan ini." />}
       {groups.map((group) => (
         <section key={group.teacher?.id ?? 'none'} className={styles.section}>
           <h2>{group.teacher?.name || 'Tanpa guru'}</h2>

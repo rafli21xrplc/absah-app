@@ -1,7 +1,7 @@
 'use client';
 
 import { DudiPartner, DudiPartnerList, PKL_DEFAULT_RADIUS_M, type DudiWorkDay } from '@absah/contracts';
-import { Button, DateInput, Input } from '@absah/ui';
+import { Button, DateInput, EmptyState, Input } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { DAY_LABELS, DAYS } from '@/lib/activities';
@@ -49,7 +49,7 @@ export default function DudiPartnersPage() {
             }}
           />
         )}
-        {partners && partners.length === 0 && <p className={styles.empty}>Belum ada DUDI.</p>}
+        {partners && partners.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada DUDI." />}
         {partners && partners.length > 0 && (
           <div className={styles.tableWrap}>
             <table className={styles.table}>

@@ -1,5 +1,6 @@
 'use client';
 
+import { EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import styles from '../data.module.css';
 import { useReleases } from '../changelog-context';
@@ -14,7 +15,7 @@ export default function RilisPage() {
         ← Beranda
       </Link>
       <h1 className={styles.title}>Yang baru di Absah</h1>
-      {releases.length === 0 && <p className={styles.empty}>Belum ada catatan rilis.</p>}
+      {releases.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada catatan rilis." />}
       {releases.map((release) => (
         <section key={release.id} className={styles.section}>
           <ReleaseNotes release={release} />

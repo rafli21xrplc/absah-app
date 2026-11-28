@@ -1,5 +1,6 @@
 'use client';
 
+import { EmptyState } from '@absah/ui';
 import { SessionCompliance } from '@absah/contracts';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -66,7 +67,7 @@ function Kepatuhan() {
                 ))}
               </tbody>
             </table>
-            {data.teachers.length === 0 && <p className={styles.empty}>Belum ada sesi pada periode ini.</p>}
+            {data.teachers.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada sesi pada periode ini." />}
           </div>
           <p className={styles.muted}>Telat isi: diisi setelah pengingat &quot;belum diisi&quot; terkirim. Sesi yang belum lewat tidak dihitung.</p>
         </>

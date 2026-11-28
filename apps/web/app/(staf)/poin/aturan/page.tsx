@@ -1,7 +1,7 @@
 'use client';
 
 import { PointRule, PointRuleList, PointThreshold, PointThresholdList } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -91,7 +91,7 @@ function Rules({ schoolId, manage }: { schoolId: string | null; manage: boolean 
           {error}
         </p>
       )}
-      {rules.length === 0 && <p className={styles.empty}>Belum ada aturan poin.</p>}
+      {rules.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada aturan poin." />}
       <ul className={ui.sessions}>
         {rules.map((r) => (
           <li key={r.id} className={ui.student} aria-label={r.name}>
@@ -215,7 +215,7 @@ function Thresholds({ schoolId, manage }: { schoolId: string | null; manage: boo
           {error}
         </p>
       )}
-      {tiers.length === 0 && <p className={styles.empty}>Belum ada ambang.</p>}
+      {tiers.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada ambang." />}
       <ul className={ui.sessions}>
         {tiers.map((t) => (
           <li key={t.id} className={ui.student} aria-label={t.label}>

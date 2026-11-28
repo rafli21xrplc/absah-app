@@ -1,7 +1,7 @@
 'use client';
 
 import { PklPlacement, PklPlacementList } from '@absah/contracts';
-import { Button, DateInput, Input, Select } from '@absah/ui';
+import { Button, DateInput, EmptyState, Input, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
@@ -84,7 +84,7 @@ export default function PklPage() {
             }}
           />
         )}
-        {items && items.length === 0 && <p className={styles.empty}>Belum ada siswa PKL.</p>}
+        {items && items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada siswa PKL." />}
         {items && items.length > 0 && (
           <div className={styles.tableWrap}>
             <table className={styles.table}>

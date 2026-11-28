@@ -1,7 +1,7 @@
 'use client';
 
 import { PklDayDecision, PklReviewList, type AttendanceStatus, type PklReviewItem } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -60,7 +60,7 @@ export default function PklReviewPage() {
         </Link>
         <h1 className={styles.title}>Tinjauan kehadiran PKL</h1>
         {error && <p role="alert">{error}</p>}
-        {items && items.length === 0 && <p className={styles.empty}>Tidak ada yang perlu ditinjau.</p>}
+        {items && items.length === 0 && <EmptyState bare headingLevel="p" kind="done" title="Tidak ada yang perlu ditinjau." />}
         <ul className={ui.students} aria-label="Antrean tinjauan">
           {items?.map((item) => (
             <li key={item.sessionId} className={ui.student} aria-label={`${item.student.name} ${item.date}`}>

@@ -126,7 +126,7 @@ export default function KegiatanPage() {
       >
         {error && <ErrorState headingLevel="h3" title={error} onRetry={load} />}
         {!list && !error && <SkeletonRows count={3} />}
-        {list && shown.length === 0 && <EmptyState bare headingLevel="h3" title={items.length === 0 ? (overseer ? t.emptyManager : t.emptyCoach) : t.noMatch} />}
+        {list && shown.length === 0 && <EmptyState bare headingLevel="h3" kind={items.length === 0 ? 'empty' : 'search'} title={items.length === 0 ? (overseer ? t.emptyManager : t.emptyCoach) : t.noMatch} />}
         {shown.length > 0 && (
           <ul aria-label={t.listLabel} className="m-0 grid list-none grid-cols-1 gap-3 p-0 md:grid-cols-2">
             {paged.slice.map((a) => {

@@ -9,7 +9,7 @@ import { dateLabel, monthLabel, rupiah } from '@/lib/billing';
 import { STUDENT_BILLING_READING } from '@/lib/student-billing';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../../data.module.css';
-import { DateInput, Select } from '@absah/ui';
+import { DateInput, EmptyState, Select } from '@absah/ui';
 
 /** Rekap pembayaran (TGH-04): what came in during a month and what is still owed per rombel. JSON only on the API for now. */
 export default function RekapTagihanPage() {
@@ -86,7 +86,7 @@ function Recap() {
               </p>
             )}
             {recap.received.days.length === 0 ? (
-              <p className={styles.empty}>Belum ada pembayaran pada bulan ini.</p>
+              <EmptyState bare headingLevel="p" kind="empty" title="Belum ada pembayaran pada bulan ini." />
             ) : (
               <div className={styles.tableWrap}>
                 <table className={styles.table}>
@@ -117,7 +117,7 @@ function Recap() {
               {recap.bills.overdue > 0 && <> · lewat jatuh tempo {rupiah(recap.bills.overdue)}</>}
             </p>
             {recap.bills.classes.length === 0 ? (
-              <p className={styles.empty}>Belum ada tagihan.</p>
+              <EmptyState bare headingLevel="p" kind="empty" title="Belum ada tagihan." />
             ) : (
               <div className={styles.tableWrap}>
                 <table className={styles.table}>

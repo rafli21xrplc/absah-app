@@ -1,7 +1,7 @@
 'use client';
 
 import { PklAssessmentAspectList } from '@absah/contracts';
-import { Button, Input } from '@absah/ui';
+import { Button, EmptyState, Input } from '@absah/ui';
 import { useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { aspectsRequest, draftsFrom, moveRow, PKL_ASPECT_MAX, type AspectDraft } from '@/lib/pkl-assessment';
@@ -44,7 +44,7 @@ export function AspectsEditor({ schoolId, aspects, onSaved }: { schoolId: string
     <section className={styles.section} aria-labelledby="aspek">
       <h2 id="aspek">Aspek penilaian</h2>
       <p className={styles.muted}>Pembimbing industri menilai setiap aspek dengan angka 0-100. Bobot menentukan seberapa besar aspek itu dalam nilai akhir. Penilaian yang sudah diberikan tidak berubah bila aspek diubah.</p>
-      {rows.length === 0 && <p className={styles.empty}>Belum ada aspek. Tambahkan minimal satu supaya pembimbing industri bisa menilai.</p>}
+      {rows.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada aspek.">Tambahkan minimal satu supaya pembimbing industri bisa menilai.</EmptyState>}
       <ul className={styles.risk}>
         {rows.map((r, i) => (
           <li key={r.id ?? `new-${i}`} aria-label={`Aspek ${i + 1}`}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { LearningGroup, LearningGroupDetail, ScheduleConflictDetail, StudentList, type LearningGroupDetail as Detail } from '@absah/contracts';
-import { Button, Input, Select } from '@absah/ui';
+import { Button, EmptyState, Input, Select } from '@absah/ui';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { z } from 'zod';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -189,7 +189,7 @@ export function GroupsTab({ data, canEdit, onChanged }: { data: ScheduleData; ca
             ))}
           </tbody>
         </table>
-        {data.groups.length === 0 && <p className={styles.empty}>Belum ada kelompok belajar.</p>}
+        {data.groups.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada kelompok belajar." />}
       </div>
       {open && <MembersEditor key={open} groupId={open} data={data} canEdit={canEdit} onSaved={onChanged} />}
       {canEdit && (
