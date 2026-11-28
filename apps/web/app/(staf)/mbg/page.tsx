@@ -1,7 +1,7 @@
 'use client';
 
 import { MbgDaily, MbgSettings } from '@absah/contracts';
-import { Button, DateInput, Input } from '@absah/ui';
+import { Button, DateInput, Input, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -88,7 +88,7 @@ export default function MbgPage() {
       </Link>
       <h1 className={styles.title}>Jumlah hadir MBG</h1>
       {error && <p role="alert">{error}</p>}
-      {!daily && !error && <p role="status">Memuat…</p>}
+      {!daily && !error && <LoadingState variant="cards" />}
       {notice && <p role="status">{notice}</p>}
       {daily && (
         <>

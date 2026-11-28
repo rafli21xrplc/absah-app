@@ -8,7 +8,7 @@ import { useWorkspace } from '@/lib/workspace';
 import styles from '../data.module.css';
 import { ExportButtons } from './export-buttons';
 import { PeriodPicker, usePeriod, useReport } from './period';
-import { EmptyState, Select } from '@absah/ui';
+import { EmptyState, Select, LoadingState } from '@absah/ui';
 
 /** Rekap S/I/A per rombel (RKP-01): every rombel for pimpinan, their own for a wali kelas. */
 function RekapList() {
@@ -48,7 +48,7 @@ function RekapList() {
         </p>
       )}
       {error && <p role="alert">{error}</p>}
-      {!data && !error && <p role="status">Memuat…</p>}
+      {!data && !error && <LoadingState variant="table" />}
       {data && period && (
         <div className={styles.tableWrap}>
           <table className={styles.table}>

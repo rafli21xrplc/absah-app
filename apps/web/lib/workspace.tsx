@@ -1,6 +1,7 @@
 'use client';
 
 import { MeContextResponse, type Role } from '@absah/contracts';
+import { AppLoading } from '@absah/ui';
 import { usePathname, useRouter } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { api, ApiError } from './api';
@@ -95,7 +96,7 @@ export function WorkspaceProvider({ children, signInPath = '/masuk' }: { childre
   }, []);
   const reload = useCallback(() => setVersion((v) => v + 1), []);
 
-  if (state.status === 'loading') return <p role="status" style={{ padding: 24 }}>Memuat…</p>;
+  if (state.status === 'loading') return <AppLoading />;
   if (state.status === 'error') return <p role="alert" style={{ padding: 24 }}>{state.message}</p>;
 
   const value: Workspace = {

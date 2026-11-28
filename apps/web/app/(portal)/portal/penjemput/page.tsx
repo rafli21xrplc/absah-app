@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatePickupPhotoResponse, PickupGuardian, PickupGuardianList, PortalAttendance, type PickupRelation } from '@absah/contracts';
-import { Button, DateInput, Input, Select } from '@absah/ui';
+import { Button, DateInput, Input, Select, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
@@ -36,7 +36,7 @@ export default function PortalPenjemput() {
       <IfCap name="gate.pickup" fallback={<p>Sekolah belum memakai penjemputan resmi.</p>}>
         {!isParent && <p>Halaman ini untuk orang tua.</p>}
         {error && <p role="alert">{error}</p>}
-        {isParent && !children && !error && <p role="status">Memuat…</p>}
+        {isParent && !children && !error && <LoadingState />}
         {children?.length === 0 && <p>Belum ada anak yang terdaftar.</p>}
         {schoolId && children?.map((c) => <ChildPickups key={c.studentId} schoolId={schoolId} studentId={c.studentId} name={c.name} />)}
       </IfCap>

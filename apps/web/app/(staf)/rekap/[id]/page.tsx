@@ -1,6 +1,6 @@
 'use client';
 
-import { EmptyState } from '@absah/ui';
+import { EmptyState, LoadingState } from '@absah/ui';
 import { ClassRecapDetail } from '@absah/contracts';
 import Link from 'next/link';
 import { Suspense, use } from 'react';
@@ -23,7 +23,7 @@ function RekapRombel({ id }: { id: string }) {
       {data && <p className={styles.muted}>Wali kelas: {data.class.homeroom?.name ?? 'belum ada'}</p>}
       {period && <PeriodPicker period={period} semesters={semesters} />}
       {error && <p role="alert">{error}</p>}
-      {!data && !error && <p role="status">Memuat…</p>}
+      {!data && !error && <LoadingState variant="table" />}
       {data && (
         <div className={styles.tableWrap}>
           <table className={styles.table}>

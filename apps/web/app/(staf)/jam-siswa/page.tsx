@@ -8,7 +8,7 @@ import { STATUS_LABELS } from '@/lib/attendance';
 import { todayIn } from '@/lib/leave';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../data.module.css';
-import { DateInput, Select } from '@absah/ui';
+import { DateInput, Select, LoadingState } from '@absah/ui';
 
 type Session = ClassStudentHours['sessions'][number];
 
@@ -77,7 +77,7 @@ export default function JamSiswa() {
           </label>
         </p>
       )}
-      {classId && !shown && !error && <p role="status">Memuat…</p>}
+      {classId && !shown && !error && <LoadingState variant="table" />}
       {shown && shown.sessions.length === 0 && <p>Tidak ada pelajaran pada tanggal ini.</p>}
       {shown && shown.sessions.length > 0 && (
         <div className={styles.tableWrap}>

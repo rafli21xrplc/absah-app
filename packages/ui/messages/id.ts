@@ -70,6 +70,12 @@ export const messages = {
   skeleton: {
     label: 'Sedang memuat',
   },
+  loadingState: {
+    slow: 'Masih memuat… koneksi sepertinya lambat.',
+    stuck: 'Belum juga selesai. Periksa koneksi internet, lalu muat ulang halaman.',
+    reload: 'Muat ulang',
+    app: 'Menyiapkan Absah…',
+  },
   errorState: {
     retry: 'Coba lagi',
     pending: 'Menunggu',

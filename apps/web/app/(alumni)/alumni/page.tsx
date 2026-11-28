@@ -1,7 +1,7 @@
 'use client';
 
 import { TracerFormContext } from '@absah/contracts';
-import { Button, Input } from '@absah/ui';
+import { Button, Input, LoadingState } from '@absah/ui';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError } from '@/lib/api';
 import { answerRequest, ORGANIZATION_LABELS, POSITION_LABELS, TRACER_STATUS_LABELS, TRACER_STATUSES, tokenFromHash } from '@/lib/tracer';
@@ -50,7 +50,7 @@ export default function AlumniPage() {
     });
   }, []);
 
-  if (load.state === 'loading') return <main className={styles.page}><p role="status">Memuat…</p></main>;
+  if (load.state === 'loading') return <main className={styles.page}><LoadingState variant="detail" /></main>;
   if (load.state === 'error') {
     return (
       <main className={styles.page}>

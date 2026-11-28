@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingState } from '@absah/ui';
 import { ArrivalBoard } from '@absah/contracts';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -60,7 +61,7 @@ export default function PapanKedatanganPage() {
         </Link>
         <h1 className={styles.title}>Papan kedatangan</h1>
         {error && <p role="alert">{error}</p>}
-        {!board && !error && <p role="status">Memuat…</p>}
+        {!board && !error && <LoadingState variant="cards" />}
         {board && (
           <>
             <div className={styles.counts} aria-label="Ringkasan sekolah">

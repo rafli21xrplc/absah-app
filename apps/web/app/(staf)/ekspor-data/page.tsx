@@ -1,7 +1,7 @@
 'use client';
 
 import { WorkspaceExport, WorkspaceExportDownload, WorkspaceExportList, WORKSPACE_EXPORT_RETENTION_DAYS } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -127,7 +127,7 @@ export default function EksporDataPage() {
 
       <section className={styles.section} aria-labelledby="riwayat">
         <h2 id="riwayat">Riwayat ekspor</h2>
-        {!items && !message && <p role="status">Memuat…</p>}
+        {!items && !message && <LoadingState />}
         {items?.length === 0 && <p className={styles.muted}>Belum ada ekspor.</p>}
         <ul>
           {items?.map((e) => (

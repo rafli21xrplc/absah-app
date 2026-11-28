@@ -1,7 +1,7 @@
 'use client';
 
 import { ClassList, ExamRoom, ExamRoomList, SeatStudentsResult, SchoolMembersResponse } from '@absah/contracts';
-import { Button, EmptyState, Select } from '@absah/ui';
+import { Button, EmptyState, Select, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { z } from 'zod';
 import { use, useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
@@ -100,7 +100,7 @@ function Rooms({ periodId }: { periodId: string }) {
         </p>
       )}
       {notice && <p role="status">{notice}</p>}
-      {!list && !error && <p role="status">Memuat…</p>}
+      {!list && !error && <LoadingState />}
       {list && (
         <p role="status">
           {list.unseated > 0 ? <strong>{list.unseated} siswa belum punya ruang.</strong> : 'Semua siswa sudah punya ruang.'}

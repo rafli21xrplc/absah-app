@@ -32,6 +32,7 @@ export { THEME_INIT_SCRIPT, THEME_KEY } from './theme-script';
 export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './components/segmented-control';
 export { Sheet, type SheetProps } from './components/sheet';
 export { Skeleton, SkeletonRows } from './components/skeleton';
+export { AppLoading, LoadingState, type LoadingStateProps, type LoadingVariant } from './components/loading-state';
 export { Table, TableBody, TableHead, TableRow, Td, Th, type TableProps } from './components/table';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/tabs';
 export { AppShell, AppTopBar, ErrorPage, LoadingPage, NarrowScreenGuard, NotFoundPage, PageMain, PortalFrame, WorkspaceLabel, type AppShellProps } from './components/frames';

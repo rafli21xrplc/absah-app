@@ -1,7 +1,7 @@
 'use client';
 
 import { TracerAlumniList, TracerClassList, TracerRecap } from '@absah/contracts';
-import { Button, EmptyState, Select } from '@absah/ui';
+import { Button, EmptyState, Select, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
@@ -75,7 +75,7 @@ export default function TracerPage() {
         <section className={styles.section} aria-labelledby="rekap">
           <h2 id="rekap">Rekap BMW</h2>
           <p className={styles.muted}>BMW = bekerja, melanjutkan studi, atau wirausaha, dari alumni yang sudah mengisi.</p>
-          {!recap && !error && <p role="status">Memuat…</p>}
+          {!recap && !error && <LoadingState variant="table" />}
           {recap && recap.rows.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada alumni.">Tambahkan alumni atau salin dari rombel.</EmptyState>}
           {recap && recap.rows.length > 0 && (
             <>
@@ -157,7 +157,7 @@ export default function TracerPage() {
               </Select>
             </label>
           </div>
-          {!alumni && !error && <p role="status">Memuat…</p>}
+          {!alumni && !error && <LoadingState variant="table" />}
           {alumni && alumni.length === 0 && <EmptyState bare headingLevel="p" kind="search" title="Tidak ada alumni untuk pilihan ini." />}
           {alumni && alumni.length > 0 && (
             <div className={styles.tableWrap}>

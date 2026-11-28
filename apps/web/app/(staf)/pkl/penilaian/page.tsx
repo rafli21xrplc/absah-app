@@ -1,7 +1,7 @@
 'use client';
 
 import { PklAssessmentAspectList, PklAssessmentList } from '@absah/contracts';
-import { Button, EmptyState } from '@absah/ui';
+import { Button, EmptyState, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
@@ -65,7 +65,7 @@ export default function PklPenilaianPage() {
 
         <section className={styles.section} aria-labelledby="hasil">
           <h2 id="hasil">Hasil penilaian</h2>
-          {!results && !error && <p role="status">Memuat…</p>}
+          {!results && !error && <LoadingState variant="table" />}
           {results && results.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada penempatan PKL yang bisa Anda lihat." />}
           {results && results.length > 0 && (
             <>

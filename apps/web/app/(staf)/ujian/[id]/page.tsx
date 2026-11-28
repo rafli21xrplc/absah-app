@@ -1,7 +1,7 @@
 'use client';
 
 import { ClassList, EligibilityList, ExamPeriod, ExamPeriodList } from '@absah/contracts';
-import { Button, EmptyState, Select } from '@absah/ui';
+import { Button, EmptyState, Select, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { use, useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -54,7 +54,7 @@ function PeriodView({ id }: { id: string }) {
         ← Ujian
       </Link>
       {error && <p role="alert">{error}</p>}
-      {!period && !error && <p role="status">Memuat…</p>}
+      {!period && !error && <LoadingState variant="table" />}
       {period && (
         <>
           <h1 className={styles.title}>{period.name}</h1>
@@ -142,7 +142,7 @@ function Eligibility({ periodId }: { periodId: string }) {
         </label>
       </form>
       {error && <p role="alert">{error}</p>}
-      {!data && !error && <p role="status">Memuat…</p>}
+      {!data && !error && <LoadingState variant="table" />}
       {data && (
         <>
           <p role="status">

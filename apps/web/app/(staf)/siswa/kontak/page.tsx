@@ -1,7 +1,7 @@
 'use client';
 
 import { StudentContacts, type GuardianRelation } from '@absah/contracts';
-import { Button, Input } from '@absah/ui';
+import { Button, Input, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, type FormEvent } from 'react';
@@ -82,7 +82,7 @@ function ContactsView() {
           {error}
         </p>
       )}
-      {!contacts && !error && <p role="status">Memuat…</p>}
+      {!contacts && !error && <LoadingState />}
       {contacts && (
         <form className={forms.form} onSubmit={(e) => void save(e)} onChange={() => setKey(newIdempotencyKey())}>
           <p>
@@ -137,7 +137,7 @@ function ContactsView() {
 
 export default function ContactsPage() {
   return (
-    <Suspense fallback={<p role="status">Memuat…</p>}>
+    <Suspense fallback={<LoadingState />}>
       <ContactsView />
     </Suspense>
   );

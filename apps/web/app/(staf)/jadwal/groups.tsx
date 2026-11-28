@@ -1,7 +1,7 @@
 'use client';
 
 import { LearningGroup, LearningGroupDetail, ScheduleConflictDetail, StudentList, type LearningGroupDetail as Detail } from '@absah/contracts';
-import { Button, EmptyState, Input, Select } from '@absah/ui';
+import { Button, EmptyState, Input, Select, LoadingState } from '@absah/ui';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { z } from 'zod';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -67,7 +67,7 @@ function MembersEditor({ groupId, data, canEdit, onSaved }: { groupId: string; d
     }
   }
 
-  if (!group) return message ? <p role="alert">{message.text}</p> : <p role="status">Memuat…</p>;
+  if (!group) return message ? <p role="alert">{message.text}</p> : <LoadingState />;
   const chosen = new Set(members.map((m) => m.enrollmentId));
   return (
     <section className={styles.section} aria-label={`Anggota ${group.name}`}>
