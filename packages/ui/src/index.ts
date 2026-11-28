@@ -34,7 +34,7 @@ export { Sheet, type SheetProps } from './components/sheet';
 export { Skeleton, SkeletonRows } from './components/skeleton';
 export { Table, TableBody, TableHead, TableRow, Td, Th, type TableProps } from './components/table';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/tabs';
-export { AppShell, AppTopBar, ErrorPage, LoadingPage, NotFoundPage, PageMain, PortalFrame, WorkspaceLabel, type AppShellProps } from './components/frames';
+export { AppShell, AppTopBar, ErrorPage, LoadingPage, NarrowScreenGuard, NotFoundPage, PageMain, PortalFrame, WorkspaceLabel, type AppShellProps } from './components/frames';
 export { AccountMenu, AccountSummary, menuItemStyles, SchoolSwitcher, type AccountMenuProps, type SchoolChoice } from './components/sidebar-menus';
 export { CommandPalette, SearchTrigger, useCommandShortcut, type CommandAction, type CommandGroupData, type CommandPaletteProps } from './components/command-palette';
 export { SideNav, type SideNavGroup, type SideNavItem, type SideNavProps } from './components/side-nav';

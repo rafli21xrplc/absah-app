@@ -1,3 +1,4 @@
+import { Monitor } from 'lucide-react';
 import type { ElementType, ReactNode } from 'react';
 import { messages } from '../../messages/id';
 import { Button } from './button';
@@ -49,7 +50,7 @@ export function AppShell({ sidebar, sidebarHeader, sidebarFooter, header, topBar
       <div className="flex min-w-0 flex-1 flex-col">
         {header && (
           <div className="sticky top-0 z-30 hidden bg-latar-app lg:block">
-            <div className="mx-auto box-border flex min-h-18 w-full max-w-360 items-center gap-3 px-8">{header}</div>
+            <div className="box-border flex min-h-18 w-full items-center gap-3 px-8">{header}</div>
           </div>
         )}
         {topBar && <div className="sticky top-0 z-30 border-b border-garis bg-kapur-raised lg:hidden">{topBar}</div>}
@@ -58,6 +59,26 @@ export function AppShell({ sidebar, sidebarHeader, sidebarFooter, header, topBar
         </div>
         {bottomBar && <div className="fixed inset-x-0 bottom-0 z-30 lg:hidden">{bottomBar}</div>}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Covers the staff area on screens under 500 px for people who run the school (admin): their pages are tables and forms
+ * made for a laptop. CSS decides (no width check in JS), so it is right from the first paint and on rotation. `action`
+ * is a way out, e.g. Keluar.
+ */
+export function NarrowScreenGuard({ action }: { action?: ReactNode }) {
+  return (
+    <div role="alertdialog" aria-modal="true" aria-labelledby="layar-sempit-judul" className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-latar-app px-6 text-center min-[500px]:hidden">
+      <span aria-hidden className="inline-flex size-16 items-center justify-center rounded-lg bg-papan-soft text-papan">
+        <Monitor strokeWidth={1.75} className="size-8" />
+      </span>
+      <h2 id="layar-sempit-judul" className="m-0 text-h2">
+        {messages.appShell.narrowTitle}
+      </h2>
+      <p className="m-0 max-w-80 text-body text-tinta-muted">{messages.appShell.narrowBody}</p>
+      {action}
     </div>
   );
 }
@@ -87,11 +108,12 @@ export function WorkspaceLabel({ name, detail }: { name: string; detail?: string
 
 /**
  * A page's own main landmark and its column: padding and spacing live here so a page holds no free styling.
- * `full` (v3 boards): the whole width next to the side menu, up to 1440 px, 16 px between cards.
+ * V10: from 1024 px every width fills the whole space next to the side menu (no cap), so a wide screen never shows empty
+ * bands. Below that `md` stays a readable phone column; `full` (v3 boards) keeps 16 px between cards.
  */
 export function PageMain({ children, width = 'md' }: { children: ReactNode; width?: 'md' | 'lg' | 'xl' | 'full' }) {
-  if (width === 'full') return <main className="mx-auto box-border flex w-full max-w-360 flex-col gap-4 px-4 pb-8 pt-4 sm:px-6 lg:px-8 lg:pt-2">{children}</main>;
-  return <main className={cx('mx-auto box-border flex w-full flex-col gap-5 px-4 py-6 sm:px-6 lg:px-8 lg:py-8', width === 'xl' ? 'max-w-6xl' : width === 'lg' ? 'max-w-5xl' : 'max-w-xl')}>{children}</main>;
+  if (width === 'full') return <main className="box-border flex w-full flex-col gap-4 px-4 pb-8 pt-4 sm:px-6 lg:px-8 lg:pt-2">{children}</main>;
+  return <main className={cx('mx-auto box-border flex w-full flex-col gap-5 px-4 py-6 sm:px-6 lg:max-w-none lg:px-8 lg:pb-8 lg:pt-2', width === 'md' ? 'max-w-xl' : 'max-w-5xl')}>{children}</main>;
 }
 
 /** The portal: one simple column, at most 480 px wide on a laptop. */

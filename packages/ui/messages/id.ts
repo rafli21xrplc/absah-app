@@ -181,6 +181,7 @@ export const messages = {
     fixedHint: 'Tidak bisa diubah di sini',
     sheetEyebrow: 'Pilih kehadiran untuk',
     chosen: 'Dipilih',
+    legendTitle: 'Arti status',
     descH: 'Ada di kelas',
     descT: 'Datang setelah pelajaran dimulai',
     descI: 'Tidak hadir, ada surat atau kabar dari orang tua',
@@ -1001,6 +1002,8 @@ export const messages = {
     shortcuts: 'Pintasan',
     menu: 'Menu',
     closeMenu: 'Tutup menu',
+    narrowTitle: 'Buka di layar yang lebih lebar',
+    narrowBody: 'Halaman admin dibuat untuk laptop atau tablet. Lebarkan jendela browser atau buka dari laptop (minimal 500 px).',
   },
   pageState: {
     errorTitle: 'Halaman belum bisa dibuka',

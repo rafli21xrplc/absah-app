@@ -60,7 +60,8 @@ describe('step 2: opened, everyone "Belum diisi"', () => {
     expect(screen.getByRole('button', { name: 'Semua 25' }).getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByRole('button', { name: 'Belum 25' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Tidak hadir 0' })).toBeTruthy();
-    expect(screen.getByText('Hadir 0')).toBeTruthy();
+    // The total is one tile: the word and its number (a separate span, big on a laptop).
+    expect(screen.getByText((_, el) => el?.tagName === 'SPAN' && el.children.length === 1 && el.textContent === 'Hadir 0')).toBeTruthy();
     await expectNoAxeViolations(container);
   });
 
