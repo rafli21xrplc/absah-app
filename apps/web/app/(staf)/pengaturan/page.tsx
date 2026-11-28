@@ -1,7 +1,7 @@
 'use client';
 
 import { PushConfig, PushStatus } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -131,7 +131,7 @@ export default function Pengaturan() {
       <h1 className={styles.title}>Notifikasi di HP ini</h1>
       {schoolName && <p>{schoolName}</p>}
       <p>Absah memberi tahu Anda saat ada tamu yang menunggu, sesi yang belum diisi, atau izin siswa yang perlu disetujui. Pesan tidak memuat nama siapa pun.</p>
-      {!browser && <p role="status">Memuat…</p>}
+      {!browser && <LoadingState variant="detail" />}
       {browser && browser.availability !== 'ready' && <p role="status">{MESSAGES[browser.availability]}</p>}
       {browser?.availability === 'ready' && (
         <p>

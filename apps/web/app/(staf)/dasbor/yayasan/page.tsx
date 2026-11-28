@@ -1,6 +1,6 @@
 'use client';
 
-import { EmptyState } from '@absah/ui';
+import { EmptyState, LoadingState } from '@absah/ui';
 import { CollectionDashboardList, type CollectionDashboard } from '@absah/contracts';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -94,7 +94,7 @@ export default function DasborYayasanPage() {
       </Link>
       <h1 className={styles.title}>Dasbor yayasan</h1>
       {error && <p role="alert">{error}</p>}
-      {!data && !error && <p role="status">Memuat…</p>}
+      {!data && !error && <LoadingState variant="cards" />}
       {data && data.items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Anda belum memimpin sekolah yang tergabung dalam yayasan.">Hanya sekolah tempat Anda kepala sekolah, wakil, atau admin yang dihitung.</EmptyState>}
       {data?.items.map((c) => <Collection key={c.id} c={c} />)}
     </main>

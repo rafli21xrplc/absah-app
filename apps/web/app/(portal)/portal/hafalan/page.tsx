@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingState } from '@absah/ui';
 import { PortalAttendance } from '@absah/contracts';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -28,7 +29,7 @@ export default function PortalHafalan() {
       <h1 className={styles.title}>Hafalan Al-Qur&apos;an</h1>
       <IfCap name="religious.memorization" fallback={<p>Sekolah belum mencatat hafalan di Absah.</p>}>
         {error && <p role="alert">{error}</p>}
-        {!children && !error && <p role="status">Memuat…</p>}
+        {!children && !error && <LoadingState />}
         {schoolId && children?.map((c) => <HafalanHistory key={c.studentId} className={styles.card} schoolId={schoolId} studentId={c.studentId} />)}
       </IfCap>
     </main>

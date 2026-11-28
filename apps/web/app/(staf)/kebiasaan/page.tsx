@@ -9,7 +9,7 @@ import { addDays, HABIT_LABELS, HABITS, mondayOf, shortDay } from '@/lib/habits'
 import { todayIn } from '@/lib/leave';
 import { useWorkspace } from '@/lib/workspace';
 import styles from '../data.module.css';
-import { Select } from '@absah/ui';
+import { Select, LoadingState } from '@absah/ui';
 
 /**
  * Jurnal 7 KAIH, weekly summary per rombel (KEG-02): days filled and ticks per habit per student.
@@ -75,7 +75,7 @@ export default function Kebiasaan() {
           </button>
         </p>
       )}
-      {classId && !shown && !error && <p role="status">Memuat…</p>}
+      {classId && !shown && !error && <LoadingState variant="table" />}
       {shown && (
         <>
           <p>

@@ -1,7 +1,7 @@
 'use client';
 
 import { Correction, CorrectionList } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -61,7 +61,7 @@ export default function KoreksiPage() {
         </button>
       </div>
       {error && <p role="alert">{error}</p>}
-      {!items && !error && <p role="status">Memuat…</p>}
+      {!items && !error && <LoadingState />}
       {items?.length === 0 && <p className={styles.notice}>Tidak ada koreksi.</p>}
       <ul className={ui.sessions}>
         {items?.map((c) => (

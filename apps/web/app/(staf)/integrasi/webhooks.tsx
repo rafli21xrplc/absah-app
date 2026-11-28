@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatedWebhook, Webhook, WebhookDeliveryList, WebhookList, WebhookTestQueued, WEBHOOK_EVENTS, type WebhookDelivery, type WebhookEventType } from '@absah/contracts';
-import { Button, Input } from '@absah/ui';
+import { Button, Input, LoadingState } from '@absah/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -80,7 +80,7 @@ function Activity({ hook, schoolId }: { hook: Webhook; schoolId: string }) {
       )}
       {open && (
         <div aria-live="polite">
-          {!items && !message && <p role="status">Memuat…</p>}
+          {!items && !message && <LoadingState />}
           {items?.length === 0 && <p className={styles.muted}>Belum ada pengiriman.</p>}
           <ul>
             {items?.map((d) => (
@@ -195,7 +195,7 @@ export function Webhooks({ schoolId }: { schoolId: string }) {
         </p>
       )}
 
-      {!items && !message && <p role="status">Memuat…</p>}
+      {!items && !message && <LoadingState />}
       {items?.length === 0 && <p className={styles.muted}>Belum ada webhook.</p>}
       <ul>
         {items?.map((h) => (

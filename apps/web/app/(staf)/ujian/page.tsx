@@ -1,6 +1,6 @@
 'use client';
 
-import { EmptyState } from '@absah/ui';
+import { EmptyState, LoadingState } from '@absah/ui';
 import { ExamPeriod, ExamPeriodList, MyRooms } from '@absah/contracts';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -94,7 +94,7 @@ function Periods({ manage }: { manage: boolean }) {
           <input type="checkbox" checked={closed} onChange={(e) => setClosed(e.target.checked)} /> Tampilkan yang sudah ditutup
         </label>
         {error && <p role="alert">{error}</p>}
-        {!items && !error && <p role="status">Memuat…</p>}
+        {!items && !error && <LoadingState />}
         {items && items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada ujian." />}
         <ul>
           {items?.map((p) => (

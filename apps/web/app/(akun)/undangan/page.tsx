@@ -1,7 +1,7 @@
 'use client';
 
 import { AcceptInvitationResponse, InvitationPreviewResponse } from '@absah/contracts';
-import { Button, Input } from '@absah/ui';
+import { Button, Input, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError } from '@/lib/api';
@@ -74,7 +74,7 @@ export default function InvitationPage() {
           {error}
         </p>
       )}
-      {!error && !preview && <p role="status">Memuat undangan…</p>}
+      {!error && !preview && <LoadingState variant="detail" label="Memuat undangan" />}
       {preview && (
         <form className={styles.form} onSubmit={(e) => void submit(e)}>
           <p>

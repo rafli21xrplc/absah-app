@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingState } from '@absah/ui';
 import { MyExams, type MyExam } from '@absah/contracts';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -43,7 +44,7 @@ function Exams() {
   return (
     <>
       {error && <p role="alert">{error}</p>}
-      {!list && !error && <p role="status">Memuat…</p>}
+      {!list && !error && <LoadingState />}
       {list && open.length === 0 && <p>Belum ada ujian yang akan datang.</p>}
       {open.map((e) => (
         <ExamCard key={`${e.enrollmentId}|${e.period.id}`} exam={e} view={examCardView(e, today)} />

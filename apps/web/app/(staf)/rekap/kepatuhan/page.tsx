@@ -1,6 +1,6 @@
 'use client';
 
-import { EmptyState } from '@absah/ui';
+import { EmptyState, LoadingState } from '@absah/ui';
 import { SessionCompliance } from '@absah/contracts';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -25,7 +25,7 @@ function Kepatuhan() {
       {!allowed && <p>Halaman ini untuk wakasek, kepala sekolah, dan admin.</p>}
       {allowed && period && <PeriodPicker period={period} semesters={semesters} />}
       {error && <p role="alert">{error}</p>}
-      {allowed && !data && !error && <p role="status">Memuat…</p>}
+      {allowed && !data && !error && <LoadingState variant="table" />}
       {data && (
         <>
           <div className={styles.counts} aria-label="Ringkasan">

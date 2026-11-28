@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingState } from '@absah/ui';
 import { NOTIFICATION_STATUSES, NotificationOverview } from '@absah/contracts';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -34,7 +35,7 @@ export default function NotifikasiPage() {
       <h1 className={styles.title}>Notifikasi WhatsApp</h1>
       <p className={styles.muted}>Pesan ke orang tua: alpa dan keputusan izin. Pesan setelah pukul 21.00 dikirim pukul 06.00.</p>
       {error && <p role="alert">{error}</p>}
-      {!overview && !error && <p>Memuat…</p>}
+      {!overview && !error && <LoadingState variant="cards" />}
       {overview && (
         <>
           <div className={styles.counts} aria-label="Hari ini">

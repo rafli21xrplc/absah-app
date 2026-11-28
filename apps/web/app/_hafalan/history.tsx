@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingState } from '@absah/ui';
 import { MemorizationLogList, surahLabel } from '@absah/contracts';
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
@@ -16,7 +17,7 @@ export function HafalanHistory({ schoolId, studentId, reload = 0, className }: {
   }, [schoolId, studentId, reload]);
 
   if (error) return <p role="alert">{error}</p>;
-  if (!list) return <p role="status">Memuat…</p>;
+  if (!list) return <LoadingState />;
   const first = list.name.split(/\s+/)[0] ?? list.name;
   return (
     <section className={className} aria-label={`Hafalan ${first}`}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { API_KEY_DEFAULT_RATE, API_KEY_SCOPES, ApiKey, ApiKeyList, CreatedApiKey, type ApiKeyScope } from '@absah/contracts';
-import { Button, Input } from '@absah/ui';
+import { Button, Input, LoadingState } from '@absah/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { keyState, KEY_STATE_LABELS, parseRate, SCOPE_LABELS, toggle } from '@/lib/integration';
@@ -130,7 +130,7 @@ export function Keys({ schoolId, timezone }: { schoolId: string; timezone: strin
         </p>
       )}
 
-      {!items && !message && <p role="status">Memuat…</p>}
+      {!items && !message && <LoadingState />}
       {items?.length === 0 && <p className={styles.muted}>Belum ada kunci.</p>}
       <ul>
         {items?.map((k) => (

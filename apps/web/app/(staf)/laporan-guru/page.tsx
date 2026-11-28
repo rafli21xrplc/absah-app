@@ -1,7 +1,7 @@
 'use client';
 
 import { TeacherReport, type TeacherReportRow } from '@absah/contracts';
-import { Button, EmptyState } from '@absah/ui';
+import { Button, EmptyState, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
@@ -67,7 +67,7 @@ export default function LaporanGuruPage() {
                 {error}
               </p>
             )}
-            {!report && !error && <p role="status">Memuat…</p>}
+            {!report && !error && <LoadingState variant="table" />}
             {report && (
               <p className={styles.muted}>
                 {report.schoolDays === 0 ? 'Belum ada hari sekolah pada bulan ini.' : `${report.schoolDays} hari sekolah${report.through ? ` sampai ${report.through}` : ''}.`} Hari tanpa absen dan tanpa izin ditulis “tanpa catatan”; sekolah

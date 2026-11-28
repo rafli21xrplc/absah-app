@@ -1,7 +1,7 @@
 'use client';
 
 import { PickupEvent, PickupEventList, PickupGuardian, PickupGuardianList, PickupPhotoLink } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -74,7 +74,7 @@ export default function PenjemputanPage() {
       <h1 className={styles.title}>Penjemputan</h1>
       <IfCap name="gate.pickup" fallback={<p>Penjemputan resmi belum diaktifkan.</p>}>
         {error && <p role="alert">{error}</p>}
-        {!day && !error && <p role="status">Memuat…</p>}
+        {!day && !error && <LoadingState variant="cards" />}
 
         <section className={styles.section} aria-labelledby="ditahan">
           <h2 id="ditahan">Penjemput tidak terdaftar menunggu</h2>

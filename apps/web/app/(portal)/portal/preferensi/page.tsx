@@ -1,7 +1,7 @@
 'use client';
 
 import { NotificationPreferences, type MutableTemplateCode } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -78,7 +78,7 @@ export default function PortalPreferensi() {
       ) : (
         <>
           {error && <p role="alert">{error}</p>}
-          {!draft && !error && <p role="status">Memuat…</p>}
+          {!draft && !error && <LoadingState variant="detail" />}
           {draft && saved && (
             <form
               className={styles.card}

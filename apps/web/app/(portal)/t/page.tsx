@@ -1,7 +1,7 @@
 'use client';
 
 import { ActionLinkContext, ActionLinkLeave, CardDeviceKeys, LinkHeldPickups, PickupPhotoLink, type LeaveKind, type LinkHeldPickup } from '@absah/contracts';
-import { Button, DateInput, Textarea } from '@absah/ui';
+import { Button, DateInput, Textarea, LoadingState } from '@absah/ui';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError } from '@/lib/api';
 import { STATUS_LABELS } from '@/lib/attendance';
@@ -66,7 +66,7 @@ export default function ActionLinkPage() {
     });
   }, [refresh]);
 
-  if (load.state === 'loading') return <main className={styles.main}><p role="status">Memuat…</p></main>;
+  if (load.state === 'loading') return <main className={styles.main}><LoadingState variant="detail" /></main>;
   if (load.state === 'error' || !token) {
     return (
       <main className={styles.main}>

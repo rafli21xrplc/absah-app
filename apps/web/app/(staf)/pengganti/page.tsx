@@ -1,7 +1,7 @@
 'use client';
 
 import { CandidateList, SubstitutionItem, SubstitutionList, type SubstituteCandidate } from '@absah/contracts';
-import { Button, DateInput, EmptyState } from '@absah/ui';
+import { Button, DateInput, EmptyState, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -135,7 +135,7 @@ function Candidates({ schoolId, item, onClose, onDone }: { schoolId: string | nu
           {error}
         </p>
       )}
-      {!list && !error && <p role="status">Memuat…</p>}
+      {!list && !error && <LoadingState />}
       {list?.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Tidak ada guru yang kosong pada jam ini." />}
       <ul className={ui.sessions}>
         {list?.map((c) => (

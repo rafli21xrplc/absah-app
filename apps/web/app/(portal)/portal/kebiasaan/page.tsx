@@ -1,7 +1,7 @@
 'use client';
 
 import { HabitDay, HabitJournal, PortalAttendance, type HabitCode } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -33,7 +33,7 @@ export default function PortalKebiasaan() {
       <h1 className={styles.title}>7 Kebiasaan Anak Indonesia Hebat</h1>
       {mode === 'off' && <p>Sekolah belum memakai jurnal 7 kebiasaan.</p>}
       {error && <p role="alert">{error}</p>}
-      {mode && mode !== 'off' && !children && !error && <p role="status">Memuat…</p>}
+      {mode && mode !== 'off' && !children && !error && <LoadingState />}
       {schoolId && children?.map((c) => <Journal key={c.studentId} schoolId={schoolId} studentId={c.studentId} />)}
     </main>
   );

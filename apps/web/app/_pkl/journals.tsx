@@ -1,7 +1,7 @@
 'use client';
 
 import { PklAttachmentLink, PklJournal, PklJournalList } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
 import { JOURNAL_STATUS_LABELS } from '@/lib/pkl';
@@ -34,7 +34,7 @@ export function PklJournals({ schoolId, query = '', reload = 0, showStudent = tr
     }
   }
 
-  if (!items) return error ? <p role="alert">{error}</p> : <p role="status">Memuat jurnal…</p>;
+  if (!items) return error ? <p role="alert">{error}</p> : <LoadingState label="Memuat jurnal" />;
   return (
     <section className={className} aria-label="Jurnal PKL">
       {error && <p role="alert">{error}</p>}

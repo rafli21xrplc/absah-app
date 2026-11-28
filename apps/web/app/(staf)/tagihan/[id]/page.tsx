@@ -1,7 +1,7 @@
 'use client';
 
 import { InvoiceDetail, Payment, PaymentList, type PaymentMethod } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import QRCode from 'qrcode';
 import { use, useCallback, useEffect, useState } from 'react';
@@ -82,7 +82,7 @@ function InvoiceView({ id }: { id: string }) {
       </Link>
       <h1 className={styles.title}>Tagihan {invoice ? monthLabel(invoice.month) : ''}</h1>
       {error && <p role="alert">{error}</p>}
-      {!invoice && !error && <p role="status">Memuat…</p>}
+      {!invoice && !error && <LoadingState variant="detail" />}
       {invoice && (
         <>
           <div className={styles.counts}>

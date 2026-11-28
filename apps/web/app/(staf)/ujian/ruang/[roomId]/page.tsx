@@ -1,7 +1,7 @@
 'use client';
 
 import { ExamCheckIn, RoomAttendance } from '@absah/contracts';
-import { Button, EmptyState } from '@absah/ui';
+import { Button, EmptyState, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { use, useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -68,7 +68,7 @@ function Room({ roomId }: { roomId: string }) {
         ← Ujian
       </Link>
       {error && <p role="alert">{error}</p>}
-      {!data && !error && <p role="status">Memuat…</p>}
+      {!data && !error && <LoadingState variant="table" />}
       {data && (
         <>
           <h1 className={styles.title}>Ruang {data.room.name}</h1>

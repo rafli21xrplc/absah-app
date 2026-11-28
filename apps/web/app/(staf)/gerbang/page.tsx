@@ -1,7 +1,7 @@
 'use client';
 
 import { Arrival, GateToday } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, fieldError, newIdempotencyKey } from '@/lib/api';
@@ -55,7 +55,7 @@ export default function GerbangPage() {
         )}
         {error && <p role="alert">{error}</p>}
         {notice && <p role="status">{notice}</p>}
-        {!today && !error && <p>Memuat…</p>}
+        {!today && !error && <LoadingState variant="cards" />}
         {today && (
           <>
             <div className={styles.counts} aria-label="Ringkasan">

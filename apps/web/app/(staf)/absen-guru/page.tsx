@@ -1,7 +1,7 @@
 'use client';
 
 import { TeacherAttendance, TeacherToday } from '@absah/contracts';
-import { Button, EmptyState } from '@absah/ui';
+import { Button, EmptyState, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -63,7 +63,7 @@ export default function AbsenGuruPage() {
                 {error}
               </p>
             )}
-            {!today && !error && <p role="status">Memuat…</p>}
+            {!today && !error && <LoadingState variant="cards" />}
             {today && (
               <section className={styles.section} aria-labelledby="hari-ini">
                 <h2 id="hari-ini">Hari ini, {today.schoolDate}</h2>

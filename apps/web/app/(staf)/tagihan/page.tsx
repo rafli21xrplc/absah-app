@@ -1,6 +1,6 @@
 'use client';
 
-import { EmptyState } from '@absah/ui';
+import { EmptyState, LoadingState } from '@absah/ui';
 import { InvoiceList } from '@absah/contracts';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -30,7 +30,7 @@ export default function TagihanPage() {
       <h1 className={styles.title}>Tagihan Absah</h1>
       <p className={styles.muted}>Rp10.000 per siswa aktif per bulan, dihitung per hari. Tagihan terbit tanggal 1 untuk bulan sebelumnya.</p>
       {error && <p role="alert">{error}</p>}
-      {!list && !error && <p role="status">Memuat…</p>}
+      {!list && !error && <LoadingState />}
       {list && list.items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada tagihan." />}
       {list && list.items.length > 0 && (
         <div className={styles.tableWrap}>

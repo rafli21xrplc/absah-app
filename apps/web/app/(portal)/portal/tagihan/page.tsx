@@ -1,7 +1,7 @@
 'use client';
 
 import { MyBillsList, StudentPayment, type BillInstallment, type PaymentMethod, type StudentBill } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, LoadingState } from '@absah/ui';
 import Link from 'next/link';
 import QRCode from 'qrcode';
 import { useCallback, useEffect, useState } from 'react';
@@ -73,7 +73,7 @@ function Bills() {
   return (
     <>
       {error && <p role="alert">{error}</p>}
-      {!list && !error && <p role="status">Memuat…</p>}
+      {!list && !error && <LoadingState />}
       {list && list.items.length === 0 && <p>Belum ada tagihan.</p>}
       {groupByChild(list?.items ?? []).map((g) => (
         <section key={g.key} className={styles.card} aria-label={`Tagihan ${g.name.split(/\s+/)[0]}`}>
