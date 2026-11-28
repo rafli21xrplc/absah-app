@@ -1,7 +1,7 @@
 'use client';
 
 import { Visitor, VisitorList, VisitorPhotoLink } from '@absah/contracts';
-import { Button, DateInput } from '@absah/ui';
+import { Button, DateInput, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -90,7 +90,7 @@ export default function TamuPage() {
             {list.inside} tamu masih di sekolah.
           </p>
         )}
-        {list && list.items.length === 0 && <p className={styles.empty}>Belum ada tamu.</p>}
+        {list && list.items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada tamu." />}
         <ul className={ui.sessions}>
           {list?.items.map((v) => (
             <li key={v.id} className={ui.student} aria-label={`Tamu ${v.name}`}>

@@ -100,6 +100,27 @@ describe('EmptyState', () => {
   });
 });
 
+describe('EmptyState kinds (V11)', () => {
+  it('offers a second way forward and hints, and an empty part of a card can be a plain paragraph', async () => {
+    const { container } = render(
+      <main>
+        <h1>Hari ini</h1>
+        <EmptyState kind="offDay" title="Anda tidak mengajar hari ini" action={<Button>Lihat semua sesi</Button>} secondaryAction={<a href="/rekap">Rekap kehadiran</a>} tips={['Sesi dibuat otomatis pukul 05.00.']}>
+          Presensi seluruh sekolah bisa dipantau dari Semua sesi.
+        </EmptyState>
+        <EmptyState bare headingLevel="p" kind="done" title="Tidak ada yang perlu ditinjau." />
+      </main>,
+    );
+    expect(screen.getByRole('heading', { name: 'Anda tidak mengajar hari ini' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Lihat semua sesi' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Rekap kehadiran' })).toBeTruthy();
+    expect(screen.getByText('Sesi dibuat otomatis pukul 05.00.')).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: 'Tidak ada yang perlu ditinjau.' })).toBeNull();
+    expect(screen.getByText('Tidak ada yang perlu ditinjau.').tagName).toBe('P');
+    await expectNoAxeViolations(container);
+  });
+});
+
 describe('ErrorState', () => {
   it('an error is announced at once and can be retried', async () => {
     const onRetry = vi.fn();

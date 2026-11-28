@@ -1,5 +1,6 @@
 'use client';
 
+import { EmptyState } from '@absah/ui';
 import { ClassRecapDetail } from '@absah/contracts';
 import Link from 'next/link';
 import { Suspense, use } from 'react';
@@ -67,7 +68,7 @@ function RekapRombel({ id }: { id: string }) {
               </tr>
             </tfoot>
           </table>
-          {data.items.length === 0 && <p className={styles.empty}>Tidak ada siswa pada periode ini.</p>}
+          {data.items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Tidak ada siswa pada periode ini." />}
         </div>
       )}
       {data && period?.semesterId && <ExportButtons semesterId={period.semesterId} classId={id} />}

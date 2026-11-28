@@ -1,7 +1,7 @@
 'use client';
 
 import { UksStudentList, UksVisit, UksVisitList, type UksOutcome } from '@absah/contracts';
-import { Button, DateInput } from '@absah/ui';
+import { Button, DateInput, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -70,7 +70,7 @@ export default function UksPage() {
                 {error}
               </p>
             )}
-            {visits && visits.items.length === 0 && <p className={styles.empty}>Belum ada kunjungan.</p>}
+            {visits && visits.items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada kunjungan." />}
             <ul className={ui.sessions}>
               {visits?.items.map((v) => (
                 <li key={v.id} className={ui.student} aria-label={`Kunjungan ${v.student.name}`}>

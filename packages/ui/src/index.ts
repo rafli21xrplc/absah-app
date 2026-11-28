@@ -20,7 +20,7 @@ export { Card, type CardProps } from './components/card';
 export { DataToolbar, type DataToolbarProps } from './components/data-toolbar';
 export { Dialog, type DialogProps } from './components/dialog';
 export { Drawer, type DrawerProps } from './components/drawer';
-export { EmptyState, type EmptyStateProps } from './components/empty-state';
+export { EmptyState, type EmptyKind, type EmptyStateProps } from './components/empty-state';
 export { ErrorState, type ErrorStateProps } from './components/error-state';
 export { initials } from './components/initials';
 export { ListRow, type ListRowProps } from './components/list-row';

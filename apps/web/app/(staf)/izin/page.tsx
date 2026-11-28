@@ -198,7 +198,7 @@ export default function IzinPage() {
         </div>
         {error && <ErrorState headingLevel="h3" title={error} onRetry={() => setAttempt((n) => n + 1)} />}
         {!items && !error && <SkeletonRows count={4} />}
-        {items && shown.length === 0 && <EmptyState bare headingLevel="h3" title={q || kind || when ? t.noMatch : status === 'pending' ? t.emptyPending : t.empty} />}
+        {items && shown.length === 0 && <EmptyState bare headingLevel="h3" kind={q || kind || when ? 'search' : status === 'pending' ? 'done' : 'empty'} title={q || kind || when ? t.noMatch : status === 'pending' ? t.emptyPending : t.empty} />}
         {shown.length > 0 && (
           <Table bare dense caption={t.table} className="min-w-160">
             <TableHead>

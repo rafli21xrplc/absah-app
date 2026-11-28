@@ -1,7 +1,7 @@
 'use client';
 
 import { CounselingNote, CounselingNoteList, PointStudentList, type CounselingFollowUp } from '@absah/contracts';
-import { Button, DateInput } from '@absah/ui';
+import { Button, DateInput, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -75,7 +75,7 @@ export default function BkPage() {
                 {error}
               </p>
             )}
-            {notes && notes.length === 0 && <p className={styles.empty}>Tidak ada catatan.</p>}
+            {notes && notes.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Tidak ada catatan." />}
             <ul className={ui.sessions}>
               {notes?.map((n) => (
                 <li key={n.id} className={ui.student} aria-label={`${n.student.name} ${n.date}`}>

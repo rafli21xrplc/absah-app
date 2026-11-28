@@ -11,7 +11,7 @@ import { useWorkspace } from '@/lib/workspace';
 import forms from '../../forms.module.css';
 import styles from '../data.module.css';
 import ui from '../presensi.module.css';
-import { Select } from '@absah/ui';
+import { EmptyState, Select } from '@absah/ui';
 
 const RANGES = [7, 14, 30] as const;
 
@@ -54,7 +54,7 @@ export default function PeringatanDiniPage() {
             {error}
           </p>
         )}
-        {list && list.items.length === 0 && <p className={styles.empty}>Tidak ada peringatan pada periode ini.</p>}
+        {list && list.items.length === 0 && <EmptyState bare headingLevel="p" kind="done" title="Tidak ada peringatan pada periode ini." />}
         <ul className={ui.sessions}>
           {list?.items.map((w) => (
             <li key={w.id} className={ui.student} aria-label={`${w.student.name} ${EARLY_WARNING_LABELS[w.kind]}`}>

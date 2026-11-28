@@ -1,7 +1,7 @@
 'use client';
 
 import { FollowupTask, FollowupTaskList, type FollowupStatus } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -69,7 +69,7 @@ export default function TindakLanjutPage() {
             {error}
           </p>
         )}
-        {tasks && tasks.length === 0 && <p className={styles.empty}>{status === 'open' ? 'Tidak ada tugas yang menunggu.' : 'Belum ada tugas selesai.'}</p>}
+        {tasks && tasks.length === 0 && <EmptyState bare headingLevel="p" kind="done" title={status === 'open' ? 'Tidak ada tugas yang menunggu.' : 'Belum ada tugas selesai.'} />}
         <ul className={ui.sessions}>
           {tasks?.map((t) => (
             <li key={t.id} className={ui.student} aria-label={`${t.student.name} ${t.label}`}>

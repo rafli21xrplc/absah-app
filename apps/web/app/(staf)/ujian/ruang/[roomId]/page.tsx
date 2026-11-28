@@ -1,7 +1,7 @@
 'use client';
 
 import { ExamCheckIn, RoomAttendance } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { use, useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -85,7 +85,7 @@ function Room({ roomId }: { roomId: string }) {
               Catat
             </Button>
           </form>
-          {data.items.length === 0 && <p className={styles.empty}>Belum ada siswa di ruang ini.</p>}
+          {data.items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada siswa di ruang ini." />}
           <ul className={ui.sessions}>
             {data.items.map((i) => (
               <li key={i.enrollmentId} className={ui.student} aria-label={i.student.name}>

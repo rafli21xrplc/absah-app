@@ -1,7 +1,7 @@
 'use client';
 
 import { BillingClassList, FeeTypeList, StudentBill, StudentBillList, type BillStatus } from '@absah/contracts';
-import { Button, Select } from '@absah/ui';
+import { Button, EmptyState, Select } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -130,7 +130,7 @@ function Bills() {
       </form>
       {error && <p role="alert">{error}</p>}
       {!list && !error && <p role="status">Memuat…</p>}
-      {list && list.items.length === 0 && <p className={styles.empty}>Tidak ada tagihan yang cocok.</p>}
+      {list && list.items.length === 0 && <EmptyState bare headingLevel="p" kind="search" title="Tidak ada tagihan yang cocok." />}
       {list && list.items.length > 0 && (
         <>
           <p className={styles.muted}>

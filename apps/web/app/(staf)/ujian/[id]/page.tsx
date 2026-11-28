@@ -1,7 +1,7 @@
 'use client';
 
 import { ClassList, EligibilityList, ExamPeriod, ExamPeriodList } from '@absah/contracts';
-import { Button, Select } from '@absah/ui';
+import { Button, EmptyState, Select } from '@absah/ui';
 import Link from 'next/link';
 import { use, useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -148,7 +148,7 @@ function Eligibility({ periodId }: { periodId: string }) {
           <p role="status">
             {data.counts.eligible} dari {data.counts.students} siswa boleh ujian · <strong>{data.counts.ineligible} belum boleh</strong>
           </p>
-          {data.items.length === 0 && <p className={styles.empty}>{all ? 'Tidak ada siswa.' : 'Semua siswa boleh ujian.'}</p>}
+          {data.items.length === 0 && <EmptyState bare headingLevel="p" kind="done" title={all ? 'Tidak ada siswa.' : 'Semua siswa boleh ujian.'} />}
           <ul className={ui.sessions}>
             {data.items.map((i) => (
               <li key={i.enrollmentId} className={ui.student} aria-label={i.student.name}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { TeacherReport, type TeacherReportRow } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
@@ -50,7 +50,7 @@ export default function LaporanGuruPage() {
         </Link>
         <h1 className={styles.title}>Kehadiran guru</h1>
         {!allowed ? (
-          <p className={styles.empty}>Peran Anda tidak membuka laporan guru.</p>
+          <EmptyState bare headingLevel="p" kind="noAccess" title="Peran Anda tidak membuka laporan guru." />
         ) : (
           <>
             <div className={styles.rowActions} role="group" aria-label="Bulan">
@@ -79,7 +79,7 @@ export default function LaporanGuruPage() {
                 <p role="status">
                   Rata-rata kehadiran {rateLabel(report.totals.rate)} · terlambat {report.totals.late}× · izin {report.totals.leave} hari · tanpa catatan {report.totals.noRecord} hari
                 </p>
-                {report.items.length === 0 && <p className={styles.empty}>Belum ada guru.</p>}
+                {report.items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada guru." />}
                 <div style={{ overflowX: 'auto' }}>
                   <table>
                     <caption className={styles.muted}>Kehadiran guru {monthLabel(month)}</caption>

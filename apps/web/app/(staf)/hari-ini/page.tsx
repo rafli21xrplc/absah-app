@@ -1,8 +1,9 @@
 'use client';
 
 import { SessionDetail, TodayResponse, type SessionSummary } from '@absah/contracts';
-import { Banner, EmptyState, ErrorState, GreetingHeader, PageHeader, PageMain, percentText, ProgressBar, SegmentedControl, SessionGroup, SessionHero, SessionItem, SkeletonRows, SummaryCard, messages } from '@absah/ui';
+import { Banner, Button, buttonStyles, cx, EmptyState, ErrorState, GreetingHeader, PageHeader, PageMain, percentText, ProgressBar, SegmentedControl, SessionGroup, SessionHero, SessionItem, SkeletonRows, SummaryCard, messages } from '@absah/ui';
 import { CircleCheck, ClipboardList, Clock, Hourglass } from 'lucide-react';
+import { SchoolGlance } from './school-glance';
 import { AllSessionsTable, FILTERS, type AllSessionsView, type Filter, type RowState } from './all-sessions';
 import Link from 'next/link';
 import { Suspense, useEffect, useMemo, useState } from 'react';
@@ -211,9 +212,37 @@ function HariIniView() {
         </ErrorState>
       )}
       {!data && !error && <SkeletonRows count={3} />}
-      {empty && (
-        <EmptyState title={scope === 'mine' ? t.empty : t.emptyAll}>{scope === 'mine' ? t.emptyBody : t.emptyAllBody}</EmptyState>
+      {empty && scope === 'all' && (
+        <EmptyState kind="offDay" title={t.emptyAll} tips={[t.tipSessions]}>
+          {t.emptyAllBody}
+        </EmptyState>
       )}
+      {/* V11: nothing to teach today is not a dead end. A leader gets the way to every session and the school's day at a
+          glance; a teacher gets where the schedule comes from and the pages they still use today. */}
+      {empty && scope === 'mine' && (
+        <EmptyState
+          kind="offDay"
+          title={t.noTeachTitle}
+          action={
+            canSeeAll ? (
+              <Button onClick={() => setScope('all')}>{t.seeAllSessions}</Button>
+            ) : (
+              <Link href="/izin" className={cx(buttonStyles({ variant: 'primary' }), 'no-underline')}>
+                {t.openLeave}
+              </Link>
+            )
+          }
+          secondaryAction={
+            <Link href={canSeeAll ? '/rekap' : '/jurnal'} className={cx(buttonStyles({ variant: 'secondary' }), 'no-underline')}>
+              {canSeeAll ? t.openRecap : t.openJournal}
+            </Link>
+          }
+          tips={canSeeAll ? [t.tipSessions] : [t.tipSchedule, t.tipSubstitute]}
+        >
+          {canSeeAll ? t.noTeachManagerBody : t.noTeachTeacherBody}
+        </EmptyState>
+      )}
+      {empty && scope === 'mine' && canSeeAll && schoolId && <SchoolGlance schoolId={schoolId} nowMinutes={nowMinutes} />}
       {data && !empty && groups && (
         // Laptop only: on a phone the teacher's screen stays one decision (the card in progress).
         <ul aria-label={t.summary} className="m-0 hidden list-none grid-cols-2 gap-4 p-0 lg:grid xl:grid-cols-4">

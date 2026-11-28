@@ -1,7 +1,7 @@
 'use client';
 
 import { PointEntry, PointEvidenceLink, StudentPoints } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { use, useCallback, useEffect, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -78,7 +78,7 @@ export default function PoinSiswaPage({ params }: { params: Promise<{ enrollment
             <p>
               {data.student.className} · <strong>{data.total >= 0 ? '+' : ''}{data.total} poin</strong> ({totalsLine(data.violationPoints, data.achievementPoints)})
             </p>
-            {data.items.length === 0 && <p className={styles.empty}>Belum ada catatan poin.</p>}
+            {data.items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada catatan poin." />}
             <ul className={ui.sessions}>
               {data.items.map((e) => (
                 <li key={e.id} className={ui.student} aria-label={`${e.rule} ${signedPoints(e.points)}`}>

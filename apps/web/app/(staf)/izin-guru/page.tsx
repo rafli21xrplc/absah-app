@@ -2,7 +2,7 @@
 
 import { TeacherLeave, TeacherLeaveList, type TeacherLeaveKind } from '@absah/contracts';
 import { TEACHER_LEAVE_KINDS } from '@absah/contracts';
-import { Button, DateInput } from '@absah/ui';
+import { Button, DateInput, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -68,7 +68,7 @@ export default function IzinGuruPage() {
         {decides && (
           <section className={styles.section} aria-labelledby="menunggu">
             <h2 id="menunggu">Menunggu keputusan</h2>
-            {waiting.length === 0 && <p className={styles.empty}>Tidak ada izin guru yang menunggu.</p>}
+            {waiting.length === 0 && <EmptyState bare headingLevel="p" kind="done" title="Tidak ada izin guru yang menunggu." />}
             <ul className={ui.sessions}>
               {waiting.map((l) => (
                 <Decision key={l.id} leave={l} onDecide={(approve, note) => act(l, 'decide', { approve, ...(note ? { note } : {}) })} />
@@ -81,7 +81,7 @@ export default function IzinGuruPage() {
             <NewLeave schoolId={schoolId} today={today} onDone={load} />
             <section className={styles.section} aria-labelledby="saya">
               <h2 id="saya">Izin saya</h2>
-              {mine?.length === 0 && <p className={styles.empty}>Belum ada izin.</p>}
+              {mine?.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada izin." />}
               <ul className={ui.sessions}>
                 {mine?.map((l) => (
                   <li key={l.id} className={ui.student} aria-label={`Izin ${l.startsOn}`}>
@@ -105,7 +105,7 @@ export default function IzinGuruPage() {
             </section>
           </>
         )}
-        {!teaches && !decides && <p className={styles.empty}>Peran Anda tidak memakai izin guru.</p>}
+        {!teaches && !decides && <EmptyState bare headingLevel="p" kind="noAccess" title="Peran Anda tidak memakai izin guru." />}
       </main>
     </IfCap>
   );

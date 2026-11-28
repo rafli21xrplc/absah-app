@@ -1,7 +1,7 @@
 'use client';
 
 import { ClassList, ExamRoom, ExamRoomList, SeatStudentsResult, SchoolMembersResponse } from '@absah/contracts';
-import { Button, Select } from '@absah/ui';
+import { Button, EmptyState, Select } from '@absah/ui';
 import Link from 'next/link';
 import { z } from 'zod';
 import { use, useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
@@ -106,7 +106,7 @@ function Rooms({ periodId }: { periodId: string }) {
           {list.unseated > 0 ? <strong>{list.unseated} siswa belum punya ruang.</strong> : 'Semua siswa sudah punya ruang.'}
         </p>
       )}
-      {list && list.items.length === 0 && <p className={styles.empty}>Belum ada ruang.</p>}
+      {list && list.items.length === 0 && <EmptyState bare headingLevel="p" kind="empty" title="Belum ada ruang." />}
       <ul>
         {list?.items.map((r) => (
           <li key={r.id} aria-label={r.name}>

@@ -1,4 +1,4 @@
-import { Monitor } from 'lucide-react';
+import { FileQuestion, Monitor } from 'lucide-react';
 import type { ElementType, ReactNode } from 'react';
 import { messages } from '../../messages/id';
 import { Button } from './button';
@@ -6,7 +6,7 @@ import { cx } from '../cx';
 import { buttonStyles } from './button-styles';
 import { EmptyState } from './empty-state';
 import { ErrorState } from './error-state';
-import { SkeletonRows } from './skeleton';
+import { Skeleton, SkeletonRows } from './skeleton';
 
 export interface AppShellProps {
   /** Side menu column (240 px, from 1024 px up). Below that it is hidden: the page offers the menu another way (a sheet). */
@@ -123,16 +123,31 @@ export function PortalFrame({ children }: { children: ReactNode }) {
 
 /** A loading, error or not-found state replaces the whole page, so it is the page's own main landmark. */
 function StateFrame({ children }: { children: ReactNode }) {
-  return <main className="mx-auto box-border flex w-full max-w-xl flex-col gap-4 px-4 py-6">{children}</main>;
+  // V11: in the middle of the free space, so a whole-page state never sits as a strip at the top of an empty screen.
+  return <main className="mx-auto box-border flex min-h-[70dvh] w-full max-w-2xl flex-col justify-center gap-4 px-4 py-6">{children}</main>;
 }
 
 /** loading.tsx of a route group. */
 export function LoadingPage() {
+  // V11: shaped like the page that is coming (title, summary cards, a list) and as wide as it, so nothing jumps when it arrives.
   return (
-    <StateFrame>
+    <main className="box-border flex w-full flex-col gap-4 px-4 pb-8 pt-4 sm:px-6 lg:px-8 lg:pt-2">
       <h1 className="sr-only">{messages.skeleton.label}</h1>
-      <SkeletonRows count={4} />
-    </StateFrame>
+      <div aria-hidden className="flex flex-col gap-2 py-2">
+        <Skeleton className="h-6 w-56" />
+        <Skeleton className="w-80 max-w-full" />
+      </div>
+      <div aria-hidden className="hidden grid-cols-2 gap-4 lg:grid xl:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="flex flex-col gap-3 rounded-lg border border-garis bg-kapur-raised p-4">
+            <Skeleton className="w-24" />
+            <Skeleton className="h-7 w-16" />
+            <Skeleton className="w-32" />
+          </div>
+        ))}
+      </div>
+      <SkeletonRows count={5} />
+    </main>
   );
 }
 
@@ -154,6 +169,8 @@ export function NotFoundPage({ homeHref = '/', linkAs }: { homeHref?: string; li
     <StateFrame>
       <EmptyState
         title={messages.pageState.notFoundTitle}
+        kind="search"
+        icon={FileQuestion}
         headingLevel="h1"
         action={
           <Link href={homeHref} className={buttonStyles({ variant: 'primary', size: '48' }) + ' no-underline'}>

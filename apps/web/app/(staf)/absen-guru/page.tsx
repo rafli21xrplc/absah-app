@@ -1,7 +1,7 @@
 'use client';
 
 import { TeacherAttendance, TeacherToday } from '@absah/contracts';
-import { Button } from '@absah/ui';
+import { Button, EmptyState } from '@absah/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiError, newIdempotencyKey } from '@/lib/api';
@@ -55,7 +55,7 @@ export default function AbsenGuruPage() {
           ← Beranda
         </Link>
         <h1 className={styles.title}>Absen guru</h1>
-        {!hasRole(...TEACHER_CHECKIN) && <p className={styles.empty}>Peran Anda tidak mengisi absen guru.</p>}
+        {!hasRole(...TEACHER_CHECKIN) && <EmptyState bare headingLevel="p" kind="noAccess" title="Peran Anda tidak mengisi absen guru." />}
         {hasRole(...TEACHER_CHECKIN) && (
           <>
             {error && (
@@ -67,7 +67,7 @@ export default function AbsenGuruPage() {
             {today && (
               <section className={styles.section} aria-labelledby="hari-ini">
                 <h2 id="hari-ini">Hari ini, {today.schoolDate}</h2>
-                {!today.schoolDay && !today.attendance && <p className={styles.empty}>Hari ini bukan hari sekolah.</p>}
+                {!today.schoolDay && !today.attendance && <EmptyState bare headingLevel="p" kind="offDay" title="Hari ini bukan hari sekolah." />}
                 {today.attendance ? (
                   <p role="status">{checkInSummary(today.attendance, today.schoolStart, timezone)}</p>
                 ) : (
